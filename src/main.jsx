@@ -4,8 +4,12 @@ import './index.css'
 import App from './App.jsx'
 import 'boxicons/css/boxicons.min.css'
 
+import { ThemeProvider } from './context/ThemeContext.jsx'
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </StrictMode>,
 )
