@@ -2,8 +2,7 @@ import Header from './components/Header.jsx'
 import SplitText from './components/SplitText.jsx'
 import SideRays from './components/SideRays.jsx'
 import TextType from './components/TextType.jsx'
-import GradientText from './components/GradientText'
-import AnimatedContent from './components/AnimatedContent.jsx'
+import AboutSection from './components/AboutSection.jsx'
 import { useState, useEffect } from 'react'
 import './index.css'
 import 'boxicons'
@@ -49,7 +48,7 @@ function App() {
       </div>
 
       {/* Hero section */}
-      <div className="home-container w-full h-screen flex flex-col items-center justify-center relative z-10">
+      <div id="home" className="home-container w-full h-screen flex flex-col items-center justify-center relative z-10">
 
         <div className="relative z-10 intro-about-me flex flex-col items-center gap-0.5">
           <SplitText
@@ -95,17 +94,8 @@ function App() {
         </div>
       </div>
 
-      {/* Next section */}
-      <div className="w-full h-screen flex items-center justify-center relative z-10">
-        <AnimatedContent
-          direction="horizontal"
-          distance={100}
-          duration={0.8}
-          ease="power3.out"
-        >
-          <p className="text-lg font-bold text-white">Software Engineer</p>
-        </AnimatedContent>
-      </div>
+      {/* About section */}
+      <AboutSection />
     </>
   )
 }
