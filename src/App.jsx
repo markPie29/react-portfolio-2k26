@@ -1,7 +1,7 @@
 import Header from './components/Header.jsx'
-import SplitText from './components/SplitText.jsx'
-import SideRays from './components/SideRays.jsx'
-import TextType from './components/TextType.jsx'
+import SplitText from '../components/SplitText.jsx'
+import SideRays from '../components/SIdeRays.jsx'
+import TextType from '../components/TextType.jsx'
 import AboutSection from './components/AboutSection.jsx'
 import { useState, useEffect } from 'react'
 import './index.css'
@@ -50,11 +50,11 @@ function App() {
       {/* Hero section */}
       <div id="home" className="home-container w-full h-screen flex flex-col items-center justify-center relative z-10">
 
-        <div className="relative z-10 intro-about-me flex flex-col items-center gap-0.5">
+        <div className="relative z-10 flex flex-col items-center gap-0.5">
           <SplitText
             text="Mark Angelo A. Isulat"
             tag="p"
-            className="font-neutralfacebold text-2xl"
+            className="font-neutralfacebold text-2xl md:text-5xl lg:text-6xl text-center"
             delay={40}
             duration={0.8}
             ease="power3.out"
@@ -74,7 +74,7 @@ function App() {
             deletingSpeed={50}
             variableSpeedEnabled={false}
             cursorBlinkDuration={0.5}
-            className="text-sm text-center"
+            className="text-sm text-center font-helvetica-neue-medium md:text-2xl lg:text-3xl"
           />
           <a className="gradient-border rounded-full text-sm pl-5 pr-5 pt-2 pb-2 mt-2 text-accent font-bold" href="Mark_Angelo_Isulat_Final_Resume.pdf" download>Download CV</a>
         </div>

@@ -1,5 +1,6 @@
-import GradientText from './GradientText'
-import AnimatedContent from './AnimatedContent.jsx'
+import AnimatedContent from '../../components/AnimatedContent.jsx'
+import ScrollFloat from '../../components/ScrollFloat';
+import '../index.css'
 
 const skillGroups = [
   {
@@ -80,15 +81,6 @@ const achievements = [
   { label: 'React Performance Badge', issuer: 'Web Academy', year: '2024' }
 ]
 
-const SectionHeading = ({ title, subtitle }) => (
-  <div className="mb-8 max-w-3xl text-center mx-auto">
-    <GradientText className="text-3xl md:text-4xl font-semibold mb-4" showBorder={false}>
-      {title}
-    </GradientText>
-    <p className="text-sm md:text-base text-slate-300 max-w-2xl mx-auto">{subtitle}</p>
-  </div>
-)
-
 const SkillGroup = ({ title, skills }) => (
   <div className="rounded-3xl p-6 shadow-[0_12px_40px_rgba(0,0,0,0.35)]" style={{ backgroundColor: 'rgba(8,10,15,0.44)', border: '1px solid rgba(72,202,228,0.06)' }}>
     <h3 className="text-lg font-semibold text-white mb-4">{title}</h3>
@@ -142,12 +134,19 @@ const PlaceholderCard = ({ title, description }) => (
 )
 
 const AboutSection = () => (
-  <section id="about" className="relative z-10 px-6 py-16 md:px-12 lg:px-24">
-    <div className="mx-auto max-w-6xl">
-      <SectionHeading
-        title="About Me"
-        subtitle="A modular and scalable introduction to my skills, experience, and technical interests. Designed for easy updates and clean customization."
-      />
+  <section id="about" className="relative z-10 px-6 py-16 md:px-12 lg:px-24 text-center">
+    <div className="mx-auto max-w-6xl text-center">
+
+      <ScrollFloat
+      animationDuration={1}
+      ease='back.inOut(2)'
+      scrollStart='center bottom+=50%'
+      scrollEnd='bottom bottom-=40%'
+      stagger={0.03}
+      textClassName="text-center font-threat font-2xl"
+      >
+      About me
+      </ScrollFloat> 
 
       <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">

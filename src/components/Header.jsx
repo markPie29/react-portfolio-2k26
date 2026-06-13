@@ -1,4 +1,4 @@
-import StaggeredMenu from './StaggeredMenu';
+import StaggeredMenu from '../../components/StaggeredMenu';
 
 const Header = () => {
   const menuItems = [
@@ -14,24 +14,24 @@ const Header = () => {
     { label: 'LinkedIn', link: 'https://linkedin.com' }
   ];
 
-  // return (
-  //   <StaggeredMenu
-  //     position="right"
-  //     items={menuItems}
-  //     socialItems={socialItems}
-  //     displaySocials
-  //     displayItemNumbering={true}
-  //     menuButtonColor="#48cae4"
-  //     openMenuButtonColor="#000000"
-  //     changeMenuColorOnOpen={true}
-  //     colors={['#B497CF', '#5227FF']}
-  //     logoUrl="/public/main-icon.svg"
-  //     accentColor="#48cae4"
-  //     onMenuOpen={() => console.log('Menu opened')}
-  //     onMenuClose={() => console.log('Menu closed')}
-  //     isFixed
-  //   />
-  // )
+  return (
+    <StaggeredMenu
+      position="right"
+      items={menuItems}
+      socialItems={socialItems}
+      displaySocials
+      displayItemNumbering={true}
+      menuButtonColor="#48cae4"
+      openMenuButtonColor="#000000"
+      changeMenuColorOnOpen={true}
+      colors={['#B497CF', '#5227FF']}
+      logoUrl="/public/main-icon.svg"
+      accentColor="#48cae4"
+      onMenuOpen={() => console.log('Menu opened')}
+      onMenuClose={() => console.log('Menu closed')}
+      isFixed
+    />
+  )
 }
 
 export default Header
