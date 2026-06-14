@@ -1,23 +1,7 @@
-import StaggeredMenu from '../../components/StaggeredMenu';
-
 import { useTheme } from '../context/ThemeContext.jsx';
 
 const Header = () => {
   const { theme, toggleTheme } = useTheme();
-  
-  const menuItems = [
-    { label: 'Home', ariaLabel: 'Go to home section', link: '#home' },
-    { label: 'About', ariaLabel: 'Learn about me', link: '#about' },
-    { label: 'Projects', ariaLabel: 'View featured projects', link: '#projects' },
-    { label: 'Contact', ariaLabel: 'Get in touch', link: '#contact' }
-  ];
-
-  const socialItems = [
-    { label: 'Twitter', link: 'https://twitter.com' },
-    { label: 'GitHub', link: 'https://github.com' },
-    { label: 'LinkedIn', link: 'https://linkedin.com' }
-  ];
-
   const isDark = theme === 'dark';
   const menuButtonColor = isDark ? '#48cae4' : '#0077b6';
   const accentColor = isDark ? '#48cae4' : '#0077b6';
@@ -43,22 +27,6 @@ const Header = () => {
           </svg>
         )}
       </button>
-      <StaggeredMenu
-      position="right"
-      items={menuItems}
-      socialItems={socialItems}
-      displaySocials
-      displayItemNumbering={true}
-        menuButtonColor={menuButtonColor}
-      openMenuButtonColor="#000000"
-      changeMenuColorOnOpen={true}
-      colors={['#B497CF', '#5227FF']}
-      logoUrl="/public/main-icon.svg"
-        accentColor={accentColor}
-      onMenuOpen={() => console.log('Menu opened')}
-      onMenuClose={() => console.log('Menu closed')}
-      isFixed
-    />
     </div>
   )
 }

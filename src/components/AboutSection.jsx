@@ -1,32 +1,42 @@
-import AnimatedContent from '../../components/AnimatedContent.jsx'
+import AnimatedContent from '../../components/AnimatedContent'
 import ScrollFloat from '../../components/ScrollFloat';
+import LogoLoop from '../../components/LogoLoop';
+import ProfileCard from '../../components/ProfileCard'
+import BorderGlow from '../../components/BorderGlow'
+
 import '../index.css'
+
+import { SiReact, SiNextdotjs, SiTypescript, SiTailwindcss } from 'react-icons/si';
+
+const techLogos = [
+  { node: <SiReact />, title: "React", href: "https://react.dev" },
+  { node: <SiNextdotjs />, title: "Next.js", href: "https://nextjs.org" },
+  { node: <SiTypescript />, title: "TypeScript", href: "https://www.typescriptlang.org" },
+  { node: <SiTailwindcss />, title: "Tailwind CSS", href: "https://tailwindcss.com" },
+];
+
+// Alternative with image sources
+const imageLogos = [
+  { src: "/logos/company1.png", alt: "Company 1", href: "https://company1.com" },
+  { src: "/logos/company2.png", alt: "Company 2", href: "https://company2.com" },
+  { src: "/logos/company3.png", alt: "Company 3", href: "https://company3.com" },
+];
+
+
 
 const skillGroups = [
   {
     title: 'Frontend',
-    skills: ['React', 'Next.js', 'Tailwind CSS', 'TypeScript', 'HTML5', 'CSS3']
+    skills: ['React', 'Next.js', 'Tailwind CSS', 'TypeScript', 'HTML5', 'CSS3', 'ReactBits','GSAP', 'Framer Motion', 'shadcdn/ui']
   },
   {
     title: 'Backend',
-    skills: ['Node.js', 'Express', 'REST APIs', 'GraphQL', 'Firebase']
-  },
-  {
-    title: 'Databases',
-    skills: ['PostgreSQL', 'MongoDB', 'MySQL', 'Redis']
-  },
-  {
-    title: 'Tools',
-    skills: ['Figma', 'Git', 'Vite', 'VS Code', 'GitHub', 'Postman']
+    skills: ['Laravel', 'Node.js', 'Express', 'REST APIs', 'MongoDB', 'MySQL', 'Firebase', 'Supabase' ]
   },
   {
     title: 'Design',
-    skills: ['Figma', 'Adobe Illustrator', 'Adobe Photoshop', 'Webflow']
+    skills: ['Figma', 'Adobe Illustrator', 'Adobe Photoshop', 'Canva']
   },
-  {
-    title: 'Other',
-    skills: ['Agile', 'Cross-functional collaboration', 'Performance optimization']
-  }
 ]
 
 const experiences = [
@@ -68,7 +78,10 @@ const technologies = [
   'MongoDB',
   'Figma',
   'Git',
-  'Vite'
+  'Vite',
+  'Adobe Photoshop',
+  'Adobe Illustrator',
+  'Webflow'
 ]
 
 const placeholderItems = [
@@ -134,8 +147,11 @@ const PlaceholderCard = ({ title, description }) => (
   </div>
 )
 
+
+
 const AboutSection = () => (
-  <section id="about" className="relative z-10 px-6 py-16 md:px-12 lg:px-24 text-center">
+
+  <section id="about" className="relative z-10 py-16 px-10 md:px-12 lg:px-24 text-center h-lvh">
     <div className="mx-auto max-w-6xl text-center">
 
       <ScrollFloat
@@ -149,7 +165,88 @@ const AboutSection = () => (
       About me
       </ScrollFloat> 
 
-      <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
+      <AnimatedContent
+        distance={100}
+        direction="vertical"
+        reverse={false}
+        duration={3}
+        ease="power3.out"
+        initialOpacity={0}
+        animateOpacity
+        scale={1}
+        threshold={0.1}
+        delay={0}
+      >
+
+      <BorderGlow
+        edgeSensitivity={30}
+        glowColor="80 80 80"
+        backgroundColor=""
+        borderRadius={28}
+        glowRadius={40}
+        glowIntensity={1}
+        coneSpread={25}
+        animated={true}
+        colors={['#c084fc', '#f472b6', '#38bdf8']}
+        className="order-1 lg:order-2 lg:col-span-2"
+      >
+        <div className="p-4 font-helvetica-neue-medium flex flex-col gap-6 lg:grid lg:grid-cols-3 lg:px-0">
+          <div className="w-full mx-auto order-2 lg:order-1 lg:max-w-none lg:col-span-1 overflow-clip">
+            <img 
+              src="/avatar.jpg" 
+              alt="Profile Avatar"
+              className="w-full rounded-2xl object-cover"
+            />
+          </div>
+
+          <div className="col-span-2">
+            <div className="text-left w-full px-4 py-4">
+              <h1 className="text-2xl md:text-2xl lg:text-3xl">
+                The name's <span className="font-bold gradient-text">Mark</span> but you can also call me <span className="font-bold gradient-text">Marky</span>
+              </h1>
+              <p className="text-sm lg:text-base py-2">
+                I'm a Software Engineer, Multimedia Designer, and UI/UX Designer who loves helping businesses grow. Whether it's building a fast,
+                modern website, designing a seamless user experience, or crafting a brand identity that actually sticks —
+                I bring the right mix of technical skill and creative thinking to make it happen.
+              </p>
+            </div>
+
+          <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
+            <div className="flex flex-col">
+              {skillGroups.map(group => (
+                <SkillGroup key={group.title} title={group.title} skills={group.skills} />
+              ))}
+            </div>
+          </AnimatedContent>
+          </div>
+   
+        </div>
+      </BorderGlow>
+      </AnimatedContent>
+
+
+
+
+      {/* <div className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden">
+        <LogoLoop
+          logos={techLogos}
+          speed={100}
+          direction="left"
+          width="100vw"
+          className="w-screen"
+          logoHeight={40}
+          gap={45}
+          hoverSpeed={0}
+          scaleOnHover
+          fadeOut
+          fadeOutColor="var(--color-card-bg)"
+          ariaLabel="Technology partners"
+        />
+      </div> */}
+
+
+
+      {/* <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
           <div className="rounded-[2rem] p-8 shadow-xl" style={{ backgroundColor: 'var(--color-card-bg)', border: '1px solid var(--color-border)' }}>
             <p className="text-lg font-medium uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--color-accent)' }}>Hi, I'm Mark Angelo</p>
@@ -174,15 +271,8 @@ const AboutSection = () => (
             </ul>
           </div>
         </div>
-      </AnimatedContent>
+      </AnimatedContent> */}
 
-      <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
-        <div className="grid gap-6 lg:grid-cols-3">
-          {skillGroups.map(group => (
-            <SkillGroup key={group.title} title={group.title} skills={group.skills} />
-          ))}
-        </div>
-      </AnimatedContent>
 
       <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
         <div>

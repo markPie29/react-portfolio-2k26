@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 * {
   scrollbar-width: none; /* Firefox */
@@ -189,10 +189,17 @@
   background: linear-gradient(90deg, #0077b6, #0096c7, #00b4d8, #48cae4, #90e0ef);
 }
 
-.gradient-border {
+.gradient-border-dark {
   border: 2px solid transparent;
   background: linear-gradient(#080A0F, #080A0F) padding-box,
               linear-gradient(90deg, #0077b6, #0096c7, #00b4d8, #48cae4, #90e0ef) border-box;
+}
+
+.gradient-border-light {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#f8fafc, #f8fafc) padding-box,
+    linear-gradient(90deg,#0077b6,#0096c7,#00b4d8, #48cae4, #90e0ef ) border-box;
 }
 
 .intro-text {
