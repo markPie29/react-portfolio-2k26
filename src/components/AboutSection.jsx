@@ -4,6 +4,11 @@ import LogoLoop from '../../components/LogoLoop';
 import ProfileCard from '../../components/ProfileCard'
 import BorderGlow from '../../components/BorderGlow'
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+import { motion } from "framer-motion";
+import { useState } from "react";
+
 import '../index.css'
 
 import { SiReact, SiNextdotjs, SiTypescript, SiTailwindcss } from 'react-icons/si';
@@ -27,7 +32,7 @@ const imageLogos = [
 const skillGroups = [
   {
     title: 'Frontend',
-    skills: ['React', 'Next.js', 'Tailwind CSS', 'TypeScript', 'HTML5', 'CSS3', 'ReactBits','GSAP', 'Framer Motion', 'shadcdn/ui']
+    skills: ['React', 'Next.js', 'Tailwind CSS', 'TypeScript', 'ReactBits','GSAP', 'Framer Motion', 'shadcdn/ui']
   },
   {
     title: 'Backend',
@@ -148,10 +153,11 @@ const PlaceholderCard = ({ title, description }) => (
 )
 
 
+const AboutSection = () => {
+  const [activeSide, setActiveSide] = useState("developer");
 
-const AboutSection = () => (
-
-  <section id="about" className="relative z-10 py-16 px-10 md:px-12 lg:px-24 text-center h-lvh">
+  return (
+    <section id="about" className="relative z-10 py-16 px-10 md:px-12 lg:px-24 text-center h-lvh">
     <div className="mx-auto max-w-6xl text-center">
 
       <ScrollFloat
@@ -211,19 +217,80 @@ const AboutSection = () => (
               </p>
             </div>
 
-          <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
-            <div className="flex flex-col">
-              {skillGroups.map(group => (
-                <SkillGroup key={group.title} title={group.title} skills={group.skills} />
-              ))}
-            </div>
-          </AnimatedContent>
+            <Tabs defaultValue="account" className="w-[400px]">
+              <TabsList>
+                <TabsTrigger value="account">Account</TabsTrigger>
+                <TabsTrigger value="password">Password</TabsTrigger>
+              </TabsList>
+              <TabsContent value="account">Make changes to your account here.</TabsContent>
+              <TabsContent value="password">Change your password here.</TabsContent>
+            </Tabs>
+
+            <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
+              <div>
+                <h2 className="mb-4 text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                  What I focus on
+                </h2>
+                <div className="flex flex-col sm:flex-row sm:items-center">
+                  <button
+                    onClick={() => setActiveSide("developer")}
+                    className={`rounded-full border px-5 py-2 text-sm font-semibold transition duration-300 ${
+                      activeSide === "developer"
+                        ? 'bg-white text-black'
+                        : 'bg-transparent text-white/80 hover:text-white'
+                    }`}
+                  >
+                    💻 Developer
+                  </button>
+                  <button
+                    onClick={() => setActiveSide("designer")}
+                    className={`rounded-full border px-5 py-2 text-sm font-semibold transition duration-300 ${
+                      activeSide === "designer"
+                        ? 'bg-white text-black'
+                        : 'bg-transparent text-white/80 hover:text-white'
+                    }`}
+                  >
+                    🎨 Designer
+                  </button>
+                </div>
+
+                <div className="mt-6 rounded-[2rem] border border-white/10 bg-white/5 p-6 text-left shadow-sm" style={{ backdropFilter: 'blur(12px)' }}>
+                  {activeSide === 'developer' ? (
+                    <>
+                      <p className="text-sm leading-7" style={{ color: 'var(--color-text-secondary)' }}>
+                        I build polished, high-performance web apps using React, TypeScript, and modern frontend workflows. I focus on clean code, smooth interactions, and accessible UI that works across devices.
+                      </p>
+                      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                        <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>React & Next.js</span>
+                        <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>TypeScript</span>
+                        <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Tailwind CSS</span>
+                        <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Animation & Motion</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm leading-7" style={{ color: 'var(--color-text-secondary)' }}>
+                        I create thoughtful visual systems, brand direction, and user experiences that feel intuitive and memorable. I bring strong typography, layout, and storytelling to every project.
+                      </p>
+                      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                        <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>UI/UX Design</span>
+                        <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Figma</span>
+                        <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Brand Systems</span>
+                        <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Prototype & Motion</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </AnimatedContent>
           </div>
    
         </div>
       </BorderGlow>
       </AnimatedContent>
 
+
+     
 
 
 
@@ -344,6 +411,7 @@ const AboutSection = () => (
       </AnimatedContent>
     </div>
   </section>
-)
+  )
+}
 
 export default AboutSection
