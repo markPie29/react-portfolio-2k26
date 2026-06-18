@@ -1,15 +1,14 @@
-import SplitText from '../components/SplitText.jsx'
-import SideRays from '../components/SIdeRays.jsx'
-import TextType from '../components/TextType.jsx'
-import BlurText from "../components/BlurText.jsx";
+import SplitText from '../components/SplitText'
+import SideRays from '../components/SIdeRays'
+import TextType from '../components/TextType'
+import BlurText from "../components/BlurText";
 
-import Header from './components/Header.jsx'
-import AboutSection from './components/AboutSection.jsx'
+import Header from './components/Header'
 
 import { useState, useEffect } from 'react'
 import './index.css'
 import 'boxicons'
-import { useTheme } from './context/ThemeContext.jsx'
+import { useTheme } from './context/ThemeContext'
 
 
 function App() {
@@ -69,7 +68,7 @@ function App() {
               href="https://facebook.com/markPie29"
               className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
             >
-              <i class='bx bxl-facebook-circle'></i>
+              <i className='bx bxl-facebook-circle'></i>
             </a>,
 
             <a
@@ -77,7 +76,7 @@ function App() {
               href="#"
               className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text" 
             >
-              <i class='bx bxl-github' ></i>
+              <i className='bx bxl-github' ></i>
             </a>,
 
             <a
@@ -85,7 +84,7 @@ function App() {
               href="#"
               className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
             >
-              <i class='bx bxl-linkedin-square'></i>
+              <i className='bx bxl-linkedin-square'></i>
             </a>,
 
             <a
@@ -93,7 +92,7 @@ function App() {
               href="#"
               className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
             >
-              <i class='bx bxl-discord'></i>
+              <i className='bx bxl-discord'></i>
             </a>,
           ]}
           delay={150}

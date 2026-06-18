@@ -1,10 +1,9 @@
-import { useTheme } from '../context/ThemeContext.jsx';
+import { useTheme } from '../context/ThemeContext';
 
 const Header = () => {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
-  const menuButtonColor = isDark ? '#48cae4' : '#0077b6';
-  const accentColor = isDark ? '#48cae4' : '#0077b6';
+
 
   return (
     <div className="relative">

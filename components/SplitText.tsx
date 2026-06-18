@@ -1,10 +1,26 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, ElementType } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText as GSAPSplitText } from 'gsap/SplitText';
 import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(ScrollTrigger, GSAPSplitText, useGSAP);
+
+export interface SplitTextProps {
+  text: string;
+  className?: string;
+  delay?: number;
+  duration?: number;
+  ease?: string;
+  splitType?: string;
+  from?: { opacity: number; y: number; [key: string]: any };
+  to?: { opacity: number; y: number; [key: string]: any };
+  threshold?: number;
+  rootMargin?: string;
+  textAlign?: 'left' | 'center' | 'right' | 'justify' | 'start' | 'end';
+  tag?: ElementType;
+  onLetterAnimationComplete?: () => void;
+}
 
 const SplitText = ({
   text,
@@ -20,7 +36,7 @@ const SplitText = ({
   textAlign = 'center',
   tag = 'p',
   onLetterAnimationComplete
-}) => {
+}: SplitTextProps) => {
   const ref = useRef(null);
   const animationCompletedRef = useRef(false);
   const onCompleteRef = useRef(onLetterAnimationComplete);
@@ -46,7 +62,7 @@ const SplitText = ({
       if (!ref.current || !text || !fontsLoaded) return;
       // Prevent re-animation if already completed
       if (animationCompletedRef.current) return;
-      const el = ref.current;
+      const el = ref.current as any;
 
       if (el._rbsplitInstance) {
         try {
@@ -69,8 +85,8 @@ const SplitText = ({
             : `+=${marginValue}${marginUnit}`;
       const start = `top ${startPct}%${sign}`;
 
-      let targets;
-      const assignTargets = self => {
+      let targets: any;
+      const assignTargets = (self: any) => {
         if (splitType.includes('chars') && self.chars.length) targets = self.chars;
         if (!targets && splitType.includes('words') && self.words.length) targets = self.words;
         if (!targets && splitType.includes('lines') && self.lines.length) targets = self.lines;

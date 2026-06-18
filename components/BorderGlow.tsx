@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useRef, useCallback, useState, useEffect } from 'react';
 
 function parseHSL(hslStr) {

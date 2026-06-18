@@ -1,8 +1,20 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, ReactNode, RefObject } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+
+export interface ScrollFloatProps {
+  children: ReactNode;
+  scrollContainerRef?: RefObject<HTMLElement | null>;
+  containerClassName?: string;
+  textClassName?: string;
+  animationDuration?: number;
+  ease?: string;
+  scrollStart?: string;
+  scrollEnd?: string;
+  stagger?: number;
+}
 
 const ScrollFloat = ({
   children,
@@ -14,8 +26,8 @@ const ScrollFloat = ({
   scrollStart = 'center bottom+=50%',
   scrollEnd = 'bottom bottom-=40%',
   stagger = 0.03
-}) => {
-  const containerRef = useRef(null);
+}: ScrollFloatProps) => {
+  const containerRef = useRef<HTMLHeadingElement>(null);
 
   const splitText = useMemo(() => {
     const text = typeof children === 'string' ? children : '';

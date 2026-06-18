@@ -1,12 +1,12 @@
 import { useRef, useEffect, useState } from 'react';
 import { Renderer, Program, Triangle, Mesh } from 'ogl';
 
-const hexToRgb = hex => {
+const hexToRgb = (hex: string): number[] => {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return m ? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255] : [1, 1, 1];
 };
 
-const originToFlip = origin => {
+const originToFlip = (origin: string): number[] => {
   switch (origin) {
     case 'top-left': return [1, 0];
     case 'bottom-right': return [0, 1];
@@ -14,6 +14,21 @@ const originToFlip = origin => {
     default: return [0, 0];
   }
 };
+
+export interface SideRaysProps {
+  speed?: number;
+  rayColor1?: string;
+  rayColor2?: string;
+  intensity?: number;
+  spread?: number;
+  origin?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  tilt?: number;
+  saturation?: number;
+  blend?: number;
+  falloff?: number;
+  opacity?: number;
+  className?: string;
+}
 
 const SideRays = ({
   speed = 2.5,
@@ -28,15 +43,15 @@ const SideRays = ({
   falloff = 1.6,
   opacity = 1.0,
   className = ''
-}) => {
-  const containerRef = useRef(null);
-  const uniformsRef = useRef(null);
-  const rendererRef = useRef(null);
-  const animationIdRef = useRef(null);
-  const meshRef = useRef(null);
-  const cleanupFunctionRef = useRef(null);
+}: SideRaysProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const uniformsRef = useRef<any>(null);
+  const rendererRef = useRef<any>(null);
+  const animationIdRef = useRef<number | null>(null);
+  const meshRef = useRef<any>(null);
+  const cleanupFunctionRef = useRef<(() => void) | null>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const observerRef = useRef(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -188,7 +203,7 @@ void main() {
         uniforms.iResolution.value = [w * renderer.dpr, h * renderer.dpr];
       };
 
-      const loop = t => {
+      const loop = (t: number) => {
         if (!rendererRef.current || !uniformsRef.current || !meshRef.current) return;
         uniforms.iTime.value = t * 0.001;
         try {

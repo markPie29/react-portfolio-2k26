@@ -1,8 +1,30 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, ReactNode } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+
+export interface AnimatedContentProps {
+  children: ReactNode;
+  container?: string | Element | null;
+  distance?: number;
+  direction?: 'vertical' | 'horizontal';
+  reverse?: boolean;
+  duration?: number;
+  ease?: string;
+  initialOpacity?: number;
+  animateOpacity?: boolean;
+  scale?: number;
+  threshold?: number;
+  delay?: number;
+  disappearAfter?: number;
+  disappearDuration?: number;
+  disappearEase?: string;
+  onComplete?: () => void;
+  onDisappearanceComplete?: () => void;
+  className?: string;
+  [key: string]: any;
+}
 
 const AnimatedContent = ({
   children,
@@ -24,7 +46,7 @@ const AnimatedContent = ({
   onDisappearanceComplete,
   className = '',
   ...props
-}) => {
+}: AnimatedContentProps) => {
   const ref = useRef(null);
 
   useEffect(() => {

@@ -1,15 +1,30 @@
 import { motion } from 'motion/react';
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, ReactNode } from 'react';
 
-const buildKeyframes = (from, steps) => {
+const buildKeyframes = (from: Record<string, any>, steps: Record<string, any>[]) => {
   const keys = new Set([...Object.keys(from), ...steps.flatMap(s => Object.keys(s))]);
 
-  const keyframes = {};
+  const keyframes: Record<string, any[]> = {};
   keys.forEach(k => {
     keyframes[k] = [from[k], ...steps.map(s => s[k])];
   });
   return keyframes;
 };
+
+export interface BlurTextProps {
+  text?: string | ReactNode[];
+  delay?: number;
+  className?: string;
+  animateBy?: 'words' | 'letters';
+  direction?: 'top' | 'bottom';
+  threshold?: number;
+  rootMargin?: string;
+  animationFrom?: Record<string, any>;
+  animationTo?: Record<string, any>[];
+  easing?: any;
+  onAnimationComplete?: () => void;
+  stepDuration?: number;
+}
 
 const BlurText = ({
   text = '',
@@ -21,17 +36,17 @@ const BlurText = ({
   rootMargin = '0px',
   animationFrom,
   animationTo,
-  easing = t => t,
+  easing = (t: number) => t,
   onAnimationComplete,
   stepDuration = 0.35
-}) => {
+}: BlurTextProps) => {
   const elements = Array.isArray(text)
     ? text
     : animateBy === 'words'
-      ? text.split(' ')
-      : text.split('');
+      ? (text as string).split(' ')
+      : (text as string).split('');
   const [inView, setInView] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -39,7 +54,9 @@ const BlurText = ({
       ([entry]) => {
         if (entry.isIntersecting) {
           setInView(true);
-          observer.unobserve(ref.current);
+          if (ref.current) {
+            observer.unobserve(ref.current);
+          }
         }
       },
       { threshold, rootMargin }
@@ -78,7 +95,7 @@ const BlurText = ({
       {elements.map((segment, index) => {
         const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
 
-        const spanTransition = {
+        const spanTransition: any = {
           duration: totalDuration,
           times,
           delay: (index * delay) / 1000

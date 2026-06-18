@@ -1,12 +1,21 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-const ThemeContext = createContext();
+interface ThemeContextType {
+  theme: string;
+  toggleTheme: () => void;
+}
 
-export const ThemeProvider = ({ children }) => {
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     try {
       return localStorage.getItem('portfolio-theme') || 'dark';
-    } catch (e) {
+    } catch {
       return 'dark';
     }
   });
@@ -17,21 +26,11 @@ export const ThemeProvider = ({ children }) => {
     document.documentElement.classList.add(theme);
   }, [theme]);
 
-  // Initialize once if localStorage changed since initialization
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('portfolio-theme');
-      if (saved && saved !== theme) setTheme(saved);
-    } catch (e) {
-      // ignore
-    }
-  }, []);
-
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     try {
       localStorage.setItem('portfolio-theme', newTheme);
-    } catch (e) {}
+    } catch {}
     setTheme(newTheme);
   };
 
