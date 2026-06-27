@@ -5,8 +5,19 @@ import BorderGlow from '../../components/BorderGlow'
 import TiltedCard from '../../components/TiltedCard'
 import FadeContent from '../../components/FadeContent'
 import '../index.css'
+import LogoLoop from './LogoLoop'
+import { SiReact, SiNextdotjs, SiTypescript, SiTailwindcss, SiJavascript, SiFigma, SiHtml5, SiCss } from 'react-icons/si'
 
-
+const techLogos = [
+  { node: <SiReact />, title: "React" },
+  { node: <SiNextdotjs />, title: "Next.js" },
+  { node: <SiTypescript />, title: "TypeScript" },
+  { node: <SiTailwindcss />, title: "Tailwind CSS" },
+  { node: <SiJavascript />, title: "JavaScript" },
+  { node: <SiFigma />, title: "Figma" },
+  { node: <SiHtml5 />, title: "HTML5" },
+  { node: <SiCss />, title: "CSS3" },
+];
 
 const experiences = [
   {
@@ -111,7 +122,7 @@ const AboutSection = () => {
     <section id="about" className="relative z-10 py-16 px-10 md:px-12 lg:px-24 text-center min-h-screen">
       <div className="mx-auto max-w-6xl text-center">
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 w-full mb-16 mt-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 w-full mb-8 mt-8 items-center">
           <div className="lg:col-span-2 w-full">
 
             <ScrollFloat
@@ -201,11 +212,67 @@ const AboutSection = () => {
           </div>
         </div>
 
+        {/* Skills Logo Loop */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mb-8 overflow-hidden" style={{ color: 'var(--color-text-secondary)' }}>
+          <LogoLoop
+            logos={techLogos}
+            speed={80}
+            direction="left"
+            logoHeight={40}
+            gap={60}
+            hoverSpeed={0}
+            scaleOnHover
+            ariaLabel="Technology stack"
+          />
+        </div>
 
+        {/* Bottom Content: Developer & Designer Cards */}
+        <AnimatedContent
+          distance={50}
+          direction="vertical"
+          reverse={false}
+          duration={1.5}
+          ease="power3.out"
+          initialOpacity={0}
+          animateOpacity
+          delay={0.4}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 w-full mb-16">
+            {/* Developer Card */}
+            <div className="flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative overflow-hidden group" style={{ backgroundColor: 'transparent', border: '1px solid var(--color-border)' }}>
+              <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05), transparent)' }} />
+              <div className="flex justify-between items-center mb-6 w-full">
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold">Developer</h3>
+                <a href="#projects" className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1" style={{ color: 'var(--color-text-secondary)' }}>
+                  View All
+                </a>
+              </div>
+              <div className="flex flex-wrap gap-2 sm:gap-3 mt-auto">
+                <Pill label="REACT" />
+                <Pill label="NEXT.JS" />
+                <Pill label="TYPESCRIPT" />
+                <Pill label="TAILWIND CSS" />
+              </div>
+            </div>
 
-
-
-
+            {/* Designer Card */}
+            <div className="flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative overflow-hidden group" style={{ backgroundColor: 'transparent', border: '1px solid var(--color-border)' }}>
+              <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(192, 132, 252, 0.05), transparent)' }} />
+              <div className="flex justify-between items-center mb-6 w-full">
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold">Designer</h3>
+                <a href="#projects" className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1" style={{ color: 'var(--color-text-secondary)' }}>
+                  View All
+                </a>
+              </div>
+              <div className="flex flex-wrap gap-2 sm:gap-3 mt-auto">
+                <Pill label="FIGMA" />
+                <Pill label="ADOBE XD" />
+                <Pill label="ILLUSTRATOR" />
+                <Pill label="UI/UX DESIGN" />
+              </div>
+            </div>
+          </div>
+        </AnimatedContent>
 
 
 
