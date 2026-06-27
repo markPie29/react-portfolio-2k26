@@ -9,6 +9,7 @@ export interface ScrollFloatProps {
   scrollContainerRef?: RefObject<HTMLElement | null>;
   containerClassName?: string;
   textClassName?: string;
+  charClassName?: string;
   animationDuration?: number;
   ease?: string;
   scrollStart?: string;
@@ -21,6 +22,7 @@ const ScrollFloat = ({
   scrollContainerRef,
   containerClassName = '',
   textClassName = '',
+  charClassName = '',
   animationDuration = 1,
   ease = 'back.inOut(2)',
   scrollStart = 'center bottom+=50%',
@@ -32,11 +34,11 @@ const ScrollFloat = ({
   const splitText = useMemo(() => {
     const text = typeof children === 'string' ? children : '';
     return text.split('').map((char, index) => (
-      <span className="inline-block word" key={index}>
+      <span className={`inline-block word ${charClassName}`} key={index}>
         {char === ' ' ? '\u00A0' : char}
       </span>
     ));
-  }, [children]);
+  }, [children, charClassName]);
 
   useEffect(() => {
     const el = containerRef.current;

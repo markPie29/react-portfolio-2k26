@@ -107,9 +107,15 @@ const ExperienceCard = ({ experience }: { experience: Experience }) => (
   </div>
 )
 
-const Pill = ({ label }: { label: string }) => (
-  <span className="rounded-full px-4 py-2 text-sm shadow-sm" style={{ color: 'var(--color-text-secondary)', backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid var(--color-border)' }}>
-    {label}
+const Pill = ({ label, icon }: { label: string, icon?: React.ReactNode }) => (
+  <span className="group w-full flex justify-center items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-2 sm:py-2.5 text-[10.5px] sm:text-[12px] font-bold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-default" 
+        style={{ 
+          backgroundColor: 'rgba(8, 10, 15, 0.4)', 
+          border: '1px solid rgba(72, 202, 228, 0.3)',
+          boxShadow: '0 4px 14px 0 rgba(72, 202, 228, 0.08)'
+        }}>
+    {icon && <span className="text-[14px] sm:text-[16px] transition-transform duration-300 group-hover:scale-110" style={{ color: 'var(--color-accent)' }}>{icon}</span>}
+    <span className="gradient-text tracking-wider">{label}</span>
   </span>
 )
 
@@ -252,11 +258,11 @@ const AboutSection = () => {
                   View All
                 </a>
               </div>
-              <div className="flex flex-wrap gap-2 sm:gap-3 mt-auto">
-                <Pill label="REACT" />
-                <Pill label="NEXT.JS" />
-                <Pill label="TYPESCRIPT" />
-                <Pill label="TAILWIND CSS" />
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full mt-auto">
+                <Pill label="REACT" icon={<SiReact />} />
+                <Pill label="TAILWIND" icon={<SiTailwindcss />} />
+                <Pill label="NEXT.JS" icon={<SiNextdotjs />} />
+                <Pill label="LARAVEL" icon={<SiLaravel />} />
               </div>
             </div>
 
@@ -269,11 +275,11 @@ const AboutSection = () => {
                   View All
                 </a>
               </div>
-              <div className="flex flex-wrap gap-2 sm:gap-3 mt-auto">
-                <Pill label="FIGMA" />
-                <Pill label="ADOBE XD" />
-                <Pill label="ILLUSTRATOR" />
-                <Pill label="UI/UX DESIGN" />
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full mt-auto">
+                <Pill label="PHOTOSHOP" icon={<CustomPhotoshop />} />
+                <Pill label="ILLUSTRATOR" icon={<CustomIllustrator />} />
+                <Pill label="CANVA" icon={<SiCanva />} />
+                <Pill label="FIGMA" icon={<SiFigma />} />
               </div>
             </div>
           </div>
