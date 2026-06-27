@@ -6,17 +6,22 @@ import TiltedCard from '../../components/TiltedCard'
 import FadeContent from '../../components/FadeContent'
 import '../index.css'
 import LogoLoop from './LogoLoop'
-import { SiReact, SiNextdotjs, SiTypescript, SiTailwindcss, SiJavascript, SiFigma, SiHtml5, SiCss } from 'react-icons/si'
+import { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiLaravel, SiFirebase, SiSupabase, SiCanva, SiFigma } from 'react-icons/si'
+import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from './CustomIcons'
 
 const techLogos = [
   { node: <SiReact />, title: "React" },
   { node: <SiNextdotjs />, title: "Next.js" },
-  { node: <SiTypescript />, title: "TypeScript" },
   { node: <SiTailwindcss />, title: "Tailwind CSS" },
-  { node: <SiJavascript />, title: "JavaScript" },
+  { node: <SiExpress />, title: "Express" },
+  { node: <SiLaravel />, title: "Laravel" },
+  { node: <SiFirebase />, title: "Firebase" },
+  { node: <SiSupabase />, title: "Supabase" },
+  { node: <CustomPhotoshop />, title: "Adobe Photoshop" },
+  { node: <CustomIllustrator />, title: "Adobe Illustrator" },
+  { node: <SiCanva />, title: "Canva" },
   { node: <SiFigma />, title: "Figma" },
-  { node: <SiHtml5 />, title: "HTML5" },
-  { node: <SiCss />, title: "CSS3" },
+  { node: <CustomCapcut />, title: "Capcut" },
 ];
 
 const experiences = [
