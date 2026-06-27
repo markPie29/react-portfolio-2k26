@@ -8,6 +8,7 @@ import Lenis from 'lenis'
 
 import { ThemeProvider } from './context/ThemeContext'
 import ProjectsSection from '#components/ProjectsSection'
+import ExperienceSection from './components/ExperienceSection'
 
 const lenis = new Lenis({
   duration: 1.2,
@@ -29,6 +30,10 @@ root.render(
 
     <ThemeProvider>
       <AboutSection />
+    </ThemeProvider>
+
+    <ThemeProvider>
+      <ExperienceSection />
     </ThemeProvider>
 
     <ThemeProvider>
