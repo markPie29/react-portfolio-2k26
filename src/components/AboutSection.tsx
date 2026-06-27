@@ -1,9 +1,9 @@
 import AnimatedContent from '../../components/AnimatedContent'
+import { GraduationCap } from 'lucide-react'
 import ScrollFloat from '../../components/ScrollFloat';
 import BorderGlow from '../../components/BorderGlow'
-
-import { useState } from "react";
-
+import TiltedCard from '../../components/TiltedCard'
+import FadeContent from '../../components/FadeContent'
 import '../index.css'
 
 
@@ -40,17 +40,7 @@ const technologies = [
   'Tailwind CSS',
   'JavaScript',
   'TypeScript',
-  'Node.js',
-  'GSAP',
-  'Motion',
-  'PostgreSQL',
-  'MongoDB',
-  'Figma',
-  'Git',
-  'Vite',
-  'Adobe Photoshop',
-  'Adobe Illustrator',
-  'Webflow'
+
 ]
 
 const placeholderItems = [
@@ -116,180 +106,105 @@ const PlaceholderCard = ({ title, description }: { title: string; description: s
 
 
 const AboutSection = () => {
-  const [activeSide, setActiveSide] = useState("developer");
 
   return (
-    <section id="about" className="relative z-10 py-16 px-10 md:px-12 lg:px-24 text-center h-lvh">
+    <section id="about" className="relative z-10 py-16 px-10 md:px-12 lg:px-24 text-center min-h-screen">
       <div className="mx-auto max-w-6xl text-center">
 
-        <ScrollFloat
-          animationDuration={1}
-          ease='back.inOut(2)'
-          scrollStart='center bottom+=50%'
-          scrollEnd='bottom bottom-=40%'
-          stagger={0.03}
-          textClassName="text-center font-threat font-2xl"
-        >
-          About me
-        </ScrollFloat>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 w-full mb-16 mt-8 items-center">
+          <div className="lg:col-span-2 w-full">
 
-        <AnimatedContent
-          distance={100}
-          direction="vertical"
-          reverse={false}
-          duration={3}
-          ease="power3.out"
-          initialOpacity={0}
-          animateOpacity
-          scale={1}
-          threshold={0.1}
-          delay={0}
-        >
+            <ScrollFloat
+              animationDuration={1}
+              ease='back.inOut(2)'
+              scrollStart='center bottom+=50%'
+              scrollEnd='bottom bottom-=40%'
+              stagger={0.03}
+              textClassName="font-threat !leading-none"
+              containerClassName="text-left w-fit !my-0 pb-4"
+            >
+              About Me
+            </ScrollFloat>
 
-          <BorderGlow
-            edgeSensitivity={30}
-            glowColor="80 80 80"
-            backgroundColor=""
-            borderRadius={28}
-            glowRadius={40}
-            glowIntensity={1}
-            coneSpread={25}
-            animated={true}
-            colors={['#c084fc', '#f472b6', '#38bdf8']}
-            className="order-1 lg:order-2 lg:col-span-2"
-          >
-            <div className="p-4 font-helvetica-neue-medium flex flex-col gap-6 lg:grid lg:grid-cols-3 lg:px-0">
-              <div className="w-full mx-auto order-2 lg:order-1 lg:max-w-none lg:col-span-1 overflow-clip">
-                <img
-                  src="/avatar.jpg"
-                  alt="Profile Avatar"
-                  className="w-full rounded-2xl object-cover"
-                />
+            <AnimatedContent
+              distance={100}
+              direction="vertical"
+              reverse={false}
+              duration={3}
+              ease="power3.out"
+              initialOpacity={0}
+              animateOpacity
+              scale={1}
+              threshold={0.1}
+              delay={0}
+            >
+
+              <div className='flex flex-col gap-4 text-[15px] sm:text-base text-left text-gray-300/90 leading-relaxed mb-10'>
+                <p>
+                  I am a Computer Engineering student at the University of Rizal System and an aspiring Software Engineer. My journey is driven by a passion for building functional, beautiful, and user-centered digital experiences.
+                </p>
+                <p>
+                  With hands-on experience in full-stack web development, UI/UX design, and AR/mobile game development, I thrive at the intersection of technical implementation and creative problem-solving.
+                </p>
               </div>
 
-              <div className="col-span-2">
-                <div className="text-left w-full px-4 py-4">
-                  <h1 className="text-2xl md:text-2xl lg:text-3xl">
-                    The name's <span className="font-bold gradient-text">Mark</span> but you can also call me <span className="font-bold gradient-text">Marky</span>
-                  </h1>
-                  <p className="text-sm lg:text-base py-2">
-                    I'm a Software Engineer, Multimedia Designer, and UI/UX Designer who loves helping businesses grow. Whether it's building a fast,
-                    modern website, designing a seamless user experience, or crafting a brand identity that actually sticks —
-                    I bring the right mix of technical skill and creative thinking to make it happen.
-                  </p>
+              <BorderGlow
+                edgeSensitivity={30}
+                glowColor="80 80 80"
+                backgroundColor=""
+                borderRadius={28}
+                glowRadius={40}
+                glowIntensity={1}
+                coneSpread={25}
+                animated={true}
+                colors={['#c084fc', '#f472b6', '#38bdf8']}
+                className="w-full text-left"
+              >
+                <div className="flex items-center justify-between gap-5 p-5 sm:p-6 rounded-[28px] bg-transparent w-full relative z-10">
+                  <div className="flex flex-col gap-1">
+                    <h4 className="text-white font-bold text-base sm:text-lg leading-tight">Education</h4>
+                    <div className="text-gray-200 font-medium text-[14px] sm:text-[15px] leading-tight">University of Rizal System</div>
+                    <div className="text-gray-400 text-[13px] sm:text-sm leading-tight">BS in Computer Engineering (2023 – Present)</div>
+                    <div className="text-[#38bdf8] text-[13px] sm:text-sm font-semibold mt-0.5 leading-tight">DOST Scholar</div>
+                  </div>
+                  <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#1e293b]/50 border border-white/5 text-[#38bdf8]">
+                    <GraduationCap size={28} strokeWidth={1.5} />
+                  </div>
                 </div>
 
-                <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
-                  <div>
-                    <h2 className="mb-4 text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-                      What I focus on
-                    </h2>
-                    <div className="flex flex-col sm:flex-row sm:items-center">
-                      <button
-                        onClick={() => setActiveSide("developer")}
-                        className={`rounded-full border px-5 py-2 text-sm font-semibold transition duration-300 ${activeSide === "developer"
-                          ? 'bg-white text-black'
-                          : 'bg-transparent text-white/80 hover:text-white'
-                          }`}
-                      >
-                        💻 Developer
-                      </button>
-                      <button
-                        onClick={() => setActiveSide("designer")}
-                        className={`rounded-full border px-5 py-2 text-sm font-semibold transition duration-300 ${activeSide === "designer"
-                          ? 'bg-white text-black'
-                          : 'bg-transparent text-white/80 hover:text-white'
-                          }`}
-                      >
-                        🎨 Designer
-                      </button>
-                    </div>
-
-                    <div className="mt-6 rounded-[2rem] border border-white/10 bg-white/5 p-6 text-left shadow-sm" style={{ backdropFilter: 'blur(12px)' }}>
-                      {activeSide === 'developer' ? (
-                        <>
-                          <p className="text-sm leading-7" style={{ color: 'var(--color-text-secondary)' }}>
-                            I build polished, high-performance web apps using React, TypeScript, and modern frontend workflows. I focus on clean code, smooth interactions, and accessible UI that works across devices.
-                          </p>
-                          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                            <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>React & Next.js</span>
-                            <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>TypeScript</span>
-                            <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Tailwind CSS</span>
-                            <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Animation & Motion</span>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-sm leading-7" style={{ color: 'var(--color-text-secondary)' }}>
-                            I create thoughtful visual systems, brand direction, and user experiences that feel intuitive and memorable. I bring strong typography, layout, and storytelling to every project.
-                          </p>
-                          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                            <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>UI/UX Design</span>
-                            <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Figma</span>
-                            <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Brand Systems</span>
-                            <span className="rounded-full bg-white/10 px-3 py-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>Prototype & Motion</span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </AnimatedContent>
-              </div>
-
-            </div>
-          </BorderGlow>
-        </AnimatedContent>
-
-
-
-
-
-
-        {/* <div className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden">
-        <LogoLoop
-          logos={techLogos}
-          speed={100}
-          direction="left"
-          width="100vw"
-          className="w-screen"
-          logoHeight={40}
-          gap={45}
-          hoverSpeed={0}
-          scaleOnHover
-          fadeOut
-          fadeOutColor="var(--color-card-bg)"
-          ariaLabel="Technology partners"
-        />
-      </div> */}
-
-
-
-        {/* <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-[2rem] p-8 shadow-xl" style={{ backgroundColor: 'var(--color-card-bg)', border: '1px solid var(--color-border)' }}>
-            <p className="text-lg font-medium uppercase tracking-[0.3em] mb-4" style={{ color: 'var(--color-accent)' }}>Hi, I'm Mark Angelo</p>
-            <h2 className="text-3xl font-semibold sm:text-4xl" style={{ color: 'var(--color-text-primary)' }}>Crafting premium web experiences with performance and polish.</h2>
-            <p className="mt-6 leading-8" style={{ color: 'var(--color-text-secondary)' }}>
-              I build modern web applications and interactive design systems that balance strong visual storytelling with fast, accessible user experiences.
-              My work blends frontend engineering, UX design, and animation to deliver polished results that feel both dynamic and reliable.
-            </p>
+              </BorderGlow>
+            </AnimatedContent>
           </div>
-          <div className="rounded-[2rem] p-8 shadow-xl" style={{ backgroundColor: 'var(--color-card-bg)', border: '1px solid var(--color-border)' }}>
-            <p className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Personal summary</p>
-            <ul className="mt-6 space-y-4" style={{ color: 'var(--color-text-secondary)' }}>
-              <li className="rounded-3xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                <strong style={{ color: 'var(--color-text-primary)' }}>Adaptable creator</strong> — I work across brand, product, and frontend development to bring ideas from concept to launch.
-              </li>
-              <li className="rounded-3xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                <strong style={{ color: 'var(--color-text-primary)' }}>Collaborative mindset</strong> — I enjoy working closely with designers, developers, and stakeholders to align delivery with goals.
-              </li>
-              <li className="rounded-3xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                <strong style={{ color: 'var(--color-text-primary)' }}>Growth focused</strong> — I actively refine processes and learn new tools to keep work efficient and future-ready.
-              </li>
-            </ul>
+
+          <div className="lg:col-span-1 flex justify-center">
+            <TiltedCard
+              imageSrc="/avatar.jpg"
+              altText="Profile Avatar"
+              captionText="Profile Avatar"
+              containerHeight="400px"
+              containerWidth="40px"
+              imageHeight="400px"
+              imageWidth="400px"
+              rotateAmplitude={1}
+              scaleOnHover={1.02}
+              showMobileWarning={false}
+              showTooltip
+              displayOverlayContent
+              overlayContent={
+                <p className="tilted-card-demo-text">
+
+                </p>
+              }
+            />
           </div>
         </div>
-      </AnimatedContent> */}
+
+
+
+
+
+
+
 
 
         <AnimatedContent direction="vertical" distance={30} duration={0.9} ease="power3.out" className="mb-16">

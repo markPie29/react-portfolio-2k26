@@ -7,6 +7,7 @@ import 'boxicons/css/boxicons.min.css'
 import Lenis from 'lenis'
 
 import { ThemeProvider } from './context/ThemeContext'
+import ProjectsSection from '#components/ProjectsSection'
 
 const lenis = new Lenis({
   duration: 1.2,
@@ -28,6 +29,10 @@ root.render(
 
     <ThemeProvider>
       <AboutSection />
+    </ThemeProvider>
+
+    <ThemeProvider>
+      <ProjectsSection />
     </ThemeProvider>
   </StrictMode>
 );
