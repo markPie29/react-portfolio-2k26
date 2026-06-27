@@ -172,14 +172,14 @@ const ExperienceCard = ({ experience }: { experience: Experience }) => (
 )
 
 const Pill = ({ label, icon }: { label: string, icon?: React.ReactNode }) => (
-  <span className="group w-full flex justify-center items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-2 sm:py-2.5 text-[10.5px] sm:text-[12px] font-bold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-default"
+  <span className="group w-fit flex justify-center items-center gap-1.5 sm:gap-2 rounded-full px-3 sm:px-4 py-2 sm:py-2.5 text-[10.5px] sm:text-[12px] font-bold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-default"
     style={{
       backgroundColor: 'rgba(8, 10, 15, 0.4)',
       border: '1px solid rgba(72, 202, 228, 0.3)',
       boxShadow: '0 4px 14px 0 rgba(72, 202, 228, 0.08)'
     }}>
     {icon && <span className="text-[14px] sm:text-[16px] transition-transform duration-300 group-hover:scale-110" style={{ color: 'var(--color-accent)' }}>{icon}</span>}
-    <span className="gradient-text tracking-wider">{label}</span>
+    <span className="font-helvetica-neue-medium tracking-wider">{label}</span>
   </span>
 )
 
@@ -289,18 +289,28 @@ const AboutSection = () => {
         </div>
 
         {/* Skills Logo Loop */}
-        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mb-8 overflow-hidden" style={{ color: 'var(--color-text-secondary)' }}>
-          <LogoLoop
-            logos={techLogos}
-            speed={80}
-            direction="left"
-            logoHeight={40}
-            gap={60}
-            hoverSpeed={0}
-            scaleOnHover
-            ariaLabel="Technology stack"
-          />
-        </div>
+        <AnimatedContent
+          distance={50}
+          direction="vertical"
+          reverse={false}
+          duration={1.5}
+          ease="power3.out"
+          initialOpacity={0}
+          animateOpacity
+          delay={0.2}
+        >
+          <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mb-8 overflow-hidden" style={{ color: 'var(--color-text-secondary)' }}>
+            <LogoLoop
+              logos={techLogos}
+              speed={80}
+              direction="left"
+              logoHeight={40}
+              gap={60}
+              hoverSpeed={0}
+              scaleOnHover
+            />
+          </div>
+        </AnimatedContent>
 
         {/* Bottom Content: Developer & Designer Cards */}
         <AnimatedContent
@@ -313,89 +323,52 @@ const AboutSection = () => {
           animateOpacity
           delay={0.4}
         >
-          <div className="flex flex-col md:flex-row gap-6 lg:gap-8 w-full mb-16 overflow-hidden">
-            {/* Developer Card */}
-            <div
-              className={`flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative group overflow-hidden transition-all duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${expandedCard === 'developer' ? 'w-full scale-100 opacity-100' :
-                expandedCard === 'designer' ? 'w-0 scale-95 opacity-0 hidden md:flex md:w-0 overflow-hidden px-0 mx-0 border-transparent' :
-                  'w-full md:w-1/2'
-                }`}
-              style={{ backgroundColor: 'transparent', border: expandedCard === 'designer' ? 'none' : '1px solid var(--color-border)' }}
-            >
-              <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05), transparent)' }} />
-              <div className="flex justify-between items-center mb-6 w-full whitespace-nowrap overflow-hidden">
-                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0">Developer</h3>
-                <button
-                  onClick={() => setExpandedCard(expandedCard === 'developer' ? null : 'developer')}
-                  className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1 z-10 shrink-0"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  {expandedCard === 'developer' ? 'Close' : 'View All'}
-                </button>
+          <div className="flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative group overflow-hidden mb-16" style={{ backgroundColor: 'transparent', border: '1px solid var(--color-border)' }}>
+            <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05), rgba(192, 132, 252, 0.05))' }} />
+
+
+
+            {/* Split Layout Container */}
+            <div className="flex flex-col md:flex-row w-full gap-6 md:gap-0 relative z-10">
+
+              {/* Developer Section */}
+              <div className="w-full md:w-1/2 flex flex-col md:pr-4 lg:pr-8">
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0 mb-6">Developer</h3>
+                <div className="flex flex-wrap gap-2 sm:gap-3 w-full mt-auto">
+                  <Pill label="REACT" icon={<SiReact />} />
+                  <Pill label="NEXT.JS" icon={<SiNextdotjs />} />
+                  <Pill label="SUPABASE" icon={<SiSupabase />} />
+                  <Pill label="LARAVEL" icon={<SiLaravel />} />
+                  <Pill label="FIREBASE" icon={<SiFirebase />} />
+                  <Pill label="TAILWIND CSS" icon={<SiTailwindcss />} />
+                </div>
               </div>
-              <div className={`w-full mt-auto relative z-20 ${expandedCard === 'developer' ? 'max-h-[60vh] overflow-y-auto overscroll-contain pr-2 pb-2' : ''}`} style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--color-border) transparent' }}>
-                {expandedCard === 'developer' ? (
-                  <FadeContent blur={true} duration={800} initialOpacity={0} className="flex flex-col gap-8 w-full">
-                    {developerCategories.map((category, idx) => (
-                      <div key={idx} className="flex flex-col gap-3">
-                        <h4 className="text-[12px] sm:text-[13px] font-bold tracking-wider text-left uppercase" style={{ color: 'var(--color-accent)' }}>
-                          {category.title}
-                        </h4>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 w-full">
-                          {category.skills.map((skill, sIdx) => (
-                            <Pill key={sIdx} label={skill.label} icon={skill.icon} />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </FadeContent>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
-                    <Pill label="REACT" icon={<SiReact />} />
-                    <Pill label="TAILWIND" icon={<SiTailwindcss />} />
-                    <Pill label="NEXT.JS" icon={<SiNextdotjs />} />
-                    <Pill label="LARAVEL" icon={<SiLaravel />} />
-                  </div>
-                )}
+
+              {/* Vertical Separator */}
+              <div className="hidden md:block w-[1px] bg-[var(--color-border)] opacity-30 shrink-0 self-stretch mx-4"></div>
+
+              {/* Mobile Separator */}
+              <div className="md:hidden h-[1px] w-full bg-[var(--color-border)] opacity-30 shrink-0 my-2"></div>
+
+              {/* Designer Section */}
+              <div className="w-full md:w-1/2 flex flex-col md:pl-4 lg:pl-8">
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0 mb-6">Designer</h3>
+                <div className="flex flex-wrap gap-2 sm:gap-3 w-full mt-auto">
+                  <Pill label="PHOTOSHOP" icon={<CustomPhotoshop />} />
+                  <Pill label="ILLUSTRATOR" icon={<CustomIllustrator />} />
+                  <Pill label="CANVA" icon={<SiCanva />} />
+                  <Pill label="FIGMA" icon={<SiFigma />} />
+                  <Pill label="CAPCUT" icon={<CustomCapcut />} />
+                </div>
               </div>
+
             </div>
 
-            {/* Designer Card */}
-            <div
-              className={`flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative group overflow-hidden transition-all duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${expandedCard === 'designer' ? 'w-full scale-100 opacity-100' :
-                expandedCard === 'developer' ? 'w-0 scale-95 opacity-0 hidden md:flex md:w-0 overflow-hidden px-0 mx-0 border-transparent' :
-                  'w-full md:w-1/2'
-                }`}
-              style={{ backgroundColor: 'transparent', border: expandedCard === 'developer' ? 'none' : '1px solid var(--color-border)' }}
-            >
-              <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(192, 132, 252, 0.05), transparent)' }} />
-              <div className="flex justify-between items-center mb-6 w-full whitespace-nowrap overflow-hidden">
-                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0">Designer</h3>
-                <button
-                  onClick={() => setExpandedCard(expandedCard === 'designer' ? null : 'designer')}
-                  className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1 z-10 shrink-0"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  {expandedCard === 'designer' ? 'Close' : 'View All'}
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full mt-auto">
-                <Pill label="PHOTOSHOP" icon={<CustomPhotoshop />} />
-                <Pill label="ILLUSTRATOR" icon={<CustomIllustrator />} />
-                <Pill label="CANVA" icon={<SiCanva />} />
-                <Pill label="FIGMA" icon={<SiFigma />} />
-
-                {expandedCard === 'designer' && (
-                  <div className="col-span-2">
-                    <FadeContent blur={true} duration={600} initialOpacity={0} className="grid grid-cols-2 gap-2 sm:gap-3 mt-1 w-full">
-                      <Pill label="FRAMER" icon={<SiFramer />} />
-                      <Pill label="WEBFLOW" icon={<SiWebflow />} />
-                      <Pill label="SKETCH" icon={<SiSketch />} />
-                      <Pill label="MIRO" icon={<SiMiro />} />
-                    </FadeContent>
-                  </div>
-                )}
-              </div>
+            {/* Bottom Bar with View All */}
+            <div className="flex justify-end mt-8 w-full z-10 relative">
+              <a href="#" className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1" style={{ color: 'var(--color-text-secondary)' }}>
+                View All
+              </a>
             </div>
           </div>
         </AnimatedContent>
