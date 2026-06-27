@@ -60,8 +60,7 @@ const SplitText = ({
   useGSAP(
     () => {
       if (!ref.current || !text || !fontsLoaded) return;
-      // Prevent re-animation if already completed
-      if (animationCompletedRef.current) return;
+      // Removed early return to allow re-animation on scroll
       const el = ref.current as any;
 
       if (el._rbsplitInstance) {
@@ -114,7 +113,7 @@ const SplitText = ({
               scrollTrigger: {
                 trigger: el,
                 start,
-                once: true,
+                toggleActions: 'restart reset restart reset',
                 fastScrollEnd: true,
                 anticipatePin: 0.4
               },

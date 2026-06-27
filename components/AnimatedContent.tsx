@@ -101,8 +101,10 @@ const AnimatedContent = ({
       trigger: el,
       scroller: scrollerTarget,
       start: `top ${startPct}%`,
-      once: true,
-      onEnter: () => tl.play()
+      onEnter: () => tl.restart(),
+      onLeave: () => tl.pause(0),
+      onEnterBack: () => tl.restart(),
+      onLeaveBack: () => tl.pause(0)
     });
 
     return () => {
