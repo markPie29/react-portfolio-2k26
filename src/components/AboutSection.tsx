@@ -217,8 +217,8 @@ const AboutSection = () => {
     <section id="about" className="relative z-10 py-16 px-10 md:px-12 lg:px-24 text-center min-h-screen">
       <div className="mx-auto max-w-6xl text-center">
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 w-full mb-8 mt-8 items-center">
-          <div className="lg:col-span-2 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 w-full mb-8 mt-8 items-center lg:items-stretch">
+          <div className="lg:col-span-2 w-full flex flex-col h-full">
 
             <ScrollFloat
               animationDuration={1}
@@ -243,9 +243,10 @@ const AboutSection = () => {
               scale={1}
               threshold={0.1}
               delay={0}
+              className="flex flex-col flex-1"
             >
 
-              <div className='flex flex-col gap-4 text-[15px] sm:text-base text-left text-gray-300/90 leading-relaxed mb-10'>
+              <div className='flex flex-col gap-4 text-[15px] sm:text-base text-left text-gray-300/90 leading-relaxed mt-auto mb-6'>
                 <p>
                   I am a Computer Engineering student at the University of Rizal System and an aspiring Software Engineer. My journey is driven by a passion for building functional, beautiful, and user-centered digital experiences.
                 </p>
@@ -268,9 +269,8 @@ const AboutSection = () => {
               >
                 <div className="flex items-center justify-between gap-5 p-5 sm:p-6 rounded-[28px] bg-transparent w-full relative z-10">
                   <div className="flex flex-col gap-1">
-                    <h4 className="text-white font-bold text-base sm:text-lg leading-tight">Education</h4>
-                    <div className="text-gray-200 font-medium text-[14px] sm:text-[15px] leading-tight">University of Rizal System - Antipolo Campus</div>
-                    <div className="text-gray-400 text-[13px] sm:text-sm leading-tight">BS in Computer Engineering (2023 – Present)</div>
+                    <div className="text-white font-bold text-base sm:text-lg leading-tight">University of Rizal System - Antipolo Campus</div>
+                    <div className="text-gray-400 text-[13px] sm:text-sm leading-tight mt-1">BS in Computer Engineering (2023 – Present)</div>
                     <div className="text-[#38bdf8] text-[13px] sm:text-sm font-semibold mt-0.5 leading-tight">DOST-SEI S&T Undergraduate Scholar</div>
                   </div>
                   <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#1e293b]/50 border border-white/5 text-[#38bdf8]">
@@ -282,14 +282,14 @@ const AboutSection = () => {
             </AnimatedContent>
           </div>
 
-          <div className="lg:col-span-1 flex justify-center">
+          <div className="lg:col-span-1 flex justify-center lg:items-end">
             <FadeContent blur={true} duration={1} ease="power3.out" delay={0.2}>
               <TiltedCard
                 imageSrc="/avatar.jpg"
                 altText="Profile Avatar"
                 captionText="Profile Avatar"
                 containerHeight="400px"
-                containerWidth="40px"
+                containerWidth="400px"
                 imageHeight="400px"
                 imageWidth="400px"
                 rotateAmplitude={1}
