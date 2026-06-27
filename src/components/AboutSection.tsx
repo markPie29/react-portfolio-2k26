@@ -177,25 +177,27 @@ const AboutSection = () => {
           </div>
 
           <div className="lg:col-span-1 flex justify-center">
-            <TiltedCard
-              imageSrc="/avatar.jpg"
-              altText="Profile Avatar"
-              captionText="Profile Avatar"
-              containerHeight="400px"
-              containerWidth="40px"
-              imageHeight="400px"
-              imageWidth="400px"
-              rotateAmplitude={1}
-              scaleOnHover={1.02}
-              showMobileWarning={false}
-              showTooltip
-              displayOverlayContent
-              overlayContent={
-                <p className="tilted-card-demo-text">
+            <FadeContent blur={true} duration={1} ease="power3.out" delay={0.2}>
+              <TiltedCard
+                imageSrc="/avatar.jpg"
+                altText="Profile Avatar"
+                captionText="Profile Avatar"
+                containerHeight="400px"
+                containerWidth="40px"
+                imageHeight="400px"
+                imageWidth="400px"
+                rotateAmplitude={1}
+                scaleOnHover={1.02}
+                showMobileWarning={false}
+                showTooltip
+                displayOverlayContent
+                overlayContent={
+                  <p className="tilted-card-demo-text">
 
-                </p>
-              }
-            />
+                  </p>
+                }
+              />
+            </FadeContent>
           </div>
         </div>
 
