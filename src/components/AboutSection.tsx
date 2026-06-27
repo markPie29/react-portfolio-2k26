@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import AnimatedContent from '../../components/AnimatedContent'
-import { GraduationCap } from 'lucide-react'
+import { GraduationCap, Image as ImageIcon, PenTool, Mail, Shirt, Layout, PlaySquare, Film, Wand2 } from 'lucide-react'
 import ScrollFloat from '../../components/ScrollFloat';
 import BorderGlow from '../../components/BorderGlow'
 import TiltedCard from '../../components/TiltedCard'
@@ -10,6 +11,7 @@ import LogoLoop from './LogoLoop'
 import { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiLaravel, SiFirebase, SiSupabase, SiCanva, SiFigma, SiTypescript, SiJavascript, SiHtml5, SiCss, SiFramer, SiWebflow, SiSketch, SiMiro, SiMysql, SiUnity, SiPython, SiPhp, SiGit, SiGithub, SiDocker, SiShadcnui } from 'react-icons/si'
 import { FaJava, FaDatabase, FaCode, FaVrCardboard } from 'react-icons/fa'
 import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from './CustomIcons'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const techLogos = [
   { node: <SiReact />, title: "React" },
@@ -30,9 +32,6 @@ const developerCategories = [
   {
     title: "Frontend",
     skills: [
-      { label: "REACT", icon: <SiReact /> },
-      { label: "NEXT.JS", icon: <SiNextdotjs /> },
-      { label: "TAILWIND CSS", icon: <SiTailwindcss /> },
       { label: "SHADCN/UI", icon: <SiShadcnui /> },
       { label: "FRAMER MOTION", icon: <SiFramer /> },
       { label: "REACT BITS", icon: <FaCode /> }
@@ -41,15 +40,7 @@ const developerCategories = [
   {
     title: "Backend Frameworks",
     skills: [
-      { label: "EXPRESS.JS", icon: <SiExpress /> },
-      { label: "LARAVEL", icon: <SiLaravel /> }
-    ]
-  },
-  {
-    title: "Backend Services",
-    skills: [
-      { label: "SUPABASE", icon: <SiSupabase /> },
-      { label: "FIREBASE", icon: <SiFirebase /> }
+      { label: "EXPRESS.JS", icon: <SiExpress /> }
     ]
   },
   {
@@ -84,6 +75,22 @@ const developerCategories = [
       { label: "GIT", icon: <SiGit /> },
       { label: "GITHUB", icon: <SiGithub /> },
       { label: "DOCKER", icon: <SiDocker /> }
+    ]
+  }
+];
+
+const designerCategories = [
+  {
+    title: "Specialization",
+    skills: [
+      { label: "POSTERS", icon: <ImageIcon size={14} strokeWidth={2} /> },
+      { label: "LOGO AND BRANDING", icon: <PenTool size={14} strokeWidth={2} /> },
+      { label: "PHOTO MANIPULATION", icon: <Wand2 size={14} strokeWidth={2} /> },
+      { label: "EMAIL ADS", icon: <Mail size={14} strokeWidth={2} /> },
+      { label: "APPAREL DESIGN", icon: <Shirt size={14} strokeWidth={2} /> },
+      { label: "UI/UX DESIGN", icon: <Layout size={14} strokeWidth={2} /> },
+      { label: "SIMPLE MOTION GRAPHICS", icon: <PlaySquare size={14} strokeWidth={2} /> },
+      { label: "VIDEO EDITING", icon: <Film size={14} strokeWidth={2} /> }
     ]
   }
 ];
@@ -192,7 +199,19 @@ const PlaceholderCard = ({ title, description }: { title: string; description: s
 
 
 const AboutSection = () => {
-  const [expandedCard, setExpandedCard] = useState<'developer' | 'designer' | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    // Refresh ScrollTrigger after the Framer Motion layout animation completes (0.3s)
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 350);
+    
+    // Also trigger an immediate refresh
+    ScrollTrigger.refresh();
+
+    return () => clearTimeout(timer);
+  }, [isExpanded]);
 
   return (
     <section id="about" className="relative z-10 py-16 px-10 md:px-12 lg:px-24 text-center min-h-screen">
@@ -323,54 +342,116 @@ const AboutSection = () => {
           animateOpacity
           delay={0.4}
         >
-          <div className="flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative group overflow-hidden mb-16" style={{ backgroundColor: 'transparent', border: '1px solid var(--color-border)' }}>
+          <motion.div layout className="flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative group overflow-hidden mb-16" style={{ backgroundColor: 'transparent', border: '1px solid var(--color-border)' }}>
             <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05), rgba(192, 132, 252, 0.05))' }} />
 
-
-
             {/* Split Layout Container */}
-            <div className="flex flex-col md:flex-row w-full gap-6 md:gap-0 relative z-10">
-
+            <motion.div layout className="flex flex-col md:flex-row w-full gap-6 md:gap-0 relative z-10">
+              
               {/* Developer Section */}
-              <div className="w-full md:w-1/2 flex flex-col md:pr-4 lg:pr-8">
-                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0 mb-6">Developer</h3>
-                <div className="flex flex-wrap gap-2 sm:gap-3 w-full mt-auto">
-                  <Pill label="REACT" icon={<SiReact />} />
-                  <Pill label="NEXT.JS" icon={<SiNextdotjs />} />
-                  <Pill label="SUPABASE" icon={<SiSupabase />} />
-                  <Pill label="LARAVEL" icon={<SiLaravel />} />
-                  <Pill label="FIREBASE" icon={<SiFirebase />} />
-                  <Pill label="TAILWIND CSS" icon={<SiTailwindcss />} />
-                </div>
-              </div>
+              <motion.div layout className="w-full md:w-1/2 flex flex-col md:pr-4 lg:pr-8">
+                <motion.h3 layout className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0 mb-6">Developer</motion.h3>
+                <motion.div layout className="w-full relative z-20">
+                  {/* Always Visible Top Skills */}
+                  <motion.div layout className="flex flex-wrap gap-2 sm:gap-3 w-full mb-2">
+                    <Pill label="REACT" icon={<SiReact />} />
+                    <Pill label="NEXT.JS" icon={<SiNextdotjs />} />
+                    <Pill label="SUPABASE" icon={<SiSupabase />} />
+                    <Pill label="LARAVEL" icon={<SiLaravel />} />
+                    <Pill label="FIREBASE" icon={<SiFirebase />} />
+                    <Pill label="TAILWIND CSS" icon={<SiTailwindcss />} />
+                  </motion.div>
+
+                  <AnimatePresence initial={false}>
+                    {isExpanded && (
+                      <motion.div
+                        key="expanded"
+                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                        animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex flex-col gap-6 w-full overflow-hidden"
+                      >
+                        {developerCategories.map((category, idx) => (
+                          <div key={idx} className="flex flex-col gap-3">
+                            <h4 className="text-[12px] sm:text-[13px] font-bold tracking-wider text-left uppercase" style={{ color: 'var(--color-accent)' }}>
+                              {category.title}
+                            </h4>
+                            <div className="flex flex-wrap gap-2 sm:gap-3 w-full">
+                              {category.skills.map((skill, sIdx) => (
+                                <Pill key={sIdx} label={skill.label} icon={skill.icon} />
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </motion.div>
 
               {/* Vertical Separator */}
-              <div className="hidden md:block w-[1px] bg-[var(--color-border)] opacity-30 shrink-0 self-stretch mx-4"></div>
-
+              <motion.div layout className="hidden md:block w-[1px] bg-[var(--color-border)] opacity-30 shrink-0 self-stretch mx-4"></motion.div>
+              
               {/* Mobile Separator */}
-              <div className="md:hidden h-[1px] w-full bg-[var(--color-border)] opacity-30 shrink-0 my-2"></div>
+              <motion.div layout className="md:hidden h-[1px] w-full bg-[var(--color-border)] opacity-30 shrink-0 my-2"></motion.div>
 
               {/* Designer Section */}
-              <div className="w-full md:w-1/2 flex flex-col md:pl-4 lg:pl-8">
-                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0 mb-6">Designer</h3>
-                <div className="flex flex-wrap gap-2 sm:gap-3 w-full mt-auto">
-                  <Pill label="PHOTOSHOP" icon={<CustomPhotoshop />} />
-                  <Pill label="ILLUSTRATOR" icon={<CustomIllustrator />} />
-                  <Pill label="CANVA" icon={<SiCanva />} />
-                  <Pill label="FIGMA" icon={<SiFigma />} />
-                  <Pill label="CAPCUT" icon={<CustomCapcut />} />
-                </div>
-              </div>
+              <motion.div layout className="w-full md:w-1/2 flex flex-col md:pl-4 lg:pl-8">
+                <motion.h3 layout className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0 mb-6">Designer</motion.h3>
+                <motion.div layout className="w-full relative z-20">
+                  <motion.div layout className="flex flex-wrap gap-2 sm:gap-3 w-full mb-2">
+                    <Pill label="PHOTOSHOP" icon={<CustomPhotoshop />} />
+                    <Pill label="ILLUSTRATOR" icon={<CustomIllustrator />} />
+                    <Pill label="CANVA" icon={<SiCanva />} />
+                    <Pill label="FIGMA" icon={<SiFigma />} />
+                    <Pill label="CAPCUT" icon={<CustomCapcut />} />
+                  </motion.div>
 
-            </div>
+                  <AnimatePresence initial={false}>
+                    {isExpanded && (
+                      <motion.div
+                        key="expanded-designer"
+                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                        animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex flex-col gap-6 w-full overflow-hidden"
+                      >
+                        {designerCategories.map((category, idx) => (
+                          <div key={idx} className="flex flex-col gap-3">
+                            <h4 className="text-[12px] sm:text-[13px] font-bold tracking-wider text-left uppercase" style={{ color: 'var(--color-accent)' }}>
+                              {category.title}
+                            </h4>
+                            <div className="flex flex-wrap gap-2 sm:gap-3 w-full">
+                              {category.skills.map((skill, sIdx) => (
+                                <Pill key={sIdx} label={skill.label} icon={skill.icon} />
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </motion.div>
+
+            </motion.div>
 
             {/* Bottom Bar with View All */}
-            <div className="flex justify-end mt-8 w-full z-10 relative">
-              <a href="#" className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1" style={{ color: 'var(--color-text-secondary)' }}>
-                View All
-              </a>
-            </div>
-          </div>
+            <motion.div layout className="flex justify-end mt-8 w-full z-10 relative">
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsExpanded(!isExpanded);
+                }}
+                className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1" 
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
+                {isExpanded ? 'Close' : 'View All'}
+              </button>
+            </motion.div>
+          </motion.div>
         </AnimatedContent>
 
 
