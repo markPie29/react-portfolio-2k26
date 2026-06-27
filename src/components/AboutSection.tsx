@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import AnimatedContent from '../../components/AnimatedContent'
 import { GraduationCap } from 'lucide-react'
 import ScrollFloat from '../../components/ScrollFloat';
@@ -6,7 +7,8 @@ import TiltedCard from '../../components/TiltedCard'
 import FadeContent from '../../components/FadeContent'
 import '../index.css'
 import LogoLoop from './LogoLoop'
-import { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiLaravel, SiFirebase, SiSupabase, SiCanva, SiFigma } from 'react-icons/si'
+import { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiLaravel, SiFirebase, SiSupabase, SiCanva, SiFigma, SiTypescript, SiJavascript, SiHtml5, SiCss, SiFramer, SiWebflow, SiSketch, SiMiro, SiMysql, SiUnity, SiPython, SiPhp, SiGit, SiGithub, SiDocker, SiShadcnui } from 'react-icons/si'
+import { FaJava, FaDatabase, FaCode, FaVrCardboard } from 'react-icons/fa'
 import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from './CustomIcons'
 
 const techLogos = [
@@ -22,6 +24,68 @@ const techLogos = [
   { node: <SiCanva />, title: "Canva" },
   { node: <SiFigma />, title: "Figma" },
   { node: <CustomCapcut />, title: "Capcut" },
+];
+
+const developerCategories = [
+  {
+    title: "Frontend",
+    skills: [
+      { label: "REACT", icon: <SiReact /> },
+      { label: "NEXT.JS", icon: <SiNextdotjs /> },
+      { label: "TAILWIND CSS", icon: <SiTailwindcss /> },
+      { label: "SHADCN/UI", icon: <SiShadcnui /> },
+      { label: "FRAMER MOTION", icon: <SiFramer /> },
+      { label: "REACT BITS", icon: <FaCode /> }
+    ]
+  },
+  {
+    title: "Backend Frameworks",
+    skills: [
+      { label: "EXPRESS.JS", icon: <SiExpress /> },
+      { label: "LARAVEL", icon: <SiLaravel /> }
+    ]
+  },
+  {
+    title: "Backend Services",
+    skills: [
+      { label: "SUPABASE", icon: <SiSupabase /> },
+      { label: "FIREBASE", icon: <SiFirebase /> }
+    ]
+  },
+  {
+    title: "Databases",
+    skills: [
+      { label: "MYSQL", icon: <SiMysql /> },
+      { label: "SQL SERVER", icon: <FaDatabase /> }
+    ]
+  },
+  {
+    title: "Game Development",
+    skills: [
+      { label: "UNITY", icon: <SiUnity /> },
+      { label: "PYGAME", icon: <SiPython /> },
+      { label: "AR DEV", icon: <FaVrCardboard /> }
+    ]
+  },
+  {
+    title: "Programming Languages",
+    skills: [
+      { label: "JAVA", icon: <FaJava /> },
+      { label: "PYTHON", icon: <SiPython /> },
+      { label: "PHP", icon: <SiPhp /> },
+      { label: "TYPESCRIPT", icon: <SiTypescript /> },
+      { label: "VISUAL BASIC", icon: <FaCode /> },
+      { label: "C#", icon: <FaCode /> }
+    ]
+  },
+  {
+    title: "Tools & Technologies",
+    skills: [
+      { label: "GIT", icon: <SiGit /> },
+      { label: "GITHUB", icon: <SiGithub /> },
+      { label: "DOCKER", icon: <SiDocker /> }
+    ]
+  }
 ];
 
 const experiences = [
@@ -108,12 +172,12 @@ const ExperienceCard = ({ experience }: { experience: Experience }) => (
 )
 
 const Pill = ({ label, icon }: { label: string, icon?: React.ReactNode }) => (
-  <span className="group w-full flex justify-center items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-2 sm:py-2.5 text-[10.5px] sm:text-[12px] font-bold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-default" 
-        style={{ 
-          backgroundColor: 'rgba(8, 10, 15, 0.4)', 
-          border: '1px solid rgba(72, 202, 228, 0.3)',
-          boxShadow: '0 4px 14px 0 rgba(72, 202, 228, 0.08)'
-        }}>
+  <span className="group w-full flex justify-center items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-2 sm:py-2.5 text-[10.5px] sm:text-[12px] font-bold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-default"
+    style={{
+      backgroundColor: 'rgba(8, 10, 15, 0.4)',
+      border: '1px solid rgba(72, 202, 228, 0.3)',
+      boxShadow: '0 4px 14px 0 rgba(72, 202, 228, 0.08)'
+    }}>
     {icon && <span className="text-[14px] sm:text-[16px] transition-transform duration-300 group-hover:scale-110" style={{ color: 'var(--color-accent)' }}>{icon}</span>}
     <span className="gradient-text tracking-wider">{label}</span>
   </span>
@@ -128,6 +192,7 @@ const PlaceholderCard = ({ title, description }: { title: string; description: s
 
 
 const AboutSection = () => {
+  const [expandedCard, setExpandedCard] = useState<'developer' | 'designer' | null>(null);
 
   return (
     <section id="about" className="relative z-10 py-16 px-10 md:px-12 lg:px-24 text-center min-h-screen">
@@ -185,9 +250,9 @@ const AboutSection = () => {
                 <div className="flex items-center justify-between gap-5 p-5 sm:p-6 rounded-[28px] bg-transparent w-full relative z-10">
                   <div className="flex flex-col gap-1">
                     <h4 className="text-white font-bold text-base sm:text-lg leading-tight">Education</h4>
-                    <div className="text-gray-200 font-medium text-[14px] sm:text-[15px] leading-tight">University of Rizal System</div>
+                    <div className="text-gray-200 font-medium text-[14px] sm:text-[15px] leading-tight">University of Rizal System - Antipolo Campus</div>
                     <div className="text-gray-400 text-[13px] sm:text-sm leading-tight">BS in Computer Engineering (2023 – Present)</div>
-                    <div className="text-[#38bdf8] text-[13px] sm:text-sm font-semibold mt-0.5 leading-tight">DOST Scholar</div>
+                    <div className="text-[#38bdf8] text-[13px] sm:text-sm font-semibold mt-0.5 leading-tight">DOST-SEI S&T Undergraduate Scholar</div>
                   </div>
                   <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#1e293b]/50 border border-white/5 text-[#38bdf8]">
                     <GraduationCap size={28} strokeWidth={1.5} />
@@ -248,38 +313,88 @@ const AboutSection = () => {
           animateOpacity
           delay={0.4}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 w-full mb-16">
+          <div className="flex flex-col md:flex-row gap-6 lg:gap-8 w-full mb-16 overflow-hidden">
             {/* Developer Card */}
-            <div className="flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative overflow-hidden group" style={{ backgroundColor: 'transparent', border: '1px solid var(--color-border)' }}>
-              <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05), transparent)' }} />
-              <div className="flex justify-between items-center mb-6 w-full">
-                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold">Developer</h3>
-                <a href="#projects" className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1" style={{ color: 'var(--color-text-secondary)' }}>
-                  View All
-                </a>
+            <div
+              className={`flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative group overflow-hidden transition-all duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${expandedCard === 'developer' ? 'w-full scale-100 opacity-100' :
+                expandedCard === 'designer' ? 'w-0 scale-95 opacity-0 hidden md:flex md:w-0 overflow-hidden px-0 mx-0 border-transparent' :
+                  'w-full md:w-1/2'
+                }`}
+              style={{ backgroundColor: 'transparent', border: expandedCard === 'designer' ? 'none' : '1px solid var(--color-border)' }}
+            >
+              <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05), transparent)' }} />
+              <div className="flex justify-between items-center mb-6 w-full whitespace-nowrap overflow-hidden">
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0">Developer</h3>
+                <button
+                  onClick={() => setExpandedCard(expandedCard === 'developer' ? null : 'developer')}
+                  className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1 z-10 shrink-0"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  {expandedCard === 'developer' ? 'Close' : 'View All'}
+                </button>
               </div>
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full mt-auto">
-                <Pill label="REACT" icon={<SiReact />} />
-                <Pill label="TAILWIND" icon={<SiTailwindcss />} />
-                <Pill label="NEXT.JS" icon={<SiNextdotjs />} />
-                <Pill label="LARAVEL" icon={<SiLaravel />} />
+              <div className={`w-full mt-auto relative z-20 ${expandedCard === 'developer' ? 'max-h-[60vh] overflow-y-auto overscroll-contain pr-2 pb-2' : ''}`} style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--color-border) transparent' }}>
+                {expandedCard === 'developer' ? (
+                  <FadeContent blur={true} duration={800} initialOpacity={0} className="flex flex-col gap-8 w-full">
+                    {developerCategories.map((category, idx) => (
+                      <div key={idx} className="flex flex-col gap-3">
+                        <h4 className="text-[12px] sm:text-[13px] font-bold tracking-wider text-left uppercase" style={{ color: 'var(--color-accent)' }}>
+                          {category.title}
+                        </h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 w-full">
+                          {category.skills.map((skill, sIdx) => (
+                            <Pill key={sIdx} label={skill.label} icon={skill.icon} />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </FadeContent>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
+                    <Pill label="REACT" icon={<SiReact />} />
+                    <Pill label="TAILWIND" icon={<SiTailwindcss />} />
+                    <Pill label="NEXT.JS" icon={<SiNextdotjs />} />
+                    <Pill label="LARAVEL" icon={<SiLaravel />} />
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Designer Card */}
-            <div className="flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative overflow-hidden group" style={{ backgroundColor: 'transparent', border: '1px solid var(--color-border)' }}>
-              <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(192, 132, 252, 0.05), transparent)' }} />
-              <div className="flex justify-between items-center mb-6 w-full">
-                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold">Designer</h3>
-                <a href="#projects" className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1" style={{ color: 'var(--color-text-secondary)' }}>
-                  View All
-                </a>
+            <div
+              className={`flex flex-col text-left rounded-[2rem] p-6 sm:p-8 shadow-xl relative group overflow-hidden transition-all duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] ${expandedCard === 'designer' ? 'w-full scale-100 opacity-100' :
+                expandedCard === 'developer' ? 'w-0 scale-95 opacity-0 hidden md:flex md:w-0 overflow-hidden px-0 mx-0 border-transparent' :
+                  'w-full md:w-1/2'
+                }`}
+              style={{ backgroundColor: 'transparent', border: expandedCard === 'developer' ? 'none' : '1px solid var(--color-border)' }}
+            >
+              <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: 'linear-gradient(135deg, rgba(192, 132, 252, 0.05), transparent)' }} />
+              <div className="flex justify-between items-center mb-6 w-full whitespace-nowrap overflow-hidden">
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0">Designer</h3>
+                <button
+                  onClick={() => setExpandedCard(expandedCard === 'designer' ? null : 'designer')}
+                  className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1 z-10 shrink-0"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  {expandedCard === 'designer' ? 'Close' : 'View All'}
+                </button>
               </div>
               <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full mt-auto">
                 <Pill label="PHOTOSHOP" icon={<CustomPhotoshop />} />
                 <Pill label="ILLUSTRATOR" icon={<CustomIllustrator />} />
                 <Pill label="CANVA" icon={<SiCanva />} />
                 <Pill label="FIGMA" icon={<SiFigma />} />
+
+                {expandedCard === 'designer' && (
+                  <div className="col-span-2">
+                    <FadeContent blur={true} duration={600} initialOpacity={0} className="grid grid-cols-2 gap-2 sm:gap-3 mt-1 w-full">
+                      <Pill label="FRAMER" icon={<SiFramer />} />
+                      <Pill label="WEBFLOW" icon={<SiWebflow />} />
+                      <Pill label="SKETCH" icon={<SiSketch />} />
+                      <Pill label="MIRO" icon={<SiMiro />} />
+                    </FadeContent>
+                  </div>
+                )}
               </div>
             </div>
           </div>
