@@ -14,7 +14,7 @@ import { useTheme } from './context/ThemeContext'
 function App() {
   const [showHeader, setShowHeader] = useState(false)
   const { theme } = useTheme()
-  
+
   const isDark = theme === 'dark'
   const rayColor = isDark ? '#00b4d8' : '#0077b6'
   const scrollIndicatorColor = isDark ? '#00b4d8' : '#0077b6'
@@ -51,9 +51,8 @@ function App() {
 
       {/* Header */}
       <div
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-          showHeader ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
-        }`}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${showHeader ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
+          }`}
       >
         <Header />
       </div>
@@ -63,44 +62,44 @@ function App() {
 
         <div className="relative z-10 flex flex-col items-center gap-2 lg:gap-6">
 
-        <BlurText
-          text={[
-            <a
-              key="fb"
-              href="https://facebook.com/markPie29"
-              className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
-            >
-              <i className='bx bxl-facebook-circle'></i>
-            </a>,
+          <BlurText
+            text={[
+              <a
+                key="fb"
+                href="https://facebook.com/markPie29"
+                className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
+              >
+                <i className='bx bxl-facebook-circle'></i>
+              </a>,
 
-            <a
-              key="git"
-              href="#"
-              className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text" 
-            >
-              <i className='bx bxl-github' ></i>
-            </a>,
+              <a
+                key="git"
+                href="https://github.com/markPie29"
+                className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
+              >
+                <i className='bx bxl-github' ></i>
+              </a>,
 
-            <a
-              key="in"
-              href="#"
-              className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
-            >
-              <i className='bx bxl-linkedin-square'></i>
-            </a>,
+              <a
+                key="in"
+                href="https://www.linkedin.com/in/mark-angelo-isulat-1954a2335/?skipRedirect=true"
+                className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
+              >
+                <i className='bx bxl-linkedin-square'></i>
+              </a>,
 
-            <a
-              key="dc"
-              href="#"
-              className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
-            >
-              <i className='bx bxl-discord'></i>
-            </a>,
-          ]}
-          delay={150}
-          className="flex gap-9 md:gap-14 lg:gap-20 flex-wrap justify-center text-3xl lg:text-4xl text-white/75"
-        />
-          
+              <a
+                key="dc"
+                href="https://discordapp.com/users/399221201383325706"
+                className="flex items-center gap-2 hover:text-accent transition-colors duration-300 gradient-text"
+              >
+                <i className='bx bxl-discord'></i>
+              </a>,
+            ]}
+            delay={150}
+            className="flex gap-9 md:gap-14 lg:gap-20 flex-wrap justify-center text-3xl lg:text-4xl text-white/75"
+          />
+
           <SplitText
             text="Mark Angelo A. Isulat"
             tag="p"
@@ -133,9 +132,8 @@ function App() {
         </div>
 
         <div
-          className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-500 ${
-            showHeader ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
+          className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-500 ${showHeader ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            }`}
         >
           <span className="text-xs tracking-widest uppercase" style={{ color: scrollTextColor }}>
             Scroll Down for more
