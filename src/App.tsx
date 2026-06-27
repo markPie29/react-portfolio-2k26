@@ -31,7 +31,7 @@ function App() {
   return (
     <>
       {/* Fixed background — stays behind everything while scrolling */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 bg-bg">
         <SideRays
           speed={2.5}
           rayColor1={rayColor}
@@ -45,6 +45,8 @@ function App() {
           falloff={1.6}
           opacity={1}
         />
+        {/* Gradient overlay to ensure the bottom always fades to the background color */}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/20 to-transparent pointer-events-none" />
       </div>
 
       {/* Header */}
