@@ -5,7 +5,7 @@ import ScrollFloat from '../../components/ScrollFloat';
 import AnimatedContent from '../../components/AnimatedContent';
 import { ChevronDown } from 'lucide-react';
 import SpotlightCard from './SpotlightCard';
-import { SiReact, SiNextdotjs, SiTailwindcss, SiFigma, SiCanva } from 'react-icons/si';
+import { SiReact, SiNextdotjs, SiTailwindcss, SiFigma, SiCanva, SiExpress, SiSupabase } from 'react-icons/si';
 import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from './CustomIcons';
 
 const Pill = ({ label, icon }: { label: string, icon?: React.ReactNode }) => (
@@ -23,24 +23,25 @@ const Pill = ({ label, icon }: { label: string, icon?: React.ReactNode }) => (
 const experienceData = [
   {
     id: 1,
-    role: "Graphic Designer Intern & Junior Developer",
-    company: "AP Global IT Solutions Inc.",
-    date: "2023",
+    role: "Full Stack Web Developer",
+    company: "Nexvision Innovations",
+    date: "2026",
     bullets: [
-      "Created visual and digital assets for branding, marketing, and client-facing materials.",
-      "Assisted with development-related tasks involving software systems and UI improvements.",
-      "Collaborated in fast-paced project environments, balancing technical implementation with creative design solutions."
+      "Engineered and developed a comprehensive Logistics Software system for a corporate client.",
+      "Architected and optimized the system structure to ensure scalability, security, and maintainability.",
+      "Implemented key features across the full stack and proactively resolved bugs to ensure system stability.",
+      "Mentored and led a team of interns, establishing best practices for codebase handling and collaboration."
     ],
     tools: [
       { label: "React", icon: <SiReact /> },
       { label: "Next.js", icon: <SiNextdotjs /> },
-      { label: "Tailwind CSS", icon: <SiTailwindcss /> },
-      { label: "Figma", icon: <SiFigma /> }
+      { label: "Express", icon: <SiExpress /> },
+      { label: "Supabase", icon: <SiSupabase /> }
     ]
   },
   {
     id: 2,
-    role: "Virtual Assistant | Graphic Design, Video Editing & Social Media Support",
+    role: "Project Based Virtual Assistant",
     company: "Marketing Hive",
     date: "2024 - Present",
     bullets: [
@@ -51,14 +52,14 @@ const experienceData = [
     ],
     tools: [
       { label: "Photoshop", icon: <CustomPhotoshop /> },
-      { label: "Illustrator", icon: <CustomIllustrator /> },
       { label: "Canva", icon: <SiCanva /> },
-      { label: "Capcut", icon: <CustomCapcut /> }
+      { label: "Capcut", icon: <CustomCapcut /> },
+      { label: "Figma", icon: <SiFigma /> }
     ]
   },
   {
     id: 3,
-    role: "Freelance Graphic Designer & UI/UX Designer",
+    role: "Freelance Multimedia Designer",
     company: "Independent Freelance Work",
     date: "2024 - Present",
     bullets: [
@@ -70,7 +71,27 @@ const experienceData = [
     tools: [
       { label: "Figma", icon: <SiFigma /> },
       { label: "Photoshop", icon: <CustomPhotoshop /> },
-      { label: "Illustrator", icon: <CustomIllustrator /> }
+      { label: "Illustrator", icon: <CustomIllustrator /> },
+      { label: "Canva", icon: <SiCanva /> },
+      { label: "Capcut", icon: <CustomCapcut /> }
+    ]
+  },
+  {
+    id: 4,
+    role: "Multimedia Designer and Developer Trainee",
+    company: "AP Global IT Solutions Inc.",
+    date: "2023",
+    bullets: [
+      "Created visual and digital assets for branding, marketing, and client-facing materials.",
+      "Assisted with development-related tasks involving software systems and UI improvements.",
+      "Collaborated in fast-paced project environments, balancing technical implementation with creative design solutions.",
+      "Learned the basics of React and applied it to frontend web development tasks."
+    ],
+    tools: [
+      { label: "Canva", icon: <SiCanva /> },
+      { label: "Figma", icon: <SiFigma /> },
+      { label: "Capcut", icon: <CustomCapcut /> },
+      { label: "React", icon: <SiReact /> }
     ]
   }
 ];
