@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence, useSpring } from 'framer-motion';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ScrollFloat from '../../components/ScrollFloat';
 import AnimatedContent from '../../components/AnimatedContent';
@@ -210,7 +210,13 @@ const ExperienceSection = () => {
     offset: ["start center", "end center"]
   });
 
-  const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  const scaleY = useTransform(smoothProgress, [0, 1], [0, 1]);
 
   return (
     <section id="experience" className="relative z-10 pt-12 md:pt-16 pb-24 px-6 md:px-12 lg:px-24 min-h-screen" ref={containerRef}>
