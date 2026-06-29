@@ -327,13 +327,14 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     useWindowScroll,
     onStackComplete,
     setupLenis,
-    updateCardTransforms
+    updateCardTransforms,
+    children
   ]);
 
   if (useWindowScroll) {
     return (
       <div className={`relative w-full ${className}`.trim()}>
-        <div className="scroll-stack-inner w-full min-h-screen">
+        <div className="scroll-stack-inner w-full min-h-screen pb-[50vh]">
           {children}
           <div className="scroll-stack-end w-full h-px" />
         </div>
