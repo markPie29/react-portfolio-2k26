@@ -51,10 +51,10 @@ function App() {
 
       {/* Header */}
       <div
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${showHeader ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${showHeader ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
           }`}
       >
-        <Header />
+        <Header isHidden={!showHeader} />
       </div>
 
       {/* Hero section */}

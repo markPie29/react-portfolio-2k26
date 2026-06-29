@@ -13,6 +13,9 @@ const lenis = new Lenis({
   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
 });
 
+// Expose lenis globally so we can stop/start it from other components
+(window as any).lenis = lenis;
+
 function raf(time: number) {
   lenis.raf(time);
   requestAnimationFrame(raf);

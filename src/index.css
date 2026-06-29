@@ -18,6 +18,15 @@
   0%, 100% { transform: translateY(0); opacity: 1; }
   50%       { transform: translateY(6px); opacity: 0.5; }
 }
+
+@keyframes glowLoop {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(72, 202, 228, 0.3)); }
+  50% { filter: drop-shadow(0 0 16px rgba(72, 202, 228, 0.8)); }
+}
+
+.animate-glow-loop {
+  animation: glowLoop 3s ease-in-out infinite;
+}
  
 @theme inline {
   --color-background: var(--background);

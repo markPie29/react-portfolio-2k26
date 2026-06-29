@@ -1,15 +1,31 @@
 import { useTheme } from '../context/ThemeContext';
 
-const Header = () => {
+import StaggeredMenu from './StaggeredMenu';
+
+const menuItems = [
+  { label: 'Home', ariaLabel: 'Go to home page', link: '/#home' },
+  { label: 'About', ariaLabel: 'Learn about me', link: '/#about' },
+  { label: 'Experience', ariaLabel: 'View my experience', link: '/#experience' },
+  { label: 'Projects', ariaLabel: 'View my projects', link: '/#projects' },
+  { label: 'Contacts', ariaLabel: 'Get in touch', link: '/#footer' }
+];
+
+const socialItems = [
+  { label: 'Facebook', link: 'https://facebook.com/markPie29' },
+  { label: 'GitHub', link: 'https://github.com/markPie29' },
+  { label: 'LinkedIn', link: 'https://www.linkedin.com/in/mark-angelo-isulat-1954a2335/?skipRedirect=true' },
+  { label: 'Discord', link: 'https://discordapp.com/users/399221201383325706' }
+];
+
+const Header = ({ isHidden = false }: { isHidden?: boolean }) => {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
 
-
   return (
-    <div className="relative">
+    <div className="relative pointer-events-none">
       <button
         onClick={toggleTheme}
-        className="absolute top-6 left-6 z-50 p-2 rounded-full transition-all duration-300"
+        className={`absolute top-6 left-6 z-50 p-2 rounded-full transition-all duration-300 ${isHidden ? '' : 'pointer-events-auto'}`}
         style={{
           backgroundColor: isDark ? 'rgba(72, 202, 228, 0.1)' : 'rgba(0, 119, 182, 0.1)',
           color: isDark ? '#48cae4' : '#0077b6'
@@ -26,6 +42,30 @@ const Header = () => {
           </svg>
         )}
       </button>
+
+      {/* Staggered Menu */}
+      <StaggeredMenu
+        position="right"
+        items={menuItems}
+        socialItems={socialItems}
+        displaySocials={true}
+        displayItemNumbering={true}
+        menuButtonColor={isDark ? "#48cae4" : "#0077b6"}
+        openMenuButtonColor={isDark ? "#48cae4" : "#0077b6"}
+        changeMenuColorOnOpen={true}
+        colors={isDark ? ['#0077b6', '#0096c7', '#00b4d8', '#48cae4'] : ['#90e0ef', '#48cae4', '#00b4d8', '#0096c7']}
+        accentColor={isDark ? "#48cae4" : "#0077b6"}
+        isFixed={true}
+        isHidden={isHidden}
+        onMenuOpen={() => {
+          document.body.style.overflow = 'hidden';
+          if ((window as any).lenis) (window as any).lenis.stop();
+        }}
+        onMenuClose={() => {
+          document.body.style.overflow = '';
+          if ((window as any).lenis) (window as any).lenis.start();
+        }}
+      />
     </div>
   )
 }
