@@ -1,15 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
-import App from './App'
-import AboutSection from './components/AboutSection'
 import 'boxicons/css/boxicons.min.css'
 import Lenis from 'lenis'
 
-import { ThemeProvider } from './context/ThemeContext'
-import ProjectsSection from '#components/ProjectsSection'
-import ExperienceSection from './components/ExperienceSection'
-import Footer from './components/Footer'
+import HomePage from './pages/HomePage'
+import ProjectsPage from './pages/ProjectsPage'
 
 const lenis = new Lenis({
   duration: 1.2,
@@ -25,24 +22,11 @@ requestAnimationFrame(raf);
 const root = createRoot(document.getElementById('root')!);
 root.render(
   <StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
-
-    <ThemeProvider>
-      <AboutSection />
-    </ThemeProvider>
-
-    <ThemeProvider>
-      <ExperienceSection />
-    </ThemeProvider>
-
-    <ThemeProvider>
-      <ProjectsSection />
-    </ThemeProvider>
-
-    <ThemeProvider>
-      <Footer />
-    </ThemeProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/projects" element={<ProjectsPage />} />
+      </Routes>
+    </BrowserRouter>
   </StrictMode>
 );

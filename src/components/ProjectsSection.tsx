@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import ScrollFloat from "../../components/ScrollFloat";
 import SpotlightCard from './SpotlightCard';
@@ -102,7 +103,7 @@ const slideVariants = {
     })
 };
 
-const ProjectsSection = () => {
+const ProjectsSection = ({ hideViewMore = false }: { hideViewMore?: boolean }) => {
     const [activeTab, setActiveTab] = useState('developer');
     const [direction, setDirection] = useState(0);
 
@@ -224,14 +225,16 @@ const ProjectsSection = () => {
                                     ))}
                                 </ScrollStack>
                                 
-                                <div className="-mt-[18vh] md:-mt-[24vh] w-full flex justify-center pb-12 relative z-20 px-4 md:px-0">
-                                    <a 
-                                        href="#" 
-                                        className="group/btn relative overflow-hidden rounded-[2rem] bg-[#080a0f] border border-accent/40 py-6 md:py-8 flex items-center justify-center transition-all duration-300 hover:bg-accent/10 hover:border-accent hover:shadow-[0_0_40px_rgba(72,202,228,0.2)] w-full"
-                                    >
-                                        <span className="text-white font-semibold tracking-wider uppercase text-sm md:text-base z-10 relative font-sans">View More of my Projects</span>
-                                    </a>
-                                </div>
+                                {!hideViewMore && (
+                                    <div className="-mt-[18vh] md:-mt-[24vh] w-full flex justify-center pb-12 relative z-20 px-4 md:px-0">
+                                        <Link 
+                                            to="/projects" 
+                                            className="group/btn relative overflow-hidden rounded-[2rem] bg-[#080a0f] border border-accent/40 py-6 md:py-8 flex items-center justify-center transition-all duration-300 hover:bg-accent/10 hover:border-accent hover:shadow-[0_0_40px_rgba(72,202,228,0.2)] w-full"
+                                        >
+                                            <span className="text-white font-semibold tracking-wider uppercase text-sm md:text-base z-10 relative font-sans">View More of my Projects</span>
+                                        </Link>
+                                    </div>
+                                )}
                             </motion.div>
                         ) : (
                             <motion.div
