@@ -117,7 +117,7 @@ const AboutSection = () => {
     const timer = setTimeout(() => {
       ScrollTrigger.refresh();
     }, 350);
-    
+
     // Also trigger an immediate refresh
     ScrollTrigger.refresh();
 
@@ -196,7 +196,7 @@ const AboutSection = () => {
           <div className="lg:col-span-1 flex justify-center lg:items-end">
             <FadeContent blur={true} duration={1} ease="power3.out" delay={0.2}>
               <TiltedCard
-                imageSrc="/avatar.jpg"
+                imageSrc="/avatar.png"
                 altText="Profile Avatar"
                 captionText="Profile Avatar"
                 containerHeight="400px"
@@ -258,7 +258,7 @@ const AboutSection = () => {
 
             {/* Split Layout Container */}
             <motion.div layout className="flex flex-col md:flex-row w-full gap-6 md:gap-0 relative z-10">
-              
+
               {/* Developer Section */}
               <motion.div layout className="w-full md:w-1/2 flex flex-col md:pr-4 lg:pr-8">
                 <motion.h3 layout className="text-2xl sm:text-3xl font-bold tracking-wide gradient-text uppercase font-neutralfacebold shrink-0 mb-6">Developer</motion.h3>
@@ -303,7 +303,7 @@ const AboutSection = () => {
 
               {/* Vertical Separator */}
               <motion.div layout className="hidden md:block w-[1px] bg-[var(--color-border)] opacity-30 shrink-0 self-stretch mx-4"></motion.div>
-              
+
               {/* Mobile Separator */}
               <motion.div layout className="md:hidden h-[1px] w-full bg-[var(--color-border)] opacity-30 shrink-0 my-2"></motion.div>
 
@@ -351,12 +351,12 @@ const AboutSection = () => {
 
             {/* Bottom Bar with View All */}
             <motion.div layout className="flex justify-end mt-8 w-full z-10 relative">
-              <button 
+              <button
                 onClick={(e) => {
                   e.preventDefault();
                   setIsExpanded(!isExpanded);
                 }}
-                className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1" 
+                className="text-[11px] sm:text-xs font-normal opacity-60 hover:opacity-100 transition-opacity cursor-pointer inline-flex items-center gap-1"
                 style={{ color: 'var(--color-text-secondary)' }}
               >
                 {isExpanded ? 'Close' : 'View All'}
