@@ -7,6 +7,7 @@ import Lenis from 'lenis'
 
 import HomePage from './pages/HomePage'
 import ProjectsPage from './pages/ProjectsPage'
+import ScrollToTop from './components/ScrollToTop'
 
 const lenis = new Lenis({
   duration: 1.2,
@@ -26,6 +27,7 @@ const root = createRoot(document.getElementById('root')!);
 root.render(
   <StrictMode>
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/projects" element={<ProjectsPage />} />
