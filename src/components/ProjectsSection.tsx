@@ -103,7 +103,7 @@ const slideVariants = {
     })
 };
 
-const ProjectsSection = ({ hideViewMore = false }: { hideViewMore?: boolean }) => {
+const ProjectsSection = ({ hideViewMore = false, isProjectsPage = false }: { hideViewMore?: boolean, isProjectsPage?: boolean }) => {
     const [activeTab, setActiveTab] = useState('developer');
     const [direction, setDirection] = useState(0);
 
@@ -116,31 +116,47 @@ const ProjectsSection = ({ hideViewMore = false }: { hideViewMore?: boolean }) =
         setActiveTab(newTab);
     };
 
+    const tabs = [
+        { id: 'developer', label: 'Developer', icon: <Code className="w-3.5 h-3.5 md:w-4 md:h-4" /> },
+        { id: 'designer', label: 'Designer', icon: <Palette className="w-3.5 h-3.5 md:w-4 md:h-4" /> }
+    ];
+
     return (
         <section id="projects" className="relative z-10 pt-12 md:pt-16 pb-24 px-6 md:px-12 lg:px-24 min-h-screen overflow-x-clip">
             <div className="mx-auto max-w-5xl">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-10 md:mb-12">
-                    <ScrollFloat
-                        animationDuration={1}
-                        ease='back.inOut(2)'
-                        scrollStart='center bottom+=50%'
-                        scrollEnd='bottom bottom-=40%'
-                        stagger={0.03}
-                        textClassName="font-threat !leading-none"
-                        containerClassName="text-left w-fit !my-0"
-                    >
-                        {"Projects"}
-                    </ScrollFloat>
+                {/* Title and Tabs Header */}
+                <div className={`flex flex-col gap-4 md:gap-6 ${isProjectsPage ? 'mb-6 md:mb-8' : 'mb-10 md:mb-12 md:flex-row md:justify-between md:items-center'}`}>
+                    {/* Title Area */}
+                    <div className="flex items-center gap-4">
+                        {isProjectsPage && (
+                            <Link 
+                                to="/#projects" 
+                                className="group/backbtn flex items-center justify-center p-2 md:p-3 border border-accent/20 rounded-full bg-[#080a0f] hover:bg-accent/10 hover:border-accent transition-all duration-300 shadow-[0_4px_14px_0_rgba(72,202,228,0.08)]"
+                                aria-label="Go back to Home Projects Section"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-accent transition-colors"><path d="m15 18-6-6 6-6"/></svg>
+                            </Link>
+                        )}
+                        <ScrollFloat
+                            animationDuration={1}
+                            ease='back.inOut(2)'
+                            scrollStart='center bottom+=50%'
+                            scrollEnd='bottom bottom-=40%'
+                            stagger={0.03}
+                            textClassName="font-threat !leading-none"
+                            containerClassName="text-left w-fit !my-0"
+                        >
+                            {"Projects"}
+                        </ScrollFloat>
+                    </div>
 
-                    <div className="flex bg-[#080a0f] border border-accent/20 rounded-full p-1.5 w-fit shadow-[0_4px_14px_0_rgba(72,202,228,0.08)]">
-                        {[
-                            { id: 'developer', label: 'Developer', icon: <Code className="w-3.5 h-3.5 md:w-4 md:h-4" /> },
-                            { id: 'designer', label: 'Designer', icon: <Palette className="w-3.5 h-3.5 md:w-4 md:h-4" /> }
-                        ].map((tab) => (
+                    {/* Tabs Selector */}
+                    <div className={`flex bg-[#080a0f] border border-accent/20 rounded-full p-1.5 shadow-[0_4px_14px_0_rgba(72,202,228,0.08)] ${isProjectsPage ? 'w-full' : 'w-fit'}`}>
+                        {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => handleTabChange(tab.id)}
-                                className={`relative px-5 md:px-6 py-2.5 rounded-full text-xs md:text-sm font-sans tracking-widest uppercase transition-colors duration-300 flex items-center gap-2 md:gap-2.5 ${
+                                className={`relative py-3 md:py-3.5 rounded-full text-xs md:text-sm font-sans tracking-widest uppercase transition-colors duration-300 flex items-center justify-center gap-2 md:gap-2.5 ${isProjectsPage ? 'flex-1' : 'px-5 md:px-6'} ${
                                     activeTab === tab.id ? 'text-[#080a0f] font-bold' : 'text-gray-400 hover:text-white'
                                 }`}
                             >
@@ -151,7 +167,7 @@ const ProjectsSection = ({ hideViewMore = false }: { hideViewMore?: boolean }) =
                                         transition={{ duration: 0.5, ease: 'easeInOut' }}
                                     />
                                 )}
-                                <span className="relative z-10 flex items-center gap-2 md:gap-2.5">
+                                <span className="relative z-10 flex items-center justify-center gap-2 md:gap-2.5">
                                     {tab.icon}
                                     {tab.label}
                                 </span>
