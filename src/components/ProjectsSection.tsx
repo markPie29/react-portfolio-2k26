@@ -162,7 +162,7 @@ const ProjectsSection = ({ hideViewMore = false, isProjectsPage = false }: { hid
                             >
                                 {activeTab === tab.id && (
                                     <motion.div
-                                        layoutId="active-tab"
+                                        layoutId={`active-tab-${isProjectsPage ? 'page' : 'section'}`}
                                         className="absolute inset-0 gradient-bg rounded-full"
                                         transition={{ duration: 0.5, ease: 'easeInOut' }}
                                     />

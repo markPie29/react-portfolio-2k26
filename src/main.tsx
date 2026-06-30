@@ -7,7 +7,9 @@ import Lenis from 'lenis'
 
 import HomePage from './pages/HomePage'
 import ProjectsPage from './pages/ProjectsPage'
-import ScrollToTop from './components/ScrollToTop'
+import AnimatedRoutes from './components/AnimatedRoutes'
+import { ThemeProvider } from './context/ThemeContext'
+import Layout from './components/Layout'
 
 const lenis = new Lenis({
   duration: 1.2,
@@ -26,12 +28,12 @@ requestAnimationFrame(raf);
 const root = createRoot(document.getElementById('root')!);
 root.render(
   <StrictMode>
-    <BrowserRouter>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/projects" element={<ProjectsPage />} />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Layout>
+          <AnimatedRoutes />
+        </Layout>
+      </BrowserRouter>
+    </ThemeProvider>
   </StrictMode>
 );

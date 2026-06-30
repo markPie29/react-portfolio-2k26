@@ -5,47 +5,42 @@ import AboutSection from '../components/AboutSection';
 import ExperienceSection from '../components/ExperienceSection';
 import ProjectsSection from '../components/ProjectsSection';
 import Footer from '../components/Footer';
-import { ThemeProvider } from '../context/ThemeContext';
-
 const HomePage = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.hash) {
+    if (location.hash && location.pathname === '/') {
       const id = location.hash.substring(1);
-      // Slight delay to ensure the DOM is ready if we just navigated from another page
-      setTimeout(() => {
+      // Use requestAnimationFrame to ensure the DOM is painted
+      requestAnimationFrame(() => {
         const element = document.getElementById(id);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+          const headerOffset = 80; // Approximate header height to avoid overlap
+          
+          if ((window as any).lenis) {
+            // If Lenis is available, use it for immediate offset scroll
+            (window as any).lenis.scrollTo(element, { immediate: true, offset: -headerOffset });
+          } else {
+            // Fallback for native immediate scrolling
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.scrollY - headerOffset;
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'instant' as ScrollBehavior // 'instant' or 'auto'
+            });
+          }
         }
-      }, 50);
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
     }
   }, [location]);
 
   return (
     <>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
-
-      <ThemeProvider>
-        <AboutSection />
-      </ThemeProvider>
-
-      <ThemeProvider>
-        <ExperienceSection />
-      </ThemeProvider>
-
-      <ThemeProvider>
-        <ProjectsSection />
-      </ThemeProvider>
-
-      <ThemeProvider>
-        <Footer />
-      </ThemeProvider>
+      <App />
+      <AboutSection />
+      <ExperienceSection />
+      <ProjectsSection />
+      <Footer />
     </>
   );
 };
