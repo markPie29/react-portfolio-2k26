@@ -2,17 +2,30 @@ import React, { useState, useEffect } from 'react';
 import SideRays from '../../components/SIdeRays';
 import Header from './Header';
 import { useTheme } from '../context/ThemeContext';
+import { AnimatePresence, motion } from 'motion/react';
+import LoadingScreen from './LoadingScreen';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [showHeader, setShowHeader] = useState(false);
   const { theme } = useTheme();
 
   const isDark = theme === 'dark';
   const rayColor = isDark ? '#00b4d8' : '#0077b6';
+
+  useEffect(() => {
+    // Wait for fonts to be ready
+    document.fonts.ready.then(() => {
+      // Artificial delay for premium feel
+      setTimeout(() => {
+        setIsLoaded(true);
+      }, 800);
+    });
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,19 +56,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/20 to-transparent pointer-events-none" />
       </div>
 
-      {/* Header */}
-      <div
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-          showHeader ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
-        }`}
-      >
-        <Header isHidden={!showHeader} />
-      </div>
+      <AnimatePresence>
+        {!isLoaded && <LoadingScreen />}
+      </AnimatePresence>
 
-      {/* Page Content */}
-      <div className="relative z-10 w-full">
-        {children}
-      </div>
+      {/* Render Header and Page Content only when loaded */}
+      {isLoaded && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+        >
+          {/* Header */}
+          <div
+            className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+              showHeader ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
+            }`}
+          >
+            <Header isHidden={!showHeader} />
+          </div>
+
+          {/* Page Content */}
+          <div className="relative z-10 w-full">
+            {children}
+          </div>
+        </motion.div>
+      )}
     </>
   );
 };
