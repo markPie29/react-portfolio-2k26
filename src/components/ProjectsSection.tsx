@@ -302,17 +302,6 @@ const ProjectsSection = ({ hideViewMore = false, isProjectsPage = false }: { hid
                                         </ScrollStackItem>
                                     ))}
                                 </ScrollStack>
-                                
-                                {!hideViewMore && (
-                                    <div className="-mt-[18vh] md:-mt-[24vh] w-full flex justify-center pb-12 relative z-20 px-4 md:px-0">
-                                        <Link 
-                                            to="/projects" 
-                                            className="group/btn relative overflow-hidden rounded-[2rem] bg-[#080a0f] border border-accent/40 py-6 md:py-8 flex items-center justify-center transition-all duration-300 hover:bg-accent/10 hover:border-accent hover:shadow-[0_0_40px_rgba(72,202,228,0.2)] w-full"
-                                        >
-                                            <span className="text-white font-semibold tracking-wider uppercase text-sm md:text-base z-10 relative font-sans">View More of my Projects</span>
-                                        </Link>
-                                    </div>
-                                )}
                             </motion.div>
                         ) : (
                             <motion.div
@@ -376,21 +365,20 @@ const ProjectsSection = ({ hideViewMore = false, isProjectsPage = false }: { hid
                                         </ScrollStackItem>
                                     ))}
                                 </ScrollStack>
-                                
-                                {!hideViewMore && (
-                                    <div className="-mt-[18vh] md:-mt-[24vh] w-full flex justify-center pb-12 relative z-20 px-4 md:px-0">
-                                        <Link 
-                                            to="/projects" 
-                                            className="group/btn relative overflow-hidden rounded-[2rem] bg-[#080a0f] border border-accent/40 py-6 md:py-8 flex items-center justify-center transition-all duration-300 hover:bg-accent/10 hover:border-accent hover:shadow-[0_0_40px_rgba(72,202,228,0.2)] w-full"
-                                        >
-                                            <span className="text-white font-semibold tracking-wider uppercase text-sm md:text-base z-10 relative font-sans">View More of my Projects</span>
-                                        </Link>
-                                    </div>
-                                )}
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
+                {!hideViewMore && (
+                    <div className="w-full flex justify-center pb-12 -mt-4 md:-mt-8 relative z-20 px-4 md:px-0">
+                        <Link 
+                            to="/projects" 
+                            className="group/btn relative overflow-hidden rounded-[2rem] bg-[#080a0f] border border-accent/40 py-6 md:py-8 flex items-center justify-center transition-all duration-300 hover:bg-accent/10 hover:border-accent hover:shadow-[0_0_40px_rgba(72,202,228,0.2)] w-full"
+                        >
+                            <span className="text-white font-semibold tracking-wider uppercase text-sm md:text-base z-10 relative font-sans">View More of my Projects</span>
+                        </Link>
+                    </div>
+                )}
             </div>
         </section>
     )
