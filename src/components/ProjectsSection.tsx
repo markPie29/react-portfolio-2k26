@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import ScrollFloat from "../../components/ScrollFloat";
 import SpotlightCard from './SpotlightCard';
 import ScrollStack, { ScrollStackItem } from './ScrollStack';
-import { SiReact, SiNextdotjs, SiTailwindcss, SiLaravel, SiFirebase, SiExpress, SiSupabase, SiUnity } from 'react-icons/si';
+import { SiReact, SiNextdotjs, SiTailwindcss, SiLaravel, SiFirebase, SiExpress, SiSupabase, SiUnity, SiFigma, SiFramer } from 'react-icons/si';
 import { Code, Palette } from 'lucide-react';
 
 const Pill = ({ label, icon }: { label: string, icon?: React.ReactNode }) => (
@@ -81,6 +81,68 @@ const projectsData = [
       { label: "Unity", icon: <SiUnity /> },
       { label: "Vuforia" },
       { label: "ARCore" }
+    ]
+  }
+];
+
+const designerProjectsData = [
+  {
+    id: 1,
+    title: "Brand Identity Design",
+    category: "Graphic Design",
+    date: "2024",
+    description: "A comprehensive brand identity design for a modern tech startup. This project includes logo design, typography selection, color palette, and brand guidelines to ensure consistent visual communication.",
+    keyContributions: [
+      "Conceptualized and designed the core logo and visual assets.",
+      "Developed comprehensive brand guidelines for marketing materials."
+    ],
+    tools: [
+      { label: "Figma", icon: <SiFigma /> },
+      { label: "Framer", icon: <SiFramer /> }
+    ]
+  },
+  {
+    id: 2,
+    title: "Mobile App UI/UX",
+    category: "Product Design",
+    date: "2023",
+    description: "User interface and user experience design for a fitness tracking mobile application. The focus was on creating an intuitive, engaging, and motivating experience for users tracking their daily workouts.",
+    keyContributions: [
+      "Created wireframes, interactive prototypes, and high-fidelity mockups.",
+      "Conducted user research to refine the navigation flow."
+    ],
+    tools: [
+      { label: "Figma", icon: <SiFigma /> },
+      { label: "Framer", icon: <SiFramer /> }
+    ]
+  },
+  {
+    id: 3,
+    title: "E-Commerce Web Redesign",
+    category: "Web Design",
+    date: "2025",
+    description: "A complete visual overhaul for an online retail store. The goal was to improve conversion rates by creating a cleaner, more accessible layout with an emphasis on high-quality product imagery and seamless checkout flow.",
+    keyContributions: [
+      "Redesigned the homepage and product detail pages.",
+      "Developed a cohesive component library for the development team."
+    ],
+    tools: [
+      { label: "Figma", icon: <SiFigma /> }
+    ]
+  },
+  {
+    id: 4,
+    title: "Fintech Dashboard",
+    category: "UI/UX Design",
+    date: "2024",
+    description: "Designed a comprehensive analytics dashboard for a financial technology platform. Focus was placed on data visualization, ensuring complex financial metrics were easy to read and understand at a glance.",
+    keyContributions: [
+      "Created data-rich interface layouts and widget components.",
+      "Conducted user testing with financial analysts to refine usability."
+    ],
+    tools: [
+      { label: "Figma", icon: <SiFigma /> },
+      { label: "React", icon: <SiReact /> }
     ]
   }
 ];
@@ -261,15 +323,70 @@ const ProjectsSection = ({ hideViewMore = false, isProjectsPage = false }: { hid
                                 animate="center"
                                 exit="exit"
                                 transition={{ duration: 0.5, ease: 'easeInOut' }}
-                                className="col-start-1 row-start-1 w-full flex justify-center py-24 md:py-32"
+                                className="col-start-1 row-start-1 w-full"
                             >
-                                <div className="w-full max-w-4xl flex flex-col items-center justify-center p-12 md:p-24 border border-dashed border-gray-800 rounded-[2rem] bg-white/[0.01]">
-                                    <Palette className="w-16 h-16 text-gray-600 mb-6" />
-                                    <h3 className="text-2xl md:text-3xl font-bold text-gray-300 font-neutralfacebold tracking-wide mb-4">Designer Projects</h3>
-                                    <p className="text-gray-400 font-sans text-center max-w-lg leading-relaxed">
-                                        This section is currently under construction. My designer portfolio will be showcased here very soon!
-                                    </p>
-                                </div>
+                                <ScrollStack 
+                                    useWindowScroll={true} 
+                                    itemDistance={20} 
+                                    itemScale={0.03} 
+                                    baseScale={0.9} 
+                                    stackPosition="15%" 
+                                    scaleEndPosition="5%"
+                                    itemStackDistance={30}
+                                >
+                                    {designerProjectsData.map((project) => (
+                                        <ScrollStackItem key={project.id} itemClassName="pb-4 sm:pb-8">
+                                            <SpotlightCard 
+                                                className="flex flex-col text-left rounded-[2rem] p-8 sm:p-10 shadow-2xl relative group overflow-hidden transition-all duration-300 w-full" 
+                                                style={{ backgroundColor: '#080a0f', border: '1px solid var(--color-border)' }}
+                                                spotlightColor="rgba(72, 202, 228, 0.15)"
+                                            >
+                                                <div className="relative z-10 flex flex-col w-full h-full min-h-[300px]">
+                                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4 w-full">
+                                                        <h3 className="text-3xl md:text-4xl font-bold text-white font-neutralfacebold tracking-wide leading-tight">{project.title}</h3>
+                                                    </div>
+
+                                                    <div className="text-base text-gray-400 font-sans tracking-wide mb-8">{project.category}</div>
+
+                                                    <p className="text-gray-300 leading-relaxed text-sm md:text-base mb-8 w-full">
+                                                        {project.description}
+                                                    </p>
+
+                                                    <div className="flex flex-col gap-3 mb-10 w-full">
+                                                        <div className="text-[12px] md:text-[13px] text-accent font-neutralface tracking-widest uppercase">Key Contributions:</div>
+                                                        <ul className="text-gray-300 leading-relaxed text-sm md:text-base list-disc list-outside ml-4 space-y-2">
+                                                            {project.keyContributions.map((contribution, idx) => (
+                                                                <li key={idx} className="pl-2 marker:text-accent/60">
+                                                                    <span className="text-gray-300">{contribution}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                    
+                                                    <div className="mt-auto">
+                                                        <div className="text-[12px] md:text-[13px] text-accent font-neutralface tracking-widest mb-4 uppercase">Tech Stack:</div>
+                                                        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                                                            {project.tools.map((tech: any, idx: number) => (
+                                                                <Pill key={idx} label={tech.label} icon={tech.icon} />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </SpotlightCard>
+                                        </ScrollStackItem>
+                                    ))}
+                                </ScrollStack>
+                                
+                                {!hideViewMore && (
+                                    <div className="-mt-[18vh] md:-mt-[24vh] w-full flex justify-center pb-12 relative z-20 px-4 md:px-0">
+                                        <Link 
+                                            to="/projects" 
+                                            className="group/btn relative overflow-hidden rounded-[2rem] bg-[#080a0f] border border-accent/40 py-6 md:py-8 flex items-center justify-center transition-all duration-300 hover:bg-accent/10 hover:border-accent hover:shadow-[0_0_40px_rgba(72,202,228,0.2)] w-full"
+                                        >
+                                            <span className="text-white font-semibold tracking-wider uppercase text-sm md:text-base z-10 relative font-sans">View More of my Projects</span>
+                                        </Link>
+                                    </div>
+                                )}
                             </motion.div>
                         )}
                     </AnimatePresence>

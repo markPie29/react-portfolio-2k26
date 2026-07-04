@@ -113,9 +113,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     const stackPositionPx = parsePercentage(stackPosition, containerHeight);
     const scaleEndPositionPx = parsePercentage(scaleEndPosition, containerHeight);
 
-    const endElement = useWindowScroll
-      ? (document.querySelector('.scroll-stack-end') as HTMLElement | null)
-      : (scrollerRef.current?.querySelector('.scroll-stack-end') as HTMLElement | null);
+    const endElement = scrollerRef.current?.querySelector('.scroll-stack-end') as HTMLElement | null;
 
     const endElementTop = endElement ? getElementOffset(endElement) : 0;
 
@@ -272,12 +270,10 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   }, [handleScroll, useWindowScroll]);
 
   useLayoutEffect(() => {
-    if (!useWindowScroll && !scrollerRef.current) return;
+    if (!scrollerRef.current) return;
 
     const cards = Array.from(
-      useWindowScroll
-        ? document.querySelectorAll('.scroll-stack-card')
-        : (scrollerRef.current?.querySelectorAll('.scroll-stack-card') ?? [])
+      scrollerRef.current?.querySelectorAll('.scroll-stack-card') ?? []
     ) as HTMLElement[];
     cardsRef.current = cards;
     const transformsCache = lastTransformsRef.current;
@@ -333,7 +329,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 
   if (useWindowScroll) {
     return (
-      <div className={`relative w-full ${className}`.trim()}>
+      <div ref={scrollerRef} className={`relative w-full ${className}`.trim()}>
         <div className="scroll-stack-inner w-full min-h-screen pb-[50vh]">
           {children}
           <div className="scroll-stack-end w-full h-px" />
