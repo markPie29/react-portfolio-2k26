@@ -1,11 +1,93 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
+import gsap from 'gsap';
 import ScrollFloat from "../../components/ScrollFloat";
 import SpotlightCard from './SpotlightCard';
 import ScrollStack, { ScrollStackItem } from './ScrollStack';
-import { SiReact, SiNextdotjs, SiTailwindcss, SiLaravel, SiFirebase, SiExpress, SiSupabase, SiUnity, SiFigma, SiFramer } from 'react-icons/si';
+import { SiReact, SiNextdotjs, SiTailwindcss, SiLaravel, SiFirebase, SiExpress, SiSupabase, SiUnity, SiFigma, SiFramer, SiCanva } from 'react-icons/si';
 import { Code, Palette } from 'lucide-react';
+import LogoLoop from './LogoLoop';
+import { CustomPhotoshop, CustomIllustrator } from './CustomIcons';
+
+const SimpleCarousel = ({ images }: { images: string[] }) => {
+    const scrollRef = React.useRef<HTMLDivElement>(null);
+    const isDown = React.useRef(false);
+    const startX = React.useRef(0);
+    const scrollLeftRef = React.useRef(0);
+    const quickToRef = React.useRef<ReturnType<typeof gsap.quickTo> | null>(null);
+
+    React.useEffect(() => {
+        if (scrollRef.current) {
+            quickToRef.current = gsap.quickTo(scrollRef.current, 'scrollLeft', {
+                duration: 0.5,
+                ease: 'power3.out',
+            });
+        }
+    }, []);
+
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollRef.current) {
+            const scrollAmount = 300;
+            scrollRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+        }
+    };
+
+    const onMouseDown = (e: React.MouseEvent) => {
+        if (!scrollRef.current) return;
+        isDown.current = true;
+        startX.current = e.pageX;
+        scrollLeftRef.current = scrollRef.current.scrollLeft;
+        scrollRef.current.style.scrollBehavior = 'auto';
+    };
+
+    const onMouseMove = (e: React.MouseEvent) => {
+        if (!isDown.current || !scrollRef.current) return;
+        e.preventDefault();
+        const walk = (e.pageX - startX.current) * 1.5;
+        const target = gsap.utils.clamp(
+            0,
+            scrollRef.current.scrollWidth - scrollRef.current.clientWidth,
+            scrollLeftRef.current - walk
+        );
+        quickToRef.current?.(target);
+    };
+
+    const onMouseUp = () => {
+        if (!scrollRef.current) return;
+        isDown.current = false;
+        scrollRef.current.style.scrollBehavior = 'smooth';
+    };
+
+    return (
+        <div className="relative group w-full mb-8">
+            <button 
+                onClick={() => scroll('left')} 
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-[#080a0f]/80 hover:bg-accent/80 text-white p-2 md:p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md border border-white/10 shadow-xl"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div 
+                ref={scrollRef}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
+                onMouseLeave={onMouseUp}
+                className="w-full flex overflow-x-auto gap-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth cursor-grab active:cursor-grabbing select-none"
+            >
+                {images.map((src, idx) => (
+                    <img key={idx} src={src} className="h-[200px] md:h-[250px] w-auto snap-center rounded-xl object-contain bg-[#0a0d14] shrink-0 border border-white/5 pointer-events-none" alt={`Carousel artwork ${idx + 1}`} loading="lazy" />
+                ))}
+            </div>
+            <button 
+                onClick={() => scroll('right')} 
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-[#080a0f]/80 hover:bg-accent/80 text-white p-2 md:p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md border border-white/10 shadow-xl"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+        </div>
+    );
+};
 
 const Pill = ({ label, icon }: { label: string, icon?: React.ReactNode }) => (
   <span className="group w-fit flex justify-center items-center gap-1.5 sm:gap-2 rounded-full px-3 sm:px-4 py-2 sm:py-2.5 text-[10.5px] sm:text-[12px] font-bold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-default"
@@ -88,17 +170,19 @@ const projectsData = [
 const designerProjectsData = [
   {
     id: 1,
-    title: "Brand Identity Design",
-    category: "Graphic Design",
+    title: "ACCESS",
+    category: "School Organization",
     date: "2024",
-    description: "A comprehensive brand identity design for a modern tech startup. This project includes logo design, typography selection, color palette, and brand guidelines to ensure consistent visual communication.",
+    description: "",
+    useLogoLoop: true,
     keyContributions: [
-      "Conceptualized and designed the core logo and visual assets.",
-      "Developed comprehensive brand guidelines for marketing materials."
+      "Designed marketing materials, event posters, and social media graphics.",
+      "Developed comprehensive brand identity and visual variations."
     ],
     tools: [
-      { label: "Figma", icon: <SiFigma /> },
-      { label: "Framer", icon: <SiFramer /> }
+      { label: "Canva", icon: <SiCanva /> },
+      { label: "Illustrator", icon: <CustomIllustrator /> },
+      { label: "Photoshop", icon: <CustomPhotoshop /> }
     ]
   },
   {
@@ -278,17 +362,6 @@ const ProjectsSection = ({ hideViewMore = false, isProjectsPage = false }: { hid
                                                         {project.description}
                                                     </p>
 
-                                                    <div className="flex flex-col gap-3 mb-10 w-full">
-                                                        <div className="text-[12px] md:text-[13px] text-accent font-neutralface tracking-widest uppercase">Key Contributions:</div>
-                                                        <ul className="text-gray-300 leading-relaxed text-sm md:text-base list-disc list-outside ml-4 space-y-2">
-                                                            {project.keyContributions.map((contribution, idx) => (
-                                                                <li key={idx} className="pl-2 marker:text-accent/60">
-                                                                    <span className="text-gray-300">{contribution}</span>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                    
                                                     <div className="mt-auto">
                                                         <div className="text-[12px] md:text-[13px] text-accent font-neutralface tracking-widest mb-4 uppercase">Tech Stack:</div>
                                                         <div className="flex flex-wrap items-center gap-2 md:gap-3">
@@ -314,17 +387,9 @@ const ProjectsSection = ({ hideViewMore = false, isProjectsPage = false }: { hid
                                 transition={{ duration: 0.5, ease: 'easeInOut' }}
                                 className="col-start-1 row-start-1 w-full"
                             >
-                                <ScrollStack 
-                                    useWindowScroll={true} 
-                                    itemDistance={20} 
-                                    itemScale={0.03} 
-                                    baseScale={0.9} 
-                                    stackPosition="15%" 
-                                    scaleEndPosition="5%"
-                                    itemStackDistance={30}
-                                >
+                                <div className="flex flex-col gap-4 sm:gap-8 w-full pt-4">
                                     {designerProjectsData.map((project) => (
-                                        <ScrollStackItem key={project.id} itemClassName="pb-4 sm:pb-8">
+                                        <div key={project.id} className="pb-4 sm:pb-8 w-full">
                                             <SpotlightCard 
                                                 className="flex flex-col text-left rounded-[2rem] p-8 sm:p-10 shadow-2xl relative group overflow-hidden transition-all duration-300 w-full" 
                                                 style={{ backgroundColor: '#080a0f', border: '1px solid var(--color-border)' }}
@@ -337,20 +402,25 @@ const ProjectsSection = ({ hideViewMore = false, isProjectsPage = false }: { hid
 
                                                     <div className="text-base text-gray-400 font-sans tracking-wide mb-8">{project.category}</div>
 
-                                                    <p className="text-gray-300 leading-relaxed text-sm md:text-base mb-8 w-full">
-                                                        {project.description}
-                                                    </p>
-
-                                                    <div className="flex flex-col gap-3 mb-10 w-full">
-                                                        <div className="text-[12px] md:text-[13px] text-accent font-neutralface tracking-widest uppercase">Key Contributions:</div>
-                                                        <ul className="text-gray-300 leading-relaxed text-sm md:text-base list-disc list-outside ml-4 space-y-2">
-                                                            {project.keyContributions.map((contribution, idx) => (
-                                                                <li key={idx} className="pl-2 marker:text-accent/60">
-                                                                    <span className="text-gray-300">{contribution}</span>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
+                                                    {(project as any).useLogoLoop ? (
+                                                        <SimpleCarousel images={[
+                                                            '/graphics/access/1.png',
+                                                            '/graphics/access/2.png',
+                                                            '/graphics/access/3.png',
+                                                            '/graphics/access/4.png',
+                                                            '/graphics/access/5.png',
+                                                            '/graphics/access/6.png',
+                                                            '/graphics/access/7.png',
+                                                            '/graphics/access/8.png',
+                                                            '/graphics/access/access mockups.png',
+                                                            '/graphics/access/access variations.png',
+                                                            '/graphics/access/access logo.png'
+                                                        ]} />
+                                                    ) : (
+                                                        <p className="text-gray-300 leading-relaxed text-sm md:text-base mb-8 w-full">
+                                                            {project.description}
+                                                        </p>
+                                                    )}
                                                     
                                                     <div className="mt-auto">
                                                         <div className="text-[12px] md:text-[13px] text-accent font-neutralface tracking-widest mb-4 uppercase">Tech Stack:</div>
@@ -362,9 +432,9 @@ const ProjectsSection = ({ hideViewMore = false, isProjectsPage = false }: { hid
                                                     </div>
                                                 </div>
                                             </SpotlightCard>
-                                        </ScrollStackItem>
+                                        </div>
                                     ))}
-                                </ScrollStack>
+                                </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
