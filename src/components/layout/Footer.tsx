@@ -3,7 +3,7 @@ import { socialsData } from '../../data/socials';
 
 const Footer: React.FC = () => {
   return (
-    <footer id="footer" className="w-full bg-[#080A0F] text-white py-12 px-6 md:px-12 border-t border-white/10">
+    <footer id="footer" className="w-full bg-transparent text-white py-12 px-6 md:px-12 border-t border-white/10">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
           <h3 className="font-neutralfacebold text-2xl md:text-3xl text-white tracking-wide">

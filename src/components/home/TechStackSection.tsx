@@ -136,7 +136,7 @@ const SkillPill: React.FC<{ label: string; iconName: string }> = ({
   label,
   iconName,
 }) => (
-  <div className="flex items-center gap-2 bg-white/5 border border-white/10 hover:border-accent/50 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider text-gray-200 hover:text-white transition-all shadow-sm">
+  <div className="flex items-center gap-2 bg-[#080a0f]/40 dark:bg-white/5 border border-[#48cae4]/20 hover:border-accent/50 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider text-gray-200 hover:text-white transition-all shadow-sm">
     <span className="text-accent text-sm">{getIcon(iconName)}</span>
     <span>{label}</span>
   </div>
@@ -146,7 +146,7 @@ const TechStackSection: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <section id="tech-stack" className="w-full bg-[#080A0F] text-white py-16 md:py-24 px-6 md:px-12 lg:px-24 overflow-hidden">
+    <section id="tech-stack" className="w-full bg-transparent text-white py-16 md:py-24 px-6 md:px-12 lg:px-24 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Skills Logo Loop - Placed just above Developer & Designer container */}
         <AnimatedContent
@@ -178,7 +178,7 @@ const TechStackSection: React.FC = () => {
         {/* Developer & Designer Card Container */}
         <motion.div
           layout
-          className="bg-[#0B0E14] border border-white/10 rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl"
+          className="bg-[#080a0f]/40 dark:bg-[#080a0f]/40 backdrop-blur-md border border-[#48cae4]/20 rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl"
         >
           <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-12 relative z-10">
             {/* Developer Column */}

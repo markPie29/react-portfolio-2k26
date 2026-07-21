@@ -4,7 +4,7 @@ import GradientText from '../../../components/GradientText';
 
 const CtaSection: React.FC = () => {
   return (
-    <section id="cta" className="py-20 md:py-32 px-6 md:px-12 lg:px-24 bg-gray-200 dark:bg-[#0D1017] border-t border-black/10 dark:border-white/10">
+    <section id="cta" className="py-20 md:py-32 px-6 md:px-12 lg:px-24 bg-transparent border-t border-black/10 dark:border-white/10">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
         {/* Heading with GradientText */}
         <motion.div
