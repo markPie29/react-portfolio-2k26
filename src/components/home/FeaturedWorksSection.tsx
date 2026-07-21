@@ -4,7 +4,40 @@ import FadeContent from '../../../components/FadeContent';
 import { projectsData } from '../../data/projects';
 import { ProjectItem } from '../../types/content';
 import ProjectModal from './ProjectModal';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, ImageOff } from 'lucide-react';
+
+const ProjectCardImage: React.FC<{ project: ProjectItem }> = ({ project }) => {
+  const [imageError, setImageError] = useState(false);
+
+  if (!project.image || imageError) {
+    return (
+      <div className="w-full h-full bg-slate-100 dark:bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
+        <div className="p-2.5 rounded-xl bg-slate-200/60 dark:bg-white/5 text-accent mb-1.5 border border-slate-300 dark:border-white/10 shadow-sm">
+          <ImageOff size={20} />
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 font-helvetica-neue-medium">
+          No Image Available
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <img
+        src={project.image}
+        alt={project.title}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100 filter grayscale group-hover:grayscale-0"
+        onError={() => setImageError(true)}
+      />
+      {/* Hover Overlay Affordance */}
+      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2 text-white font-neutralfacebold text-xs uppercase tracking-widest backdrop-blur-[2px]">
+        <span>View Project</span>
+        <ExternalLink size={14} />
+      </div>
+    </>
+  );
+};
 
 const FeaturedWorksSection: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
@@ -36,19 +69,7 @@ const FeaturedWorksSection: React.FC = () => {
               >
                 {/* Thumbnail Container */}
                 <div className="w-full aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100 filter grayscale group-hover:grayscale-0"
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
-                    }}
-                  />
-                  {/* Hover Overlay Affordance */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2 text-white font-neutralfacebold text-xs uppercase tracking-widest backdrop-blur-[2px]">
-                    <span>View Project</span>
-                    <ExternalLink size={14} />
-                  </div>
+                  <ProjectCardImage project={project} />
                 </div>
 
                 {/* Card Details */}

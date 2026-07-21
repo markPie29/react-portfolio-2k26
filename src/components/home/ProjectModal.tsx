@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ProjectItem } from '../../types/content';
-import { X, ChevronLeft, ChevronRight, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ExternalLink, CheckCircle2, ImageOff } from 'lucide-react';
 import { SiGithub } from 'react-icons/si';
 
 interface ProjectModalProps {
@@ -12,6 +12,7 @@ interface ProjectModalProps {
 
 const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
   const [mounted, setMounted] = useState(false);
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -65,10 +66,11 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
     };
   }, [project, updateScrollProgress]);
 
-  // Reset image index & scroll position when modal opens with a new project
+  // Reset image index, image error & scroll position when modal opens with a new project
   useEffect(() => {
     if (project) {
       setCurrentImageIndex(0);
+      setImageError(false);
       if (modalContainerRef.current) {
         modalContainerRef.current.scrollTop = 0;
       }
@@ -79,6 +81,10 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
       }, 50);
     }
   }, [project, scrollProgress]);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [currentImageIndex]);
 
   // Lock background scrolling (both standard body scroll and Lenis smooth scroll) + ESC key handler
   useEffect(() => {
@@ -198,10 +204,9 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
               tabIndex={0}
               className="flex-1 overflow-y-auto overscroll-contain modal-scrollbar p-5 sm:p-8 flex flex-col gap-8 outline-none"
             >
-              {/* Image Carousel Section */}
-              {imagesList.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  {/* Main Carousel Display Box */}
+              {/* Image Carousel Section or Fallback Placeholder */}
+              <div className="flex flex-col gap-3">
+                {imagesList.length > 0 && !imageError ? (
                   <div className="relative w-full aspect-[16/9] max-h-[380px] sm:max-h-[440px] bg-slate-900 rounded-2xl overflow-hidden group shadow-inner border border-slate-200/50 dark:border-white/10 flex items-center justify-center flex-shrink-0">
                     <AnimatePresence mode="wait">
                       <motion.img
@@ -213,9 +218,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.25 }}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
+                        onError={() => setImageError(true)}
                       />
                     </AnimatePresence>
 
@@ -244,31 +247,48 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
                       </>
                     )}
                   </div>
-
-                  {/* Thumbnails Navigation */}
-                  {imagesList.length > 1 && (
-                    <div className="flex items-center gap-3 overflow-x-auto pb-1 modal-scrollbar">
-                      {imagesList.map((img, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setCurrentImageIndex(idx)}
-                          className={`relative w-20 sm:w-24 aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${
-                            idx === currentImageIndex
-                              ? 'border-accent shadow-md scale-105'
-                              : 'border-transparent opacity-50 hover:opacity-100'
-                          }`}
-                        >
-                          <img
-                            src={img}
-                            alt={`Thumbnail ${idx + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </button>
-                      ))}
+                ) : (
+                  <div className="relative w-full aspect-[16/9] max-h-[380px] sm:max-h-[440px] bg-slate-100 dark:bg-slate-900/80 rounded-2xl overflow-hidden shadow-inner border border-slate-200 dark:border-white/10 flex flex-col items-center justify-center p-6 sm:p-8 text-center group flex-shrink-0">
+                    <div className="absolute inset-0 bg-radial from-accent/10 via-transparent to-transparent opacity-60 pointer-events-none" />
+                    
+                    <div className="relative mb-3.5 p-4 rounded-2xl bg-slate-200/60 dark:bg-white/5 border border-slate-300 dark:border-white/10 backdrop-blur-md shadow-md text-accent flex items-center justify-center">
+                      <ImageOff size={32} className="text-accent" />
                     </div>
-                  )}
-                </div>
-              )}
+
+                    <span className="inline-block px-3.5 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest bg-accent/10 text-accent border border-accent/20 mb-2 font-helvetica-neue-medium">
+                      No Available Image Yet
+                    </span>
+
+                    <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 max-w-sm leading-relaxed">
+                      Screenshots and visual assets for this project are currently unavailable.
+                    </p>
+                  </div>
+                )}
+
+                {/* Thumbnails Navigation */}
+                {imagesList.length > 1 && !imageError && (
+                  <div className="flex items-center gap-3 overflow-x-auto pb-1 modal-scrollbar">
+                    {imagesList.map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentImageIndex(idx)}
+                        className={`relative w-20 sm:w-24 aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${
+                          idx === currentImageIndex
+                            ? 'border-accent shadow-md scale-105'
+                            : 'border-transparent opacity-50 hover:opacity-100'
+                        }`}
+                      >
+                        <img
+                          src={img}
+                          alt={`Thumbnail ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={() => {}}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Project Details */}
               <div className="flex flex-col gap-6">
