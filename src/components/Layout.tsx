@@ -3,6 +3,7 @@ import SideRays from '../../components/SIdeRays';
 import { useTheme } from '../context/ThemeContext';
 import { AnimatePresence, motion } from 'motion/react';
 import LoadingScreen from './LoadingScreen';
+import Navbar from './layout/Navbar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,7 +19,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEffect(() => {
     // Wait for fonts to be ready
     document.fonts.ready.then(() => {
-      // Artificial delay for premium feel
       setTimeout(() => {
         setIsLoaded(true);
       }, 800);
@@ -50,13 +50,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {!isLoaded && <LoadingScreen />}
       </AnimatePresence>
 
-      {/* Render Page Content only when loaded */}
+      {/* Render Global Navbar and Page Content when loaded */}
       {isLoaded && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
+          {/* Viewport Sticky Navbar */}
+          <Navbar />
+
           {/* Page Content */}
           <div className="relative z-10 w-full">
             {children}

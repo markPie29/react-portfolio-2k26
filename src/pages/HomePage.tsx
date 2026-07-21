@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import Navbar from '../components/layout/Navbar';
 import Hero from '../components/home/Hero';
 import TaglineStrip from '../components/home/TaglineStrip';
 import StatsSection from '../components/home/StatsSection';
@@ -37,34 +36,31 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-transparent text-foreground flex flex-col">
-      {/* 1. Navbar */}
-      <Navbar />
-
-      {/* 2. Hero Section */}
+      {/* 1. Hero Section */}
       <Hero />
 
-      {/* 3. Tagline Strip (Top: Right to Left) */}
+      {/* 2. Tagline Strip (Top: Right to Left) */}
       <TaglineStrip direction="left" speed={45} />
 
-      {/* 4. Stats Section */}
+      {/* 3. Stats Section */}
       <StatsSection />
 
-      {/* 5. Tagline Strip (Bottom: Left to Right) */}
+      {/* 4. Tagline Strip (Bottom: Left to Right) */}
       <TaglineStrip direction="right" speed={45} />
 
-      {/* 6. Tech Stack Section */}
+      {/* 5. Tech Stack Section */}
       <TechStackSection />
 
-      {/* 7. Services Section */}
+      {/* 6. Services Section */}
       <ServicesSection />
 
-      {/* 8. Featured Works Section */}
+      {/* 7. Featured Works Section */}
       <FeaturedWorksSection />
 
-      {/* 9. CTA Section */}
+      {/* 8. CTA Section */}
       <CtaSection />
 
-      {/* 10. Footer */}
+      {/* 9. Footer */}
       <Footer />
     </div>
   );

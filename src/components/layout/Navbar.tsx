@@ -12,10 +12,23 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const scrollPos = (window as any).lenis?.scroll ?? window.scrollY;
+      setScrolled(scrollPos > 50);
     };
+
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    if ((window as any).lenis) {
+      (window as any).lenis.on('scroll', handleScroll);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if ((window as any).lenis) {
+        (window as any).lenis.off('scroll', handleScroll);
+      }
+    };
   }, []);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -35,10 +48,10 @@ const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
         scrolled
-          ? 'bg-[#080A0F]/85 dark:bg-[#080A0F]/85 backdrop-blur-md border-b border-white/10 shadow-md py-4'
-          : 'bg-transparent py-6'
+          ? 'opacity-100 translate-y-0 pointer-events-auto bg-[#080A0F]/85 dark:bg-[#080A0F]/85 backdrop-blur-md border-b border-white/10 shadow-md py-4'
+          : 'opacity-0 -translate-y-full pointer-events-none py-4'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
