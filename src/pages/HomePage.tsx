@@ -6,6 +6,7 @@ import StatsSection from '../components/home/StatsSection';
 import TechStackSection from '../components/home/TechStackSection';
 import ServicesSection from '../components/home/ServicesSection';
 import FeaturedWorksSection from '../components/home/FeaturedWorksSection';
+import TestimonialsSection from '../components/home/TestimonialsSection';
 import CtaSection from '../components/home/CtaSection';
 import Footer from '../components/layout/Footer';
 
@@ -57,10 +58,13 @@ const HomePage: React.FC = () => {
       {/* 7. Featured Works Section */}
       <FeaturedWorksSection />
 
-      {/* 8. CTA Section */}
+      {/* 8. Testimonials Section */}
+      <TestimonialsSection />
+
+      {/* 9. CTA Section */}
       <CtaSection />
 
-      {/* 9. Footer */}
+      {/* 10. Footer */}
       <Footer />
     </div>
   );
