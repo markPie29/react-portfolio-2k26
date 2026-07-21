@@ -1,56 +1,71 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import GradientText from '../../../components/GradientText';
+import { ProjectInquiryForm } from './ProjectInquiryForm';
+import { Calendar, ChevronDown, Sparkles } from 'lucide-react';
 
 const CtaSection: React.FC = () => {
-  return (
-    <section id="cta" className="py-20 md:py-32 px-6 md:px-12 lg:px-24 bg-transparent border-t border-black/10 dark:border-white/10">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
-        {/* Heading with GradientText */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <GradientText
-            colors={['#0077b6', '#0096c7', '#00b4d8', '#48cae4', '#90e0ef']}
-            animationSpeed={6}
-            showBorder={false}
-            className="font-neutralfacebold text-5xl sm:text-7xl md:text-8xl tracking-tight uppercase leading-[0.95]"
-          >
-            <span className="block">LETS WORK</span>
-            <span className="block">TOGETHER</span>
-          </GradientText>
-        </motion.div>
+  const [showDirectForm, setShowDirectForm] = useState(true);
 
-        {/* CTA Link / Button */}
-        <motion.div
-          initial={{ opacity: 0, x: 30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <a
-            href="#"
-            onClick={(e) => e.preventDefault()}
-            className="text-2xl sm:text-3xl md:text-4xl font-helvetica-neue-medium text-gray-800 dark:text-gray-200 hover:text-accent dark:hover:text-accent transition-colors inline-flex items-center gap-3 group cursor-pointer"
+  return (
+    <section
+      id="cta"
+      className="py-20 md:py-32 px-6 md:px-12 lg:px-24 bg-transparent border-t border-black/10 dark:border-white/10 relative scroll-mt-20"
+    >
+      <div id="inquiry" className="max-w-6xl mx-auto space-y-12">
+        {/* Heading & Subtitle */}
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-b border-gray-200 dark:border-white/10 pb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="space-y-3"
           >
-            <span>Book your free consultation</span>
-            <svg
-              className="w-8 h-8 md:w-10 md:h-10 transform group-hover:translate-x-2 transition-transform"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-500 text-xs font-semibold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Project Inquiry & Discovery</span>
+            </div>
+
+            <GradientText
+              colors={['#0077b6', '#0096c7', '#00b4d8', '#48cae4', '#90e0ef']}
+              animationSpeed={6}
+              showBorder={false}
+              className="font-neutralfacebold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase leading-[0.95]"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
-          </a>
+              <span className="block">LET'S WORK</span>
+              <span className="block">TOGETHER</span>
+            </GradientText>
+          </motion.div>
+
+          {/* Quick Schedule Call Link */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-col gap-2"
+          >
+            <a
+              href={import.meta.env.VITE_DISCOVERY_CALL_URL || 'https://cal.com'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold tracking-wider text-sky-500 hover:text-sky-400 inline-flex items-center gap-2 transition-colors uppercase cursor-pointer"
+            >
+              <Calendar className="w-4 h-4" />
+              <span>Skip form & book call directly</span>
+            </a>
+          </motion.div>
+        </div>
+
+        {/* Multi-Step Interactive Form */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <ProjectInquiryForm />
         </motion.div>
       </div>
     </section>

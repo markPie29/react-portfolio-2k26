@@ -7,7 +7,7 @@ const menuItems = [
   { label: 'About', ariaLabel: 'Learn about me', link: '/#about' },
   { label: 'Experience', ariaLabel: 'View my experience', link: '/#experience' },
   { label: 'Projects', ariaLabel: 'View my projects', link: '/#projects' },
-  { label: 'Contacts', ariaLabel: 'Get in touch', link: '/#footer' }
+  { label: 'Inquiry', ariaLabel: 'Project inquiry & discovery', link: '/#cta' }
 ];
 
 const socialItems = [

@@ -5,4 +5,5 @@ export const navigationData: NavLink[] = [
   { label: 'ABOUT', href: '#about' },
   { label: 'WORKS', href: '#works' },
   { label: 'SERVICES', href: '#services' },
+  { label: 'INQUIRY', href: '#cta' }
 ];
