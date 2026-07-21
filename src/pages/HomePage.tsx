@@ -43,25 +43,28 @@ const HomePage: React.FC = () => {
       {/* 2. Hero Section */}
       <Hero />
 
-      {/* 3. Tagline Strip */}
-      <TaglineStrip />
+      {/* 3. Tagline Strip (Top: Right to Left) */}
+      <TaglineStrip direction="left" speed={45} />
 
       {/* 4. Stats Section */}
       <StatsSection />
 
-      {/* 5. Tech Stack Section (Dark Section) */}
+      {/* 5. Tagline Strip (Bottom: Left to Right) */}
+      <TaglineStrip direction="right" speed={45} />
+
+      {/* 6. Tech Stack Section */}
       <TechStackSection />
 
-      {/* 6. Services Section */}
+      {/* 7. Services Section */}
       <ServicesSection />
 
-      {/* 7. Featured Works Section */}
+      {/* 8. Featured Works Section */}
       <FeaturedWorksSection />
 
-      {/* 8. CTA Section */}
+      {/* 9. CTA Section */}
       <CtaSection />
 
-      {/* 9. Footer */}
+      {/* 10. Footer */}
       <Footer />
     </div>
   );

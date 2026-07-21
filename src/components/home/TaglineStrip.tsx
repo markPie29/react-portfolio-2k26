@@ -1,15 +1,40 @@
 import React from 'react';
+import { motion } from 'motion/react';
 
-const TaglineStrip: React.FC = () => {
-  const tagline = 'GRAPHIC DESIGN – SOFTWARE DEVELOPMENT – SOCIAL MEDIA MANAGEMENT';
+interface TaglineStripProps {
+  direction?: 'left' | 'right';
+  speed?: number;
+}
+
+const TaglineStrip: React.FC<TaglineStripProps> = ({
+  direction = 'left',
+  speed = 45,
+}) => {
+  const taglineText = 'GRAPHIC DESIGN – SOFTWARE DEVELOPMENT – SOCIAL MEDIA MANAGEMENT';
 
   return (
-    <div className="w-full bg-black/5 dark:bg-white/5 backdrop-blur-sm text-gray-800 dark:text-gray-200 py-4 px-6 border-y border-black/10 dark:border-white/10 overflow-hidden">
-      <div className="max-w-7xl mx-auto flex justify-center items-center text-center">
-        <p className="text-xs sm:text-sm md:text-base font-neutralfacebold tracking-widest uppercase">
-          {tagline}
-        </p>
-      </div>
+    <div className="w-full bg-gradient-to-r from-[#0077b6] via-[#00b4d8] to-[#48cae4] text-white py-3.5 border-y border-white/20 overflow-hidden whitespace-nowrap select-none shadow-md">
+      <motion.div
+        className="inline-flex gap-8 items-center"
+        animate={{
+          x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%'],
+        }}
+        transition={{
+          repeat: Infinity,
+          ease: 'linear',
+          duration: speed,
+        }}
+      >
+        {[...Array(6)].map((_, i) => (
+          <span
+            key={i}
+            className="text-xs sm:text-sm md:text-base font-neutralfacebold tracking-widest uppercase flex items-center gap-8 drop-shadow-sm text-white"
+          >
+            <span>{taglineText}</span>
+            <span className="opacity-60">•</span>
+          </span>
+        ))}
+      </motion.div>
     </div>
   );
 };
