@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
             Marky Isulat
           </h3>
           <p className="text-xs md:text-sm text-gray-400 tracking-wider mt-1 uppercase font-helvetica-neue-medium">
-            GRAPHIC DESIGN - SOFTWARE DEVELOPMENT - SOCIAL MEDIA MANAGEMENT
+            GRAPHIC DESIGN & VIDEO EDITING - SOFTWARE DEVELOPMENT - SOCIAL MEDIA MANAGEMENT
           </p>
         </div>
 

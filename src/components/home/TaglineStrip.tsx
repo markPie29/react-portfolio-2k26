@@ -10,7 +10,7 @@ const TaglineStrip: React.FC<TaglineStripProps> = ({
   direction = 'left',
   speed = 45,
 }) => {
-  const taglineText = 'GRAPHIC DESIGN – SOFTWARE DEVELOPMENT – SOCIAL MEDIA MANAGEMENT';
+  const taglineText = 'GRAPHIC DESIGN & VIDEO EDITING – SOFTWARE DEVELOPMENT – SOCIAL MEDIA MANAGEMENT';
 
   return (
     <div className="w-full bg-gradient-to-r from-[#0077b6] via-[#00b4d8] to-[#48cae4] text-white py-3.5 border-y border-white/20 overflow-hidden whitespace-nowrap select-none shadow-md">

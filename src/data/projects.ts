@@ -108,7 +108,7 @@ export const projectsData: ProjectItem[] = [
   {
     id: 'access-branding',
     title: 'ACCESS Visual Identity',
-    category: 'Graphic Design',
+    category: 'Graphic Design & Video Editing',
     description:
       'Comprehensive brand identity, event posters, marketing publication materials, and merchandise graphics.',
     longDescription:

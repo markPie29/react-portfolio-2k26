@@ -2,16 +2,16 @@ import { ServiceItem } from '../types/content';
 
 export const servicesData: ServiceItem[] = [
   {
-    slug: 'graphic-design',
-    title: 'GRAPHIC DESIGN',
+    slug: 'graphic-design-video-editing',
+    title: 'GRAPHIC DESIGN & VIDEO EDITING',
     description:
-      'Crafting compelling visual identities, marketing collateral, and digital media assets that elevate brand presence and resonate with target audiences.',
+      'Crafting compelling visual identities, marketing collateral, motion graphics, video editing, and digital media assets that elevate brand presence and resonate with target audiences.',
     bullets: [
       'Logo and Branding',
+      'Video Editing & Motion Graphics',
       'Publication Materials',
       'Apparel Design',
-      'Email Ad Design',
-      'Product Design',
+      'Product & Email Ads',
     ],
     href: '#',
   },
