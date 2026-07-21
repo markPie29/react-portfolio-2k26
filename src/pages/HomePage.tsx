@@ -1,32 +1,33 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import App from '../App';
-import AboutSection from '../components/AboutSection';
-import ExperienceSection from '../components/ExperienceSection';
-import ProjectsSection from '../components/ProjectsSection';
-import Footer from '../components/Footer';
-const HomePage = () => {
+import Navbar from '../components/layout/Navbar';
+import Hero from '../components/home/Hero';
+import TaglineStrip from '../components/home/TaglineStrip';
+import StatsSection from '../components/home/StatsSection';
+import TechStackSection from '../components/home/TechStackSection';
+import ServicesSection from '../components/home/ServicesSection';
+import FeaturedWorksSection from '../components/home/FeaturedWorksSection';
+import CtaSection from '../components/home/CtaSection';
+import Footer from '../components/layout/Footer';
+
+const HomePage: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
     if (location.hash && location.pathname === '/') {
       const id = location.hash.substring(1);
-      // Use requestAnimationFrame to ensure the DOM is painted
       requestAnimationFrame(() => {
         const element = document.getElementById(id);
         if (element) {
-          const headerOffset = 80; // Approximate header height to avoid overlap
-          
+          const headerOffset = 80;
           if ((window as any).lenis) {
-            // If Lenis is available, use it for immediate offset scroll
             (window as any).lenis.scrollTo(element, { immediate: true, offset: -headerOffset });
           } else {
-            // Fallback for native immediate scrolling
             const elementPosition = element.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.scrollY - headerOffset;
             window.scrollTo({
               top: offsetPosition,
-              behavior: 'instant' as ScrollBehavior // 'instant' or 'auto'
+              behavior: 'instant' as ScrollBehavior,
             });
           }
         }
@@ -35,13 +36,34 @@ const HomePage = () => {
   }, [location]);
 
   return (
-    <>
-      <App />
-      <AboutSection />
-      <ExperienceSection />
-      <ProjectsSection />
+    <div className="relative min-h-screen bg-transparent text-foreground flex flex-col">
+      {/* 1. Navbar */}
+      <Navbar />
+
+      {/* 2. Hero Section */}
+      <Hero />
+
+      {/* 3. Tagline Strip */}
+      <TaglineStrip />
+
+      {/* 4. Stats Section */}
+      <StatsSection />
+
+      {/* 5. Tech Stack Section (Dark Section) */}
+      <TechStackSection />
+
+      {/* 6. Services Section */}
+      <ServicesSection />
+
+      {/* 7. Featured Works Section */}
+      <FeaturedWorksSection />
+
+      {/* 8. CTA Section */}
+      <CtaSection />
+
+      {/* 9. Footer */}
       <Footer />
-    </>
+    </div>
   );
 };
 
