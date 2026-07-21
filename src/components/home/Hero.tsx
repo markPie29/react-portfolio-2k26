@@ -2,6 +2,9 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { socialsData } from '../../data/socials';
 import SplitText from '../../../components/SplitText';
+import TextType from '../../../components/TextType';
+import BlurText from '../../../components/BlurText';
+import TiltedCard from '../../../components/TiltedCard';
 
 const Hero: React.FC = () => {
   return (
@@ -10,42 +13,73 @@ const Hero: React.FC = () => {
       className="relative min-h-screen flex items-center pt-28 pb-16 px-6 md:px-12 lg:px-24 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        {/* Left Column - Name, Socials, Resume */}
+        {/* Left Column - Name, Dynamic Subtitle, Socials, Resume */}
         <div className="lg:col-span-7 flex flex-col items-start justify-center z-10">
-          {/* Main Display Heading */}
-          <div className="mb-6">
-            <h1 className="font-neutralfacebold text-5xl sm:text-7xl md:text-8xl lg:text-[100px] leading-[0.95] tracking-tight uppercase">
-              <span className="block text-current">MARKY</span>
-              <span className="block text-current">ISULAT</span>
-            </h1>
+          {/* SplitText Display Name */}
+          <div className="mb-4">
+            <SplitText
+              text="MARKY"
+              className="font-neutralfacebold text-5xl sm:text-7xl md:text-8xl lg:text-[95px] leading-[0.95] tracking-tight uppercase block"
+              delay={40}
+              duration={0.8}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 30 }}
+              to={{ opacity: 1, y: 0 }}
+              textAlign="left"
+            />
+            <SplitText
+              text="ISULAT"
+              className="font-neutralfacebold text-5xl sm:text-7xl md:text-8xl lg:text-[95px] leading-[0.95] tracking-tight uppercase block"
+              delay={40}
+              duration={0.8}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 30 }}
+              to={{ opacity: 1, y: 0 }}
+              textAlign="left"
+            />
           </div>
 
-          {/* Social Tag Pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap gap-2.5 sm:gap-3 mb-8"
-          >
-            {socialsData.map((s) => (
-              <a
-                key={s.platform}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-gray-200 text-gray-800 dark:bg-white/10 dark:text-gray-200 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300 shadow-sm flex items-center gap-2"
-              >
-                <i className={s.iconClass}></i>
-                <span>{s.label}</span>
-              </a>
-            ))}
-          </motion.div>
+          {/* TextType Rotating Subtitle */}
+          <div className="mb-6 h-8 flex items-center">
+            <TextType
+              text={["Software Engineer", "UI/UX Designer", "Multimedia Specialist"]}
+              typingSpeed={80}
+              pauseDuration={1800}
+              showCursor
+              cursorCharacter="_"
+              deletingSpeed={40}
+              className="text-base sm:text-xl font-helvetica-neue-medium text-accent uppercase tracking-wider"
+            />
+          </div>
+
+          {/* BlurText Social Tag Pills */}
+          <div className="mb-8 w-full">
+            <BlurText
+              text={socialsData.map((s) => (
+                <a
+                  key={s.platform}
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-gray-200 text-gray-800 dark:bg-white/10 dark:text-gray-200 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all duration-300 shadow-sm inline-flex items-center gap-2"
+                >
+                  <i className={s.iconClass}></i>
+                  <span>{s.label}</span>
+                </a>
+              ))}
+              delay={100}
+              animateBy="words"
+              className="flex flex-wrap gap-2.5 sm:gap-3"
+            />
+          </div>
 
           {/* Resume Download Pill Button */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
             <a
               href="/Mark_Angelo_Isulat_Final_Resume.pdf"
@@ -70,25 +104,26 @@ const Hero: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Right Column - Hero Image Placeholder / Profile Card */}
+        {/* Right Column - Hero Profile Image with TiltedCard ReactBits effect */}
         <div className="lg:col-span-5 flex justify-center lg:justify-end z-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative w-full max-w-md aspect-[4/5] rounded-3xl bg-gray-300 dark:bg-white/5 border border-black/10 dark:border-white/10 overflow-hidden shadow-2xl flex items-center justify-center group"
+            className="w-full max-w-md"
           >
-            <img
-              src="/avatar.png"
-              alt="Marky Isulat Profile"
-              className="w-full h-full object-cover object-center filter grayscale group-hover:grayscale-0 transition-all duration-700"
-              onError={(e) => {
-                // Fallback to stylized box if avatar image unavailable
-                (e.target as HTMLElement).style.display = 'none';
-              }}
+            <TiltedCard
+              imageSrc="/avatar.png"
+              altText="Marky Isulat Profile"
+              containerHeight="440px"
+              containerWidth="100%"
+              imageHeight="440px"
+              imageWidth="100%"
+              rotateAmplitude={10}
+              scaleOnHover={1.03}
+              showMobileWarning={false}
+              showTooltip={false}
             />
-            {/* Ambient Background Glow */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
           </motion.div>
         </div>
       </div>

@@ -1,21 +1,27 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import GradientText from '../../../components/GradientText';
 
 const CtaSection: React.FC = () => {
   return (
     <section id="cta" className="py-20 md:py-32 px-6 md:px-12 lg:px-24 bg-gray-200 dark:bg-[#0D1017] border-t border-black/10 dark:border-white/10">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
-        {/* Heading */}
+        {/* Heading with GradientText */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="font-neutralfacebold text-5xl sm:text-7xl md:text-8xl tracking-tight uppercase leading-[0.95] text-gray-900 dark:text-white">
+          <GradientText
+            colors={['#0077b6', '#0096c7', '#00b4d8', '#48cae4', '#90e0ef']}
+            animationSpeed={6}
+            showBorder={false}
+            className="font-neutralfacebold text-5xl sm:text-7xl md:text-8xl tracking-tight uppercase leading-[0.95]"
+          >
             <span className="block">LETS WORK</span>
             <span className="block">TOGETHER</span>
-          </h2>
+          </GradientText>
         </motion.div>
 
         {/* CTA Link / Button */}

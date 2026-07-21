@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import LogoLoop from '../LogoLoop';
+import AnimatedContent from '../../../components/AnimatedContent';
 import {
   developerTopSkills,
   designerTopSkills,
@@ -39,6 +41,21 @@ import {
   Film,
 } from 'lucide-react';
 import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from '../CustomIcons';
+
+const techLogos = [
+  { node: <SiReact />, title: 'React' },
+  { node: <SiNextdotjs />, title: 'Next.js' },
+  { node: <SiTailwindcss />, title: 'Tailwind CSS' },
+  { node: <SiExpress />, title: 'Express' },
+  { node: <SiLaravel />, title: 'Laravel' },
+  { node: <SiFirebase />, title: 'Firebase' },
+  { node: <SiSupabase />, title: 'Supabase' },
+  { node: <CustomPhotoshop />, title: 'Adobe Photoshop' },
+  { node: <CustomIllustrator />, title: 'Adobe Illustrator' },
+  { node: <SiCanva />, title: 'Canva' },
+  { node: <SiFigma />, title: 'Figma' },
+  { node: <CustomCapcut />, title: 'Capcut' },
+];
 
 const getIcon = (name: string) => {
   switch (name) {
@@ -129,8 +146,36 @@ const TechStackSection: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <section id="tech-stack" className="w-full bg-[#080A0F] text-white py-16 md:py-24 px-6 md:px-12 lg:px-24">
+    <section id="tech-stack" className="w-full bg-[#080A0F] text-white py-16 md:py-24 px-6 md:px-12 lg:px-24 overflow-hidden">
       <div className="max-w-6xl mx-auto">
+        {/* Skills Logo Loop - Placed just above Developer & Designer container */}
+        <AnimatedContent
+          distance={50}
+          direction="vertical"
+          reverse={false}
+          duration={1.5}
+          ease="power3.out"
+          initialOpacity={0}
+          animateOpacity
+          delay={0.2}
+        >
+          <div
+            className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mb-12 overflow-hidden"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            <LogoLoop
+              logos={techLogos}
+              speed={80}
+              direction="left"
+              logoHeight={40}
+              gap={60}
+              hoverSpeed={0}
+              scaleOnHover
+            />
+          </div>
+        </AnimatedContent>
+
+        {/* Developer & Designer Card Container */}
         <motion.div
           layout
           className="bg-[#0B0E14] border border-white/10 rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl"
