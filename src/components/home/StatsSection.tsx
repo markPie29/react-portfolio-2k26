@@ -24,7 +24,7 @@ const StatsSection: React.FC = () => {
                 colors={['#0077b6', '#00b4d8', '#48cae4']}
                 className="w-full"
               >
-                <div className="bg-gray-200 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center aspect-square md:aspect-auto md:min-h-[160px] shadow-sm transition-all group w-full">
+                <div className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center aspect-square md:aspect-auto md:min-h-[160px] shadow-sm backdrop-blur-sm transition-all group w-full">
                   <DecryptedText
                     text={stat.value}
                     speed={130}
@@ -33,7 +33,7 @@ const StatsSection: React.FC = () => {
                     revealDirection="start"
                     animateOn="inViewHover"
                     className="font-neutralfacebold text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 dark:text-white group-hover:text-accent transition-colors"
-                    encryptedClassName="font-neutralfacebold text-3xl sm:text-4xl md:text-5xl tracking-tight text-accent/60"
+                    encryptedClassName="font-neutralfacebold text-3xl sm:text-4xl md:text-5xl tracking-tight text-accent"
                   />
                   <div className="mt-2">
                     <DecryptedText
@@ -44,7 +44,7 @@ const StatsSection: React.FC = () => {
                       revealDirection="start"
                       animateOn="inViewHover"
                       className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400"
-                      encryptedClassName="text-xs sm:text-sm font-semibold uppercase tracking-wider text-accent/50"
+                      encryptedClassName="text-xs sm:text-sm font-semibold uppercase tracking-wider text-accent"
                     />
                   </div>
                 </div>

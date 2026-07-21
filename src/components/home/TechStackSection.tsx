@@ -119,7 +119,7 @@ const SkillPill: React.FC<{ label: string; iconName: string }> = ({
   label,
   iconName,
 }) => (
-  <div className="flex items-center gap-2 bg-[#080a0f]/40 dark:bg-white/5 border border-[#48cae4]/20 hover:border-accent/50 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider text-gray-200 hover:text-white transition-all shadow-sm">
+  <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-accent px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-all shadow-sm">
     <span className="text-accent text-sm">{getIcon(iconName)}</span>
     <span>{label}</span>
   </div>
@@ -129,12 +129,12 @@ const TechStackSection: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <section id="tech-stack" className="w-full bg-transparent text-white py-16 md:py-24 px-6 md:px-12 lg:px-24 overflow-hidden">
+    <section id="tech-stack" className="w-full bg-transparent text-foreground py-16 md:py-24 px-6 md:px-12 lg:px-24 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Developer & Designer Card Container */}
         <motion.div
           layout
-          className="bg-[#080a0f]/40 dark:bg-[#080a0f]/40 backdrop-blur-md border border-[#48cae4]/20 rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl"
+          className="bg-white/70 dark:bg-[#080a0f]/40 backdrop-blur-md border border-slate-200 dark:border-[#48cae4]/20 rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-xl dark:shadow-2xl"
         >
           <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-12 relative z-10">
             {/* Developer Column */}
@@ -158,7 +158,7 @@ const TechStackSection: React.FC = () => {
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="flex flex-col gap-6 pt-4 border-t border-white/10 overflow-hidden"
+                    className="flex flex-col gap-6 pt-4 border-t border-slate-200 dark:border-white/10 overflow-hidden"
                   >
                     {developerCategories.map((cat, idx) => (
                       <div key={idx} className="flex flex-col gap-3">
@@ -202,7 +202,7 @@ const TechStackSection: React.FC = () => {
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="flex flex-col gap-6 pt-4 border-t border-white/10 overflow-hidden"
+                    className="flex flex-col gap-6 pt-4 border-t border-slate-200 dark:border-white/10 overflow-hidden"
                   >
                     {designerCategories.map((cat, idx) => (
                       <div key={idx} className="flex flex-col gap-3">
@@ -230,7 +230,7 @@ const TechStackSection: React.FC = () => {
           <motion.div layout className="flex justify-end mt-8 relative z-10">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-xs font-semibold tracking-wider text-gray-400 hover:text-white uppercase transition-colors inline-flex items-center gap-1 cursor-pointer"
+              className="text-xs font-semibold tracking-wider text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white uppercase transition-colors inline-flex items-center gap-1 cursor-pointer"
             >
               <span>{isExpanded ? 'Close' : 'View All'}</span>
               <svg

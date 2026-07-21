@@ -50,7 +50,7 @@ const Navbar: React.FC = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
         scrolled
-          ? 'opacity-100 translate-y-0 pointer-events-auto bg-[#080A0F]/85 dark:bg-[#080A0F]/85 backdrop-blur-md border-b border-white/10 shadow-md py-4'
+          ? 'opacity-100 translate-y-0 pointer-events-auto bg-white/85 dark:bg-[#080A0F]/85 backdrop-blur-md border-b border-gray-200 dark:border-white/10 shadow-sm dark:shadow-md py-4'
           : 'opacity-0 -translate-y-full pointer-events-none py-4'
       }`}
     >
@@ -59,7 +59,7 @@ const Navbar: React.FC = () => {
         <a
           href="#home"
           onClick={(e) => handleNavClick(e, '#home')}
-          className="font-neutralfacebold text-xl md:text-2xl tracking-tight text-current hover:text-accent transition-colors"
+          className="font-neutralfacebold text-xl md:text-2xl tracking-tight text-gray-900 dark:text-white hover:text-accent transition-colors"
         >
           MARKY
         </a>
@@ -71,7 +71,7 @@ const Navbar: React.FC = () => {
               key={link.label}
               href={link.href}
               onClick={(e) => handleNavClick(e, link.href)}
-              className="text-xs md:text-sm font-semibold tracking-wider text-gray-300 hover:text-white dark:hover:text-accent transition-colors uppercase"
+              className="text-xs md:text-sm font-semibold tracking-wider text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-accent transition-colors uppercase"
             >
               {link.label}
             </a>
@@ -82,7 +82,7 @@ const Navbar: React.FC = () => {
         <div className="hidden md:flex items-center gap-4">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all"
+            className="p-2 rounded-full border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all cursor-pointer"
             title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
           >
             {isDark ? <Sun size={18} /> : <Moon size={18} />}
@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
           <a
             href="#cta"
             onClick={(e) => handleNavClick(e, '#cta')}
-            className="bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-200 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 transform hover:-translate-y-0.5 shadow-md"
+            className="bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-black dark:hover:bg-gray-200 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 transform hover:-translate-y-0.5 shadow-md"
           >
             LETS WORK
           </a>
@@ -101,13 +101,13 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-3 md:hidden">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full border border-white/10 bg-white/5 text-gray-300"
+            className="p-2 rounded-full border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300"
           >
             {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 text-white"
+            className="p-2 text-gray-900 dark:text-white"
             aria-label="Toggle Navigation Menu"
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -122,7 +122,7 @@ const Navbar: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-[#080A0F] border-b border-white/10 px-6 py-6"
+            className="md:hidden bg-white dark:bg-[#080A0F] border-b border-gray-200 dark:border-white/10 px-6 py-6"
           >
             <div className="flex flex-col gap-4">
               {navigationData.map((link) => (
@@ -130,7 +130,7 @@ const Navbar: React.FC = () => {
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className="text-base font-neutralfacebold text-gray-200 hover:text-accent tracking-wider uppercase py-1"
+                  className="text-base font-neutralfacebold text-gray-800 dark:text-gray-200 hover:text-accent tracking-wider uppercase py-1"
                 >
                   {link.label}
                 </a>
@@ -138,7 +138,7 @@ const Navbar: React.FC = () => {
               <a
                 href="#cta"
                 onClick={(e) => handleNavClick(e, '#cta')}
-                className="mt-2 text-center bg-accent text-black font-bold py-3 rounded-full uppercase tracking-wider text-xs"
+                className="mt-2 text-center bg-gray-900 text-white dark:bg-white dark:text-black font-bold py-3 rounded-full uppercase tracking-wider text-xs"
               >
                 LETS WORK
               </a>

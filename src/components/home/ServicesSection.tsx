@@ -14,7 +14,7 @@ const ServicesSection: React.FC = () => {
             scrollStart="center bottom+=50%"
             scrollEnd="bottom bottom-=40%"
             stagger={0.03}
-            textClassName="font-neutralfacebold text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase !leading-none"
+            textClassName="font-neutralfacebold text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase !leading-none text-gray-900 dark:text-white"
             containerClassName="text-left w-fit !my-0"
           >
             SERVICES
@@ -26,7 +26,7 @@ const ServicesSection: React.FC = () => {
             {servicesData.map((service) => (
               <div
                 key={service.slug}
-                className="bg-gray-200 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl p-8 flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm"
+                className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm backdrop-blur-sm"
               >
                 <div>
                   <h3 className="font-neutralfacebold text-xl sm:text-2xl tracking-wide uppercase mb-4 text-gray-900 dark:text-white group-hover:text-accent transition-colors">

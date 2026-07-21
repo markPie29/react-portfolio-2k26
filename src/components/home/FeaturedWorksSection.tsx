@@ -14,7 +14,7 @@ const FeaturedWorksSection: React.FC = () => {
             scrollStart="center bottom+=50%"
             scrollEnd="bottom bottom-=40%"
             stagger={0.03}
-            textClassName="font-neutralfacebold text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase !leading-none"
+            textClassName="font-neutralfacebold text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase !leading-none text-gray-900 dark:text-white"
             containerClassName="text-left w-fit !my-0"
           >
             FEATURED WORKS
@@ -26,10 +26,10 @@ const FeaturedWorksSection: React.FC = () => {
             {projectsData.map((project) => (
               <div
                 key={project.id}
-                className="bg-gray-200 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm"
+                className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm backdrop-blur-sm"
               >
                 {/* Thumbnail Container */}
-                <div className="w-full aspect-[16/10] bg-black relative overflow-hidden flex items-center justify-center">
+                <div className="w-full aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center">
                   <img
                     src={project.image}
                     alt={project.title}
@@ -58,11 +58,11 @@ const FeaturedWorksSection: React.FC = () => {
                   </div>
 
                   {/* Tech Stack Pills */}
-                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-black/5 dark:border-white/5">
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-200/60 dark:border-white/5">
                     {project.techStack.map((tech, tIdx) => (
                       <span
                         key={tIdx}
-                        className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-gray-700 dark:text-gray-300"
+                        className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-gray-700 dark:text-gray-300"
                       >
                         {tech}
                       </span>
