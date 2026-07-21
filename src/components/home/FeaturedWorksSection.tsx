@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ScrollFloat from '../../../components/ScrollFloat';
 import FadeContent from '../../../components/FadeContent';
 import { projectsData } from '../../data/projects';
+import { ProjectItem } from '../../types/content';
+import ProjectModal from './ProjectModal';
+import { ExternalLink } from 'lucide-react';
 
 const FeaturedWorksSection: React.FC = () => {
+  const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+
   return (
     <section id="works" className="py-16 md:py-24 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
@@ -26,7 +31,8 @@ const FeaturedWorksSection: React.FC = () => {
             {projectsData.map((project) => (
               <div
                 key={project.id}
-                className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm backdrop-blur-sm"
+                onClick={() => setSelectedProject(project)}
+                className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-accent/50 transition-all duration-300 group shadow-sm backdrop-blur-sm cursor-pointer transform hover:-translate-y-1 hover:shadow-xl"
               >
                 {/* Thumbnail Container */}
                 <div className="w-full aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center">
@@ -38,7 +44,11 @@ const FeaturedWorksSection: React.FC = () => {
                       (e.target as HTMLElement).style.display = 'none';
                     }}
                   />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
+                  {/* Hover Overlay Affordance */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2 text-white font-neutralfacebold text-xs uppercase tracking-widest backdrop-blur-[2px]">
+                    <span>View Project</span>
+                    <ExternalLink size={14} />
+                  </div>
                 </div>
 
                 {/* Card Details */}
@@ -52,7 +62,7 @@ const FeaturedWorksSection: React.FC = () => {
                       {project.title}
                     </h3>
 
-                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">
                       {project.description}
                     </p>
                   </div>
@@ -74,6 +84,12 @@ const FeaturedWorksSection: React.FC = () => {
           </div>
         </FadeContent>
       </div>
+
+      {/* Project Detail Modal */}
+      <ProjectModal
+        project={selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
     </section>
   );
 };

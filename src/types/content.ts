@@ -45,7 +45,13 @@ export interface ProjectItem {
   title: string;
   category: "Graphic Design" | "Software Development" | "Social Media Management";
   description: string;
+  longDescription?: string;
   techStack: string[];
   image?: string;
+  images?: string[];
+  features?: string[];
+  liveUrl?: string;
+  githubUrl?: string;
+  role?: string;
   href?: string;
 }
