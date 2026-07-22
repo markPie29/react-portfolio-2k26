@@ -1,102 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import GradientText from '../../../components/GradientText';
 import TaglineStrip from '../home/TaglineStrip';
-import { useTheme } from '../../context/ThemeContext';
-
-const DAY_TIME = 3.0; // Day scene starting timestamp in seconds
-const SPEED_MULTIPLIER = 2.0; // 2x faster transition speed
+import TiltedCard from '../../../components/TiltedCard';
 
 const AboutHeroHeader: React.FC = () => {
-  const { theme } = useTheme();
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const prevThemeRef = useRef<string>(theme);
-  const animFrameRef = useRef<number | null>(null);
-  const isLoadedRef = useRef<boolean>(false);
-
-  const handleLoadedMetadata = () => {
-    isLoadedRef.current = true;
-    const video = videoRef.current;
-    if (!video) return;
-
-    video.playbackRate = SPEED_MULTIPLIER;
-
-    if (theme === 'light') {
-      video.currentTime = DAY_TIME;
-    } else {
-      video.currentTime = video.duration ? Math.max(0, video.duration - 0.1) : 0;
-    }
-  };
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (animFrameRef.current) {
-      cancelAnimationFrame(animFrameRef.current);
-    }
-
-    const isThemeChanged = prevThemeRef.current !== theme;
-
-    if (isThemeChanged) {
-      if (theme === 'dark') {
-        // Transition: Day -> Night (Play forward faster from 3.0s to end of video)
-        video.currentTime = DAY_TIME;
-        video.playbackRate = SPEED_MULTIPLIER;
-        video.play().catch(() => {});
-
-        const stepForward = () => {
-          const maxDur = video.duration ? video.duration - 0.1 : DAY_TIME + 2;
-          if (video.currentTime >= maxDur || video.paused) {
-            video.pause();
-            if (video.duration) {
-              video.currentTime = Math.max(0, video.duration - 0.1);
-            }
-          } else {
-            animFrameRef.current = requestAnimationFrame(stepForward);
-          }
-        };
-        animFrameRef.current = requestAnimationFrame(stepForward);
-      } else {
-        // Transition: Night -> Day (Reverse playback faster from Night down to 3.0s)
-        video.pause();
-
-        if (video.currentTime <= DAY_TIME && video.duration) {
-          video.currentTime = Math.max(0, video.duration - 0.1);
-        }
-
-        let lastTime = performance.now();
-        const stepReverse = (now: number) => {
-          const dt = ((now - lastTime) / 1000) * SPEED_MULTIPLIER;
-          lastTime = now;
-
-          if (video.currentTime <= DAY_TIME) {
-            video.currentTime = DAY_TIME;
-          } else {
-            video.currentTime = Math.max(DAY_TIME, video.currentTime - dt);
-            animFrameRef.current = requestAnimationFrame(stepReverse);
-          }
-        };
-        animFrameRef.current = requestAnimationFrame(stepReverse);
-      }
-    } else if (isLoadedRef.current) {
-      video.pause();
-      if (theme === 'light') {
-        video.currentTime = DAY_TIME;
-      } else if (video.duration) {
-        video.currentTime = Math.max(0, video.duration - 0.1);
-      }
-    }
-
-    prevThemeRef.current = theme;
-
-    return () => {
-      if (animFrameRef.current) {
-        cancelAnimationFrame(animFrameRef.current);
-      }
-    };
-  }, [theme]);
-
   return (
     <section id="about" className="relative pt-24 pb-8 flex flex-col items-center justify-center overflow-hidden">
       <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-12 lg:mb-16">
@@ -180,24 +88,26 @@ const AboutHeroHeader: React.FC = () => {
           </motion.div>
         </motion.div>
 
-        {/* Right Column: Hero Video Showcase */}
+        {/* Right Column: Profile Image Showcase (Avatar with TiltedCard ReactBits effect) */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="lg:col-span-5 w-full flex justify-center lg:justify-end"
         >
-          <div className="relative group max-w-md w-full aspect-square rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl shadow-sky-500/10 bg-slate-100 dark:bg-slate-900/60">
-            <video
-              ref={videoRef}
-              src="/about-me-transition.mp4"
-              muted
-              playsInline
-              onLoadedMetadata={handleLoadedMetadata}
-              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+          <div className="w-full max-w-md">
+            <TiltedCard
+              imageSrc="/avatar.png"
+              altText="Marky Isulat Profile"
+              containerHeight="440px"
+              containerWidth="100%"
+              imageHeight="440px"
+              imageWidth="100%"
+              rotateAmplitude={10}
+              scaleOnHover={1.03}
+              showMobileWarning={false}
+              showTooltip={false}
             />
-            {/* Subtle interactive hover highlight */}
-            <div className="absolute inset-0 rounded-2xl sm:rounded-3xl border border-sky-500/0 group-hover:border-sky-500/30 transition-colors duration-500 pointer-events-none" />
           </div>
         </motion.div>
       </div>
