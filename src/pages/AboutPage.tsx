@@ -40,20 +40,20 @@ const AboutPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-transparent text-foreground flex flex-col">
-      {/* 1. Hero Tagline Header with Resume / Works Buttons & Marquee Strip */}
+      {/* 1. Hero Header with Resume / Works Buttons & Infinite Logo Loop Strip */}
       <AboutHeroHeader />
 
-      {/* 2. Stats Grid (10+ Brands, 20+ Clients, 5+ Software Shipped, 3yr+ Experience) */}
-      <StatsSection />
-
-      {/* 3. Tech Stack Box (Developer & Designer Skills Pills) */}
+      {/* 2. Tech Stack Box (Developer & Designer Skills Pills) */}
       <TechStackSection />
 
-      {/* 4. Credentials Section (Experience & Certificates Split) */}
+      {/* 3. Credentials Section (Experience & Certificates Split) */}
       <CredentialsSection />
 
-      {/* 5. Testimonials Section */}
+      {/* 4. Testimonials Section */}
       <TestimonialsSection />
+
+      {/* 5. Stats Grid (10+ Brands, 20+ Clients, 5+ Software Shipped, 3yr+ Experience) - Moved below Testimonials */}
+      <StatsSection />
 
       {/* 6. Let's Work Together CTA */}
       <CtaSection />

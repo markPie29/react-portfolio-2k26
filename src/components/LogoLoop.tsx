@@ -328,12 +328,13 @@ export const LogoLoop = React.memo<LogoLoopProps>(
         const content = isNodeItem ? (
           <span
             className={cx(
-              'inline-flex items-center',
+              'inline-flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-accent transition-colors',
               'motion-reduce:transition-none',
               scaleOnHover &&
                 'transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover/item:scale-120'
             )}
             aria-hidden={!!(item as any).href && !(item as any).ariaLabel}
+            title={(item as any).title}
           >
             {(item as any).node}
           </span>

@@ -1,8 +1,61 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import GradientText from '../../../components/GradientText';
-import TaglineStrip from '../home/TaglineStrip';
+import LogoLoop, { LogoItem } from '../LogoLoop';
 import TiltedCard from '../../../components/TiltedCard';
+import {
+  SiReact,
+  SiNextdotjs,
+  SiTailwindcss,
+  SiExpress,
+  SiLaravel,
+  SiFirebase,
+  SiSupabase,
+  SiCanva,
+  SiFigma,
+  SiTypescript,
+  SiJavascript,
+  SiHtml5,
+  SiCss,
+  SiFramer,
+  SiMysql,
+  SiUnity,
+  SiPython,
+  SiPhp,
+  SiGit,
+  SiGithub,
+  SiDocker,
+  SiShadcnui,
+} from 'react-icons/si';
+import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from '../CustomIcons';
+
+const techLogos: LogoItem[] = [
+  { node: <SiReact />, title: 'React' },
+  { node: <SiNextdotjs />, title: 'Next.js' },
+  { node: <SiTailwindcss />, title: 'Tailwind CSS' },
+  { node: <SiTypescript />, title: 'TypeScript' },
+  { node: <SiJavascript />, title: 'JavaScript' },
+  { node: <SiExpress />, title: 'Express' },
+  { node: <SiLaravel />, title: 'Laravel' },
+  { node: <SiFirebase />, title: 'Firebase' },
+  { node: <SiSupabase />, title: 'Supabase' },
+  { node: <CustomPhotoshop />, title: 'Adobe Photoshop' },
+  { node: <CustomIllustrator />, title: 'Adobe Illustrator' },
+  { node: <SiCanva />, title: 'Canva' },
+  { node: <SiFigma />, title: 'Figma' },
+  { node: <CustomCapcut />, title: 'CapCut' },
+  { node: <SiShadcnui />, title: 'Shadcn UI' },
+  { node: <SiFramer />, title: 'Framer Motion' },
+  { node: <SiMysql />, title: 'MySQL' },
+  { node: <SiUnity />, title: 'Unity' },
+  { node: <SiPython />, title: 'Python' },
+  { node: <SiPhp />, title: 'PHP' },
+  { node: <SiGit />, title: 'Git' },
+  { node: <SiGithub />, title: 'GitHub' },
+  { node: <SiDocker />, title: 'Docker' },
+  { node: <SiHtml5 />, title: 'HTML5' },
+  { node: <SiCss />, title: 'CSS3' },
+];
 
 const AboutHeroHeader: React.FC = () => {
   return (
@@ -112,14 +165,22 @@ const AboutHeroHeader: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Marquee Ticker Strip Ribbon - Full Bleed */}
-      <div className="w-full">
-        <TaglineStrip direction="left" speed={40} />
+      {/* Logo Loop Marquee Ticker Strip - Full Bleed */}
+      <div className="w-full py-4 bg-slate-100/60 dark:bg-white/[0.03] border-y border-slate-200 dark:border-white/10 overflow-hidden backdrop-blur-sm shadow-inner">
+        <LogoLoop
+          logos={techLogos}
+          speed={50}
+          direction="left"
+          logoHeight={34}
+          gap={48}
+          fadeOut={true}
+          pauseOnHover={true}
+          scaleOnHover={true}
+          ariaLabel="Tech & design stack logo loop"
+        />
       </div>
     </section>
   );
 };
 
 export default AboutHeroHeader;
-
-
