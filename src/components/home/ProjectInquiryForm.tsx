@@ -50,6 +50,9 @@ export const ProjectInquiryForm: React.FC = () => {
     }
   });
 
+  const clientFullName = watch('fullName');
+  const clientEmailAddress = watch('email');
+
   const handleNextStep = async () => {
     let isValid = false;
 
@@ -214,7 +217,12 @@ export const ProjectInquiryForm: React.FC = () => {
           </form>
         </>
       ) : (
-        <InquirySuccess onReset={handleResetForm} inquiryId={inquiryId} />
+        <InquirySuccess
+          onReset={handleResetForm}
+          inquiryId={inquiryId}
+          clientName={clientFullName}
+          clientEmail={clientEmailAddress}
+        />
       )}
     </div>
   );

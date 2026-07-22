@@ -432,12 +432,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         <div
           ref={preLayersRef}
           className="sm-prelayers absolute top-0 right-0 bottom-0 pointer-events-none z-[5]"
-          aria-hidden="true"
         >
           {(() => {
             const raw = colors && colors.length ? colors.slice(0, 4) : ['#1e1e22', '#35353c'];
-            let arr = [...raw];
-            if (arr.length > 2) arr.pop(); // remove last element (used for panel)
+            const arr = raw.length > 2 ? raw.slice(0, -1) : raw;
             return arr.map((color, i) => (
               <div key={i} className="sm-prelayer backdrop-blur-md" style={{ backgroundColor: color }} />
             ));

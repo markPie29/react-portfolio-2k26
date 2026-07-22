@@ -12,6 +12,7 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.4.0",
+    "@supabase/supabase-js": "^2.110.8",
     "@tailwindcss/vite": "^4.3.0",
     "boxicons": "^2.1.4",
     "class-variance-authority": "^0.7.1",

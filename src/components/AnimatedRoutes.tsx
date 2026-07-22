@@ -3,6 +3,15 @@ import { AnimatePresence, motion } from 'motion/react';
 import HomePage from '../pages/HomePage';
 import ProjectsPage from '../pages/ProjectsPage';
 
+// Admin imports
+import { AdminLogin } from '../pages/admin/AdminLogin';
+import { AdminDashboard } from '../pages/admin/AdminDashboard';
+import { InquiriesPage } from '../pages/admin/InquiriesPage';
+import { CalendarPage } from '../pages/admin/CalendarPage';
+import { AvailabilityManager } from '../pages/admin/AvailabilityManager';
+import { AdminLayout } from './admin/AdminLayout';
+import { ProtectedRoute } from './admin/ProtectedRoute';
+
 const PageWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <motion.div
@@ -32,8 +41,54 @@ export default function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
       <Routes location={location} key={location.pathname}>
+        {/* Public Routes */}
         <Route path="/" element={<PageWrapper><HomePage /></PageWrapper>} />
         <Route path="/projects" element={<PageWrapper><ProjectsPage /></PageWrapper>} />
+
+        {/* Admin Login */}
+        <Route path="/admin/login" element={<PageWrapper><AdminLogin /></PageWrapper>} />
+
+        {/* Protected Admin Routes */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <AdminDashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/inquiries"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <InquiriesPage />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/calendar"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <CalendarPage />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/availability"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <AvailabilityManager />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
