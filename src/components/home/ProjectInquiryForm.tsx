@@ -85,7 +85,11 @@ export const ProjectInquiryForm: React.FC = () => {
         setInquiryId(response.inquiryId);
         setIsSuccess(true);
       } else {
-        setSubmitError(response.message || 'Failed to submit inquiry.');
+        setSubmitError(
+          response.error
+            ? `${response.message} Details: ${response.error}`
+            : response.message || 'Failed to submit inquiry.'
+        );
       }
     } catch (err: any) {
       setSubmitError('An unexpected error occurred. Please try again.');

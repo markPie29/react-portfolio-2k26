@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { BookingRow, MeetingType } from '../types/database';
+import { MeetingType } from '../types/database';
 
 export interface AvailableTimeSlot {
   time: string; // e.g. "09:00"
@@ -139,10 +139,13 @@ export const createBooking = async (
   }
 
   try {
-    const { data, error } = await supabase
+    const bookingId = crypto.randomUUID();
+
+    const { error } = await supabase
       .from('bookings')
       .insert([
         {
+          id: bookingId,
           inquiry_id: payload.inquiryId || null,
           client_name: payload.clientName,
           client_email: payload.clientEmail,
@@ -153,9 +156,7 @@ export const createBooking = async (
           status: 'confirmed',
           notes: payload.notes || null,
         },
-      ])
-      .select('id')
-      .single();
+      ]);
 
     if (error) {
       console.error('Supabase Booking Insert Error:', error);
@@ -177,7 +178,7 @@ export const createBooking = async (
     return {
       success: true,
       message: 'Discovery call booked successfully!',
-      bookingId: data?.id,
+      bookingId,
     };
   } catch (err: any) {
     console.error('Unexpected booking error:', err);

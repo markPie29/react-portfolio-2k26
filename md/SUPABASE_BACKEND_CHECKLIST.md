@@ -6,6 +6,7 @@
 
 ## 📌 Architectural & Decision Summary
 - **Database & Auth Platform**: Supabase (Free Tier - 500MB DB, 1GB Storage, 50K Auth MAUs).
+- **Automated Database Migrations**: Clean Supabase Migration file created at `supabase/migrations/00001_init_schema.sql`.
 - **Admin Auth**: Email & Password only (single-user admin access).
 - **Meeting Links**: Manually created & updated by Admin from Dashboard (no Google Calendar API overhead).
 - **Free Notification Workaround**: Discord / Telegram Webhook trigger or Supabase Database Webhook (100% free, no domain required).
@@ -20,12 +21,12 @@
   - [x] Install `@supabase/supabase-js`.
   - [x] Create `src/lib/supabase.ts` singleton client.
   - [x] Create `src/types/database.ts` schema definitions.
-- [ ] **Database Schema & SQL Execution (In Supabase Console)**
-  - [ ] Execute SQL script for `inquiries` table in Supabase SQL Editor.
-  - [ ] Execute SQL script for `availability_slots` table in Supabase SQL Editor.
-  - [ ] Execute SQL script for `bookings` table in Supabase SQL Editor.
-  - [ ] Enable Row Level Security (RLS) policies for all 3 tables.
-  - [ ] Create Supabase Storage bucket (`inquiry-attachments`) with public/authenticated access policies.
+- [x] **Automated Migration Setup**
+  - [x] Create clean Supabase migration file at `supabase/migrations/00001_init_schema.sql` (defines `inquiries`, `availability_slots`, `bookings` tables, RLS policies, and `inquiry-attachments` storage bucket).
+  - [x] Create `supabase/config.toml` CLI configuration.
+  - [x] Add `"db:push"` script to `package.json`.
+- [ ] **Push Migration to Live Supabase Project**
+  - [ ] Link your project via Supabase CLI (`npx supabase link --project-ref your-project-id`) or run `npm run db:push`.
 - [x] **Frontend Supabase Client Integration**
   - [x] Refactor `src/services/inquiryService.ts` to upload attachments to Supabase Storage & insert rows directly into `inquiries`.
 
@@ -100,71 +101,18 @@
 
 ---
 
-## 📜 Database SQL Reference Script (Run in Supabase SQL Editor)
+## 📜 How to Apply Database Migrations
 
-```sql
--- 1. Inquiries Table
-CREATE TABLE IF NOT EXISTS inquiries (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  full_name TEXT NOT NULL,
-  company TEXT,
-  email TEXT NOT NULL,
-  phone TEXT,
-  website TEXT,
-  services TEXT[] NOT NULL,
-  budget TEXT NOT NULL,
-  timeline TEXT NOT NULL,
-  project_type TEXT NOT NULL,
-  feature_chips TEXT[],
-  description TEXT NOT NULL,
-  attachments JSONB DEFAULT '[]',
-  status TEXT DEFAULT 'new' CHECK (status IN ('new','reviewed','contacted','booked','completed','archived')),
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+Run either of the following methods to apply the schema migration to your live Supabase project:
 
--- 2. Availability Slots Table
-CREATE TABLE IF NOT EXISTS availability_slots (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  day_of_week INT CHECK (day_of_week BETWEEN 0 AND 6),
-  specific_date DATE,
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
-  slot_duration INT DEFAULT 30,
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+### Method A: Automated Migration via Supabase CLI (Recommended)
+```bash
+# 1. Link your Supabase CLI to your project
+npx supabase link --project-ref <your-supabase-project-id>
 
--- 3. Bookings Table
-CREATE TABLE IF NOT EXISTS bookings (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  inquiry_id UUID REFERENCES inquiries(id) ON DELETE SET NULL,
-  client_name TEXT NOT NULL,
-  client_email TEXT NOT NULL,
-  booked_date DATE NOT NULL,
-  booked_time TIME NOT NULL,
-  duration INT DEFAULT 30,
-  meeting_type TEXT DEFAULT 'discovery' CHECK (meeting_type IN ('discovery','follow-up','consultation')),
-  status TEXT DEFAULT 'confirmed' CHECK (status IN ('confirmed','cancelled','completed','no-show')),
-  meeting_link TEXT,
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Row Level Security (RLS)
-ALTER TABLE inquiries ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public insert inquiries" ON inquiries FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admin select inquiries" ON inquiries FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin update inquiries" ON inquiries FOR UPDATE USING (auth.role() = 'authenticated');
-
-ALTER TABLE availability_slots ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public read active slots" ON availability_slots FOR SELECT USING (is_active = true);
-CREATE POLICY "Admin manage slots" ON availability_slots FOR ALL USING (auth.role() = 'authenticated');
-
-ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public insert bookings" ON bookings FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admin read bookings" ON bookings FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Admin update bookings" ON bookings FOR UPDATE USING (auth.role() = 'authenticated');
+# 2. Push migration to live database
+npm run db:push
 ```
+
+### Method B: Copy Migration SQL into Supabase Web Dashboard
+If you prefer using the browser, copy the migration SQL file contents from [supabase/migrations/00001_init_schema.sql](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/supabase/migrations/00001_init_schema.sql) and paste it into the **SQL Editor** in your Supabase Web Console, then click **Run**.

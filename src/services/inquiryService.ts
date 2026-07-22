@@ -69,12 +69,12 @@ export const submitProjectInquiry = async (
   payload: SubmitInquiryPayload
 ): Promise<InquiryResponse> => {
   if (!isSupabaseConfigured) {
-    console.log('Simulating inquiry delivery (Supabase env vars missing):', payload);
+    console.log('Simulating inquiry delivery (Supabase env vars missing/placeholder):', payload);
     const mockId = `INQ-DEV-${Date.now().toString(36).toUpperCase()}`;
     await triggerDiscordNotification(payload, mockId);
     return {
       success: true,
-      message: 'Inquiry received in local preview mode!',
+      message: 'Inquiry received in local preview fallback mode!',
       inquiryId: mockId,
     };
   }
@@ -88,7 +88,7 @@ export const submitProjectInquiry = async (
         if (file.content) {
           try {
             const blob = base64ToBlob(file.content);
-            const fileExt = file.name.split('.').pop();
+            const fileExt = file.name.split('.').pop() || 'bin';
             const filePath = `inquiry-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
             const { data: uploadData, error: uploadError } = await supabase.storage
@@ -107,9 +107,11 @@ export const submitProjectInquiry = async (
                 url: urlData.publicUrl,
               });
               continue;
+            } else if (uploadError) {
+              console.warn('Supabase storage upload notice:', uploadError.message);
             }
           } catch (e) {
-            console.warn('Storage upload error, storing metadata fallback:', e);
+            console.warn('Storage upload exception, storing metadata fallback:', e);
           }
         }
 
@@ -121,11 +123,15 @@ export const submitProjectInquiry = async (
       }
     }
 
+    // Generate client-side UUID to avoid requiring RLS SELECT permission after insert
+    const inquiryId = crypto.randomUUID();
+
     // 2. Insert into Supabase `inquiries` table
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('inquiries')
       .insert([
         {
+          id: inquiryId,
           full_name: payload.fullName,
           company: payload.company || null,
           email: payload.email,
@@ -140,22 +146,21 @@ export const submitProjectInquiry = async (
           attachments: processedAttachments,
           status: 'new',
         },
-      ])
-      .select('id')
-      .single();
+      ]);
 
     if (error) {
       console.error('Supabase Inquiry Insert Error:', error);
+      const isFetchErr = error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError');
       return {
         success: false,
-        message: 'Failed to record inquiry into database. Please try again.',
-        error: error.message,
+        message: 'Failed to record inquiry into database.',
+        error: isFetchErr
+          ? 'Network error: Cannot reach Supabase database URL. Please check VITE_SUPABASE_URL in your .env file and restart your dev server.'
+          : error.message,
       };
     }
 
-    const inquiryId = data?.id || `INQ-${Date.now()}`;
-
-    // 3. Trigger free background Discord/Telegram notification if configured
+    // 3. Trigger free background Discord notification if configured
     triggerDiscordNotification(payload, inquiryId);
 
     return {
@@ -165,10 +170,15 @@ export const submitProjectInquiry = async (
     };
   } catch (err: any) {
     console.error('Unexpected inquiry submission error:', err);
+    const errStr = err?.message || String(err);
+    const isFetchErr = errStr.includes('Failed to fetch') || errStr.includes('NetworkError');
+
     return {
       success: false,
-      message: 'An unexpected error occurred. Please try again.',
-      error: err?.message || 'Unknown error',
+      message: 'Unable to connect to database.',
+      error: isFetchErr
+        ? 'Cannot reach Supabase database. Please check VITE_SUPABASE_URL in your .env file and restart your npm dev server.'
+        : errStr,
     };
   }
 };
