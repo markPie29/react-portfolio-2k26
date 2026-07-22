@@ -124,8 +124,8 @@ const AboutHeroHeader: React.FC = () => {
           </div>
 
           {/* Intro Bio Subtext */}
-          <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl text-left font-sans">
-            My name is Mark Angelo A. Isulat, but people call me Marky. I am a passionate full-stack developer and UI/UX designer dedicated to building modern, performant, and visually captivating web applications.
+          <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl lg:max-w-2xl text-left font-sans">
+            My name is Mark Angelo A. Isulat, but people call me Marky. I started as a simple tech enthusiast as a kid, which led me to begin learning programming at the age of 16 and enter the design world at 18. Currently a 4th-year student in BS Computer Engineering and a DOST Scholar, I have worked with different brands and businesses both locally and internationally.
           </p>
 
           {/* Action Buttons: DOWNLOAD CV & WORKS */}

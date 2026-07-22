@@ -157,12 +157,12 @@ const AboutSection = () => {
               className="flex flex-col flex-1"
             >
 
-              <div className='flex flex-col gap-4 text-[15px] sm:text-base text-left text-gray-300/90 leading-relaxed mt-auto mb-6'>
+              <div className='flex flex-col gap-3 text-xs sm:text-sm text-left text-gray-300/90 leading-relaxed mt-auto mb-6'>
                 <p>
-                  I am a Computer Engineering student at the University of Rizal System and an aspiring Software Engineer. My journey is driven by a passion for building functional, beautiful, and user-centered digital experiences.
+                  My name is Mark Angelo A. Isulat, but people call me Marky. I started as a simple tech enthusiast as a kid, which led me to begin learning programming at the age of 16 and enter the design world at 18.
                 </p>
                 <p>
-                  With hands-on experience in full-stack web development, UI/UX design, and AR/mobile game development, I thrive at the intersection of technical implementation and creative problem-solving.
+                  Currently a 4th-year student in BS Computer Engineering and a DOST Scholar, I have worked with different brands and businesses both locally and internationally.
                 </p>
               </div>
 
