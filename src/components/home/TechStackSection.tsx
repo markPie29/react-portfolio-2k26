@@ -129,7 +129,7 @@ const TechStackSection: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <section id="tech-stack" className="w-full bg-transparent text-foreground py-16 md:py-24 px-6 md:px-12 lg:px-24 overflow-hidden">
+    <section id="tech-stack" className="w-full bg-transparent text-foreground py-8 md:py-12 px-6 md:px-12 lg:px-24 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Developer & Designer Card Container */}
         <motion.div

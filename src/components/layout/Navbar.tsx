@@ -41,6 +41,9 @@ const Navbar: React.FC = () => {
     return null;
   }
 
+  const isHomePage = location.pathname === '/';
+  const showNavbar = !isHomePage || scrolled;
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setMobileOpen(false);
@@ -69,14 +72,18 @@ const Navbar: React.FC = () => {
         }
       }
     } else if (href.startsWith('#')) {
-      const targetId = href.replace('#', '');
-      const element = document.getElementById(targetId);
-      if (element) {
-        if ((window as any).lenis) {
-          (window as any).lenis.scrollTo(element, { offset: -80 });
-        } else {
-          const top = element.getBoundingClientRect().top + window.scrollY - 80;
-          window.scrollTo({ top, behavior: 'smooth' });
+      if (location.pathname !== '/') {
+        navigate(`/${href}`);
+      } else {
+        const targetId = href.replace('#', '');
+        const element = document.getElementById(targetId);
+        if (element) {
+          if ((window as any).lenis) {
+            (window as any).lenis.scrollTo(element, { offset: -80 });
+          } else {
+            const top = element.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
         }
       }
     }
@@ -85,7 +92,7 @@ const Navbar: React.FC = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
-        scrolled
+        showNavbar
           ? 'opacity-100 translate-y-0 pointer-events-auto bg-white/85 dark:bg-[#080A0F]/85 backdrop-blur-md border-b border-gray-200 dark:border-white/10 shadow-sm dark:shadow-md py-4'
           : 'opacity-0 -translate-y-full pointer-events-none py-4'
       }`}
@@ -93,8 +100,8 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
         {/* Logo */}
         <a
-          href="#home"
-          onClick={(e) => handleNavClick(e, '#home')}
+          href="/"
+          onClick={(e) => handleNavClick(e, '/')}
           className="font-neutralfacebold text-xl md:text-2xl tracking-tight gradient-text hover:opacity-85 transition-opacity"
         >
           MARKY

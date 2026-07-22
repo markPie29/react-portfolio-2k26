@@ -1,41 +1,38 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import SplitText from '../../../components/SplitText';
+import GradientText from '../../../components/GradientText';
 import TaglineStrip from '../home/TaglineStrip';
 
 const AboutHeroHeader: React.FC = () => {
   return (
-    <section id="about" className="relative pt-32 pb-12 px-6 md:px-12 lg:px-24 flex flex-col items-center justify-center text-center overflow-hidden">
-      <div className="max-w-5xl mx-auto w-full flex flex-col items-center gap-8 mb-12">
+    <section id="about" className="relative pt-24 pb-8 flex flex-col items-center justify-center text-center overflow-hidden">
+      <div className="max-w-5xl mx-auto w-full px-6 md:px-12 flex flex-col items-center gap-6 mb-8">
         {/* Main Display Headline */}
         <div className="w-full max-w-4xl">
-          <SplitText
-            text="CREATING DIGITAL EXPERIENCES AS A DEVELOPER AND DESIGNER"
-            className="font-neutralfacebold text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight uppercase tracking-tight text-gray-900 dark:text-white"
-            delay={30}
-            duration={0.7}
-            ease="power3.out"
-            splitType="words"
-            from={{ opacity: 0, y: 25 }}
-            to={{ opacity: 1, y: 0 }}
-            textAlign="center"
-          />
+          <GradientText
+            colors={['#0077b6', '#0096c7', '#00b4d8', '#48cae4', '#90e0ef']}
+            animationSpeed={6}
+            showBorder={false}
+            className="font-neutralfacebold text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight uppercase tracking-tight text-center"
+          >
+            DESIGN, DEVELOP, DEPLOY
+          </GradientText>
         </div>
 
-        {/* Action Buttons: RESUME & WORKS */}
+        {/* Action Buttons: DOWNLOAD CV & WORKS */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-2"
         >
-          {/* RESUME / DOWNLOAD CV Button */}
+          {/* DOWNLOAD CV Button */}
           <a
             href="/Mark_Angelo_Isulat_Final_Resume.pdf"
             download
-            className="px-8 py-3.5 rounded-full font-neutralfacebold text-xs sm:text-sm uppercase tracking-widest text-white gradient-bg hover:brightness-110 shadow-lg shadow-sky-500/25 transition-all duration-300 transform hover:-translate-y-1 inline-flex items-center gap-2"
+            className="gradient-bg text-white hover:brightness-110 px-8 py-3.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-sky-500/25 inline-flex items-center gap-3"
           >
-            <span>RESUME</span>
+            <span>DOWNLOAD CV</span>
             <svg
               className="w-4 h-4"
               fill="none"
@@ -46,7 +43,7 @@ const AboutHeroHeader: React.FC = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2.5"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                d="M19 14l-7 7m0 0l-7-7m7 7V3"
               />
             </svg>
           </a>
@@ -74,7 +71,7 @@ const AboutHeroHeader: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Marquee Ticker Strip Ribbon */}
+      {/* Marquee Ticker Strip Ribbon - Full Bleed */}
       <div className="w-full">
         <TaglineStrip direction="left" speed={40} />
       </div>

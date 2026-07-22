@@ -10,7 +10,7 @@ const CtaSection: React.FC = () => {
   return (
     <section
       id="cta"
-      className="py-20 md:py-32 px-6 md:px-12 lg:px-24 bg-transparent border-t border-black/10 dark:border-white/10 relative scroll-mt-20"
+      className="py-12 md:py-18 px-6 md:px-12 lg:px-24 bg-transparent border-t border-black/10 dark:border-white/10 relative scroll-mt-20"
     >
       <div id="inquiry" className="max-w-6xl mx-auto space-y-12">
         {/* Heading & Subtitle */}

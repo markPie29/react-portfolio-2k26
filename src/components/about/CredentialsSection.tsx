@@ -155,10 +155,10 @@ const ExperienceCardItem: React.FC<{ item: typeof experienceItems[0] }> = ({ ite
 
 const CredentialsSection: React.FC = () => {
   return (
-    <section id="credentials" className="py-16 md:py-24 px-6 md:px-12 lg:px-24">
+    <section id="credentials" className="py-8 md:py-12 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
         {/* Section Heading */}
-        <div className="mb-12">
+        <div className="mb-8">
           <ScrollFloat
             animationDuration={1}
             ease="back.inOut(2)"

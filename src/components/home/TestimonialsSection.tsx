@@ -6,9 +6,9 @@ import { Quote, Star } from 'lucide-react';
 
 const TestimonialsSection: React.FC = () => {
   return (
-    <section id="testimonials" className="py-16 md:py-24 px-6 md:px-12 lg:px-24">
+    <section id="testimonials" className="py-8 md:py-12 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-12">
+        <div className="mb-8">
           <ScrollFloat
             animationDuration={1}
             ease="back.inOut(2)"

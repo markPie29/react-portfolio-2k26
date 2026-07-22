@@ -6,7 +6,7 @@ import { statsData } from '../../data/stats';
 
 const StatsSection: React.FC = () => {
   return (
-    <section className="py-16 md:py-24 px-6 md:px-12 lg:px-24">
+    <section className="py-8 md:py-12 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
         <FadeContent blur duration={1} ease="power3.out" delay={0.1}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
