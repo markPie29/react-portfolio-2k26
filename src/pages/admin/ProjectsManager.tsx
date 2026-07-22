@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   fetchProjects, 
   createProject, 
@@ -77,6 +78,7 @@ export const ProjectsManager: React.FC = () => {
 
   const coverFileInputRef = useRef<HTMLInputElement>(null);
   const galleryFileInputRef = useRef<HTMLInputElement>(null);
+  const modalScrollRef = useRef<HTMLDivElement>(null);
 
   const loadProjectsData = async () => {
     setIsLoading(true);
@@ -93,6 +95,32 @@ export const ProjectsManager: React.FC = () => {
   useEffect(() => {
     loadProjectsData();
   }, []);
+
+  // Prevent main page scroll (both standard body scroll and Lenis smooth scroll) when modal is open + ESC key listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isModalOpen) setIsModalOpen(false);
+        if (deleteTarget) setDeleteTarget(null);
+      }
+    };
+
+    if (isModalOpen || deleteTarget) {
+      document.body.style.overflow = 'hidden';
+      if ((window as any).lenis) {
+        (window as any).lenis.stop();
+      }
+      window.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      if ((window as any).lenis) {
+        (window as any).lenis.start();
+      }
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isModalOpen, deleteTarget]);
 
   // Show temporary toast message
   const showToast = (type: 'success' | 'error', text: string) => {
@@ -557,485 +585,528 @@ export const ProjectsManager: React.FC = () => {
         </div>
       )}
 
-      {/* CREATE / EDIT PROJECT MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
-          <div className="relative w-full max-w-3xl bg-[#0c1017] border border-white/15 rounded-3xl shadow-2xl overflow-hidden my-8">
-            {/* Modal Header */}
-            <div className="p-6 border-b border-white/10 flex items-center justify-between bg-[#080a0f]">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                  <FolderKanban className="w-5 h-5" />
+      {/* CREATE / EDIT PROJECT MODAL (Landscape Format + Portal + Lock Body Scroll) */}
+      {isModalOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 md:p-8 overflow-hidden pointer-events-auto">
+            {/* Backdrop overlay */}
+            <div
+              className="fixed inset-0 bg-black/85 backdrop-blur-md"
+              onClick={() => setIsModalOpen(false)}
+            />
+
+            {/* Landscape Modal Window Container */}
+            <div
+              className="relative z-10 w-full max-w-5xl lg:max-w-6xl max-h-[90vh] my-auto bg-[#0c0f17] border border-white/15 rounded-3xl shadow-2xl flex flex-col text-gray-100 outline-none overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Top Blue Accent Scroll Progress Bar */}
+              <div className="h-1 w-full bg-gradient-to-r from-[#0077b6] via-[#00b4d8] to-[#48cae4] shadow-[0_0_12px_rgba(72,202,228,0.7)] flex-shrink-0" />
+
+              {/* Fixed Header */}
+              <div className="p-5 sm:p-6 border-b border-white/10 flex items-center justify-between bg-[#080a0f] flex-shrink-0 z-20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                    <FolderKanban className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="font-neutralfacebold text-lg sm:text-xl text-white uppercase tracking-tight">
+                      {editingProject ? 'Edit Project' : 'Add New Project'}
+                    </h2>
+                    <span className="text-[11px] text-gray-400 block font-mono">
+                      {editingProject ? `ID: ${editingProject.id}` : 'Fill in project specifications, media assets & tech stack'}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="font-neutralfacebold text-lg text-white uppercase tracking-tight">
-                    {editingProject ? 'Edit Project' : 'Add New Project'}
-                  </h2>
-                  <span className="text-[11px] text-gray-400 block font-mono">
-                    {editingProject ? `ID: ${editingProject.id}` : 'Fill in project specifications & media assets'}
-                  </span>
-                </div>
+
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-gray-300 transition-colors cursor-pointer"
+                  aria-label="Close modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
+              {/* Modal Body Form - LANDSCAPE 2-COLUMN GRID ON DESKTOP */}
+              <form
+                onSubmit={handleSubmitForm}
+                className="flex-1 overflow-y-auto modal-scrollbar p-5 sm:p-8 flex flex-col gap-6"
+                data-lenis-prevent="true"
+                data-lenis-prevent-wheel="true"
+                data-lenis-prevent-touch="true"
+                ref={modalScrollRef}
               >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body Form */}
-            <form onSubmit={handleSubmitForm} className="p-6 space-y-6 max-h-[78vh] overflow-y-auto">
-              
-              {/* File Size Warning / Hardcode Suggestion Banner */}
-              {fileSizeWarning && (
-                <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs space-y-2">
-                  <div className="flex items-center gap-2 font-bold text-amber-300">
-                    <FileWarning className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>Supabase Storage 50MB Limit Exceeded</span>
-                  </div>
-                  <p className="whitespace-pre-line leading-relaxed text-[11.5px] font-sans">
-                    {fileSizeWarning}
-                  </p>
-                </div>
-              )}
-
-              {/* Title & Classification */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                    Project Name / Title <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. URSAC Hub 2.0"
-                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                    Classification / Category <span className="text-red-400">*</span>
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white outline-none focus:border-sky-500 transition-colors cursor-pointer"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Custom Category Input if selected */}
-              {category === 'Other Custom Category' && (
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                    Custom Classification Name <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={customCategory}
-                    onChange={(e) => setCustomCategory(e.target.value)}
-                    placeholder="e.g. Augmented Reality / Motion Graphics"
-                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                  />
-                </div>
-              )}
-
-              {/* Role & Display Order */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                    Your Role / Title
-                  </label>
-                  <input
-                    type="text"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    placeholder="e.g. Lead Full-Stack Developer & Designer"
-                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                    Display Order Index
-                  </label>
-                  <input
-                    type="number"
-                    value={displayOrder}
-                    onChange={(e) => setDisplayOrder(parseInt(e.target.value) || 0)}
-                    placeholder="0"
-                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Short Description */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                  Short Description (Card View) <span className="text-red-400">*</span>
-                </label>
-                <textarea
-                  rows={2}
-                  required
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="A concise 1-2 sentence overview of the project shown on project cards."
-                  className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors resize-y"
-                />
-              </div>
-
-              {/* Detailed Long Description */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                  Detailed Overview / Long Description (Modal View)
-                </label>
-                <textarea
-                  rows={4}
-                  value={longDescription}
-                  onChange={(e) => setLongDescription(e.target.value)}
-                  placeholder="In-depth project breakdown, problem statement, solution architecture, design choices, etc."
-                  className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors resize-y"
-                />
-              </div>
-
-              {/* Tech Stack Chips Manager */}
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
-                  <span>Tech Stack & Tools</span>
-                  <span className="text-gray-500 text-[10px] font-normal">Press Enter to add tag</span>
-                </label>
-
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
-                    <input
-                      type="text"
-                      value={techStackInput}
-                      onChange={(e) => setTechStackInput(e.target.value)}
-                      onKeyDown={handleAddTechTag}
-                      placeholder="e.g. React, Next.js, Premiere Pro, Figma, Tailwind CSS"
-                      className="w-full pl-9 pr-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleAddTechTag}
-                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
-                  >
-                    Add Tag
-                  </button>
-                </div>
-
-                {techStack.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {techStack.map((tech) => (
-                      <span
-                        key={tech}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-500/10 border border-sky-500/25 rounded-full text-xs font-semibold text-sky-300"
-                      >
-                        <span>{tech}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTechTag(tech)}
-                          className="hover:text-white transition-colors"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Key Features Bullet List Manager */}
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
-                  <span>Key Highlights & Features</span>
-                  <span className="text-gray-500 text-[10px] font-normal">Press Enter to add bullet point</span>
-                </label>
-
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <ListPlus className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
-                    <input
-                      type="text"
-                      value={featureInput}
-                      onChange={(e) => setFeatureInput(e.target.value)}
-                      onKeyDown={handleAddFeature}
-                      placeholder="e.g. Real-time post feed with image attachments"
-                      className="w-full pl-9 pr-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleAddFeature}
-                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
-                  >
-                    Add Feature
-                  </button>
-                </div>
-
-                {features.length > 0 && (
-                  <ul className="space-y-1.5 pt-1">
-                    {features.map((feat, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-center justify-between p-2.5 bg-white/5 border border-white/5 rounded-xl text-xs text-gray-200"
-                      >
-                        <span className="flex items-center gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                          <span>{feat}</span>
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveFeature(idx)}
-                          className="text-gray-400 hover:text-red-400 transition-colors p-1"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              {/* MEDIA ASSETS SECTION */}
-              <div className="p-5 bg-white/5 border border-white/10 rounded-2xl space-y-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-sky-400" />
-                  <h3 className="font-neutralfacebold text-xs uppercase text-white tracking-wider">
-                    Media Assets & Uploads (Supabase Storage Bucket "projects")
-                  </h3>
-                </div>
-
-                {/* Main Cover Image Upload & Path */}
-                <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                    Cover Image
-                  </label>
-
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <input
-                      type="file"
-                      ref={coverFileInputRef}
-                      onChange={handleCoverFileChange}
-                      accept="image/*"
-                      className="hidden"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => coverFileInputRef.current?.click()}
-                      className="px-4 py-2.5 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 text-sky-400 text-xs font-semibold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shrink-0"
-                    >
-                      <Upload className="w-4 h-4" />
-                      <span>{coverFile ? coverFile.name : 'Upload File to Supabase'}</span>
-                    </button>
-
-                    <div className="text-xs text-gray-500 text-center font-bold uppercase">OR</div>
-
-                    <input
-                      type="text"
-                      value={coverUrl}
-                      onChange={(e) => setCoverUrl(e.target.value)}
-                      placeholder="Enter Direct URL or Local Path (e.g. /assets/projects/ursac-hub.jpg)"
-                      className="flex-1 px-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {/* Gallery Images & Videos Upload & Paths */}
-                <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                    Gallery Images & Video Showcase Assets
-                  </label>
-
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <input
-                      type="file"
-                      ref={galleryFileInputRef}
-                      onChange={handleGalleryFilesChange}
-                      multiple
-                      accept="image/*,video/*"
-                      className="hidden"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => galleryFileInputRef.current?.click()}
-                      className="px-4 py-2.5 bg-white/10 border border-white/15 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shrink-0"
-                    >
-                      <Film className="w-4 h-4" />
-                      <span>Upload Gallery Files</span>
-                    </button>
-
-                    <div className="flex-1 flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={newGalleryUrlInput}
-                        onChange={(e) => setNewGalleryUrlInput(e.target.value)}
-                        placeholder="Add Asset URL or Path (e.g. /assets/projects/heavy-video.mp4)"
-                        className="flex-1 px-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddGalleryUrl}
-                        className="px-3.5 py-2 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-colors cursor-pointer shrink-0"
-                      >
-                        Add
-                      </button>
+                {/* File Size Warning / Hardcode Suggestion Banner */}
+                {fileSizeWarning && (
+                  <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs space-y-2">
+                    <div className="flex items-center gap-2 font-bold text-amber-300">
+                      <FileWarning className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>Supabase Storage 50MB Limit Exceeded</span>
                     </div>
+                    <p className="whitespace-pre-line leading-relaxed text-[11.5px] font-sans">
+                      {fileSizeWarning}
+                    </p>
                   </div>
+                )}
 
-                  {/* List of uploaded/added gallery files */}
-                  {(galleryFiles.length > 0 || galleryUrls.length > 0) && (
-                    <div className="space-y-1.5 pt-2">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                        Attached Gallery Items ({galleryFiles.length + galleryUrls.length}):
-                      </span>
+                {/* Landscape 2-Column Responsive Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+                  
+                  {/* LEFT COLUMN: Core Information & Descriptions */}
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-sky-400">
+                      <Tag className="w-4 h-4" />
+                      <h3 className="font-neutralfacebold text-xs uppercase tracking-wider text-white">
+                        1. General Information
+                      </h3>
+                    </div>
 
-                      <div className="flex flex-wrap gap-2">
-                        {galleryFiles.map((f, idx) => (
-                          <span
-                            key={`file-${idx}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-lg text-xs"
-                          >
-                            <Upload className="w-3 h-3" />
-                            <span className="truncate max-w-[150px]">{f.name}</span>
-                            <button
-                              type="button"
-                              onClick={() => setGalleryFiles((prev) => prev.filter((_, i) => i !== idx))}
-                              className="hover:text-white"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </span>
-                        ))}
+                    {/* Title & Classification */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                          Project Name / Title <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          placeholder="e.g. URSAC Hub 2.0"
+                          className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                        />
+                      </div>
 
-                        {galleryUrls.map((url) => (
-                          <span
-                            key={url}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 text-gray-300 rounded-lg text-xs"
-                          >
-                            <ImageIcon className="w-3 h-3 text-sky-400" />
-                            <span className="truncate max-w-[200px] font-mono">{url}</span>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveGalleryUrl(url)}
-                              className="hover:text-red-400"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </span>
-                        ))}
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                          Classification / Category <span className="text-red-400">*</span>
+                        </label>
+                        <select
+                          value={category}
+                          onChange={(e) => setCategory(e.target.value)}
+                          className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white outline-none focus:border-sky-500 transition-colors cursor-pointer"
+                        >
+                          {CATEGORIES.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
-                  )}
+
+                    {/* Custom Category Input if selected */}
+                    {category === 'Other Custom Category' && (
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                          Custom Classification Name <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={customCategory}
+                          onChange={(e) => setCustomCategory(e.target.value)}
+                          placeholder="e.g. Augmented Reality / Motion Graphics"
+                          className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                        />
+                      </div>
+                    )}
+
+                    {/* Role & Display Order */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                          Your Role / Title
+                        </label>
+                        <input
+                          type="text"
+                          value={role}
+                          onChange={(e) => setRole(e.target.value)}
+                          placeholder="e.g. Lead Full-Stack Developer & Designer"
+                          className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                          Display Order Index
+                        </label>
+                        <input
+                          type="number"
+                          value={displayOrder}
+                          onChange={(e) => setDisplayOrder(parseInt(e.target.value) || 0)}
+                          placeholder="0"
+                          className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Short Description */}
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                        Short Description (Card View) <span className="text-red-400">*</span>
+                      </label>
+                      <textarea
+                        rows={2}
+                        required
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="A concise 1-2 sentence overview of the project shown on project cards."
+                        className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors resize-y"
+                      />
+                    </div>
+
+                    {/* Detailed Long Description */}
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                        Detailed Overview / Long Description (Modal View)
+                      </label>
+                      <textarea
+                        rows={4}
+                        value={longDescription}
+                        onChange={(e) => setLongDescription(e.target.value)}
+                        placeholder="In-depth project breakdown, problem statement, solution architecture, design choices, etc."
+                        className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors resize-y"
+                      />
+                    </div>
+
+                    {/* External Links */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                          Live Preview URL
+                        </label>
+                        <input
+                          type="url"
+                          value={liveUrl}
+                          onChange={(e) => setLiveUrl(e.target.value)}
+                          placeholder="https://myproject.com"
+                          className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                          GitHub Repository URL
+                        </label>
+                        <input
+                          type="url"
+                          value={githubUrl}
+                          onChange={(e) => setGithubUrl(e.target.value)}
+                          placeholder="https://github.com/username/repo"
+                          className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* RIGHT COLUMN: Media Assets & Dynamic Lists */}
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-sky-400">
+                      <Sparkles className="w-4 h-4" />
+                      <h3 className="font-neutralfacebold text-xs uppercase tracking-wider text-white">
+                        2. Media Assets & Tech Specifications
+                      </h3>
+                    </div>
+
+                    {/* MEDIA ASSETS SECTION */}
+                    <div className="p-4 bg-white/5 border border-white/10 rounded-2xl space-y-4">
+                      
+                      {/* Main Cover Image Upload & Path */}
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                          Cover Image Asset
+                        </label>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                          <input
+                            type="file"
+                            ref={coverFileInputRef}
+                            onChange={handleCoverFileChange}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => coverFileInputRef.current?.click()}
+                            className="px-3.5 py-2 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 text-sky-400 text-xs font-semibold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shrink-0"
+                          >
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>{coverFile ? coverFile.name : 'Upload File'}</span>
+                          </button>
+
+                          <div className="text-[10px] text-gray-500 text-center font-bold uppercase">OR</div>
+
+                          <input
+                            type="text"
+                            value={coverUrl}
+                            onChange={(e) => setCoverUrl(e.target.value)}
+                            placeholder="Direct URL or Path (e.g. /assets/projects/ursac-hub.jpg)"
+                            className="flex-1 px-3.5 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Gallery Images & Videos Upload & Paths */}
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                          Gallery & Video Assets
+                        </label>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                          <input
+                            type="file"
+                            ref={galleryFileInputRef}
+                            onChange={handleGalleryFilesChange}
+                            multiple
+                            accept="image/*,video/*"
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => galleryFileInputRef.current?.click()}
+                            className="px-3.5 py-2 bg-white/10 border border-white/15 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shrink-0"
+                          >
+                            <Film className="w-3.5 h-3.5" />
+                            <span>Upload Files</span>
+                          </button>
+
+                          <div className="flex-1 flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={newGalleryUrlInput}
+                              onChange={(e) => setNewGalleryUrlInput(e.target.value)}
+                              placeholder="Path or URL (e.g. /assets/projects/video.mp4)"
+                              className="flex-1 px-3 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                            />
+                            <button
+                              type="button"
+                              onClick={handleAddGalleryUrl}
+                              className="px-3 py-2 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-colors cursor-pointer shrink-0"
+                            >
+                              Add
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* List of uploaded/added gallery files */}
+                        {(galleryFiles.length > 0 || galleryUrls.length > 0) && (
+                          <div className="space-y-1.5 pt-2">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                              Attached Gallery Items ({galleryFiles.length + galleryUrls.length}):
+                            </span>
+
+                            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto modal-scrollbar p-1">
+                              {galleryFiles.map((f, idx) => (
+                                <span
+                                  key={`file-${idx}`}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-lg text-xs"
+                                >
+                                  <Upload className="w-3 h-3" />
+                                  <span className="truncate max-w-[140px]">{f.name}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setGalleryFiles((prev) => prev.filter((_, i) => i !== idx))}
+                                    className="hover:text-white"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </span>
+                              ))}
+
+                              {galleryUrls.map((url) => (
+                                <span
+                                  key={url}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 text-gray-300 rounded-lg text-xs"
+                                >
+                                  <ImageIcon className="w-3 h-3 text-sky-400" />
+                                  <span className="truncate max-w-[180px] font-mono">{url}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveGalleryUrl(url)}
+                                    className="hover:text-red-400"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Tech Stack Chips Manager */}
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
+                        <span>Tech Stack & Tools</span>
+                        <span className="text-gray-500 text-[10px] font-normal">Press Enter to add tag</span>
+                      </label>
+
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                          <input
+                            type="text"
+                            value={techStackInput}
+                            onChange={(e) => setTechStackInput(e.target.value)}
+                            onKeyDown={handleAddTechTag}
+                            placeholder="e.g. React, Next.js, Premiere Pro, Figma"
+                            className="w-full pl-9 pr-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAddTechTag}
+                          className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                        >
+                          Add Tag
+                        </button>
+                      </div>
+
+                      {techStack.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-1 max-h-28 overflow-y-auto modal-scrollbar">
+                          {techStack.map((tech) => (
+                            <span
+                              key={tech}
+                              className="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-500/10 border border-sky-500/25 rounded-full text-xs font-semibold text-sky-300"
+                            >
+                              <span>{tech}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveTechTag(tech)}
+                                className="hover:text-white transition-colors"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Key Features Bullet List Manager */}
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
+                        <span>Key Highlights & Features</span>
+                        <span className="text-gray-500 text-[10px] font-normal">Press Enter to add bullet</span>
+                      </label>
+
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <ListPlus className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                          <input
+                            type="text"
+                            value={featureInput}
+                            onChange={(e) => setFeatureInput(e.target.value)}
+                            onKeyDown={handleAddFeature}
+                            placeholder="e.g. Real-time post feed with image attachments"
+                            className="w-full pl-9 pr-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAddFeature}
+                          className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                        >
+                          Add Bullet
+                        </button>
+                      </div>
+
+                      {features.length > 0 && (
+                        <ul className="space-y-1.5 pt-1 max-h-36 overflow-y-auto modal-scrollbar">
+                          {features.map((feat, idx) => (
+                            <li
+                              key={idx}
+                              className="flex items-center justify-between p-2.5 bg-white/5 border border-white/5 rounded-xl text-xs text-gray-200"
+                            >
+                              <span className="flex items-center gap-2">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                                <span>{feat}</span>
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveFeature(idx)}
+                                className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+
                 </div>
+
+                {/* Action Buttons Fixed Footer inside form */}
+                <div className="pt-5 mt-2 border-t border-white/10 flex items-center justify-end gap-3 sticky bottom-0 bg-[#0c0f17] py-2 z-10">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-6 py-2.5 rounded-xl gradient-bg hover:brightness-110 text-white font-neutralfacebold text-xs uppercase tracking-wider transition-all shadow-lg shadow-sky-500/25 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <span>Saving...</span>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>{editingProject ? 'Save Changes' : 'Publish Project'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
+
+      {/* DELETE CONFIRMATION MODAL (PORTAL + LOCK BODY SCROLL) */}
+      {deleteTarget &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <div className="w-full max-w-md bg-[#0c1017] border border-red-500/30 rounded-3xl p-6 space-y-4 shadow-2xl text-center">
+              <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center mx-auto">
+                <Trash2 className="w-6 h-6" />
               </div>
 
-              {/* External Links */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                    Live Preview URL
-                  </label>
-                  <input
-                    type="url"
-                    value={liveUrl}
-                    onChange={(e) => setLiveUrl(e.target.value)}
-                    placeholder="https://myproject.com"
-                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                  />
-                </div>
+              <h3 className="font-neutralfacebold text-lg uppercase text-white">Delete Project?</h3>
+              <p className="text-xs text-gray-400 leading-relaxed font-sans">
+                Are you sure you want to delete <strong className="text-white">"{deleteTarget.title}"</strong>? This action will remove the record from your Supabase database.
+              </p>
 
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-                    GitHub Repository URL
-                  </label>
-                  <input
-                    type="url"
-                    value={githubUrl}
-                    onChange={(e) => setGithubUrl(e.target.value)}
-                    placeholder="https://github.com/username/repo"
-                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Action Buttons Footer */}
-              <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+              <div className="flex items-center justify-center gap-3 pt-2">
                 <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                  onClick={() => setDeleteTarget(null)}
+                  className="px-5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
 
                 <button
-                  type="submit"
+                  onClick={handleDeleteConfirm}
                   disabled={isSubmitting}
-                  className="px-6 py-2.5 rounded-xl gradient-bg hover:brightness-110 text-white font-neutralfacebold text-xs uppercase tracking-wider transition-all shadow-lg shadow-sky-500/25 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-red-500/20 cursor-pointer disabled:opacity-50"
                 >
-                  {isSubmitting ? (
-                    <span>Saving...</span>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>{editingProject ? 'Save Changes' : 'Publish Project'}</span>
-                    </>
-                  )}
+                  {isSubmitting ? 'Deleting...' : 'Confirm Delete'}
                 </button>
               </div>
-
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* DELETE CONFIRMATION MODAL */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="w-full max-w-md bg-[#0c1017] border border-red-500/30 rounded-3xl p-6 space-y-4 shadow-2xl text-center">
-            <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center mx-auto">
-              <Trash2 className="w-6 h-6" />
             </div>
-
-            <h3 className="font-neutralfacebold text-lg uppercase text-white">Delete Project?</h3>
-            <p className="text-xs text-gray-400 leading-relaxed font-sans">
-              Are you sure you want to delete <strong className="text-white">"{deleteTarget.title}"</strong>? This action will remove the record from your Supabase database.
-            </p>
-
-            <div className="flex items-center justify-center gap-3 pt-2">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="px-5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={handleDeleteConfirm}
-                disabled={isSubmitting}
-                className="px-5 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-red-500/20 cursor-pointer disabled:opacity-50"
-              >
-                {isSubmitting ? 'Deleting...' : 'Confirm Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
