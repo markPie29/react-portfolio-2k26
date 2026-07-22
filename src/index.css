@@ -231,6 +231,17 @@
   background: linear-gradient(90deg, #0077b6, #0096c7, #00b4d8, #48cae4, #90e0ef);
 }
 
+.hover-gradient-blue {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-gradient-blue:hover {
+  background: linear-gradient(90deg, #0077b6, #0096c7, #00b4d8, #48cae4, #90e0ef) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(72, 202, 228, 0.3);
+  transform: translateY(-2px);
+}
+
 .gradient-border-dark {
   border: 2px solid transparent;
   background: linear-gradient(#080A0F, #080A0F) padding-box,

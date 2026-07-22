@@ -104,7 +104,7 @@ function App() {
 
 
 
-          <a className="gradient-border-dark rounded-full text-sm pl-5 pr-5 pt-2 pb-2 mt-2 text-accent font-bold dark:gradient-border-light" href="Mark_Angelo_Isulat_Final_Resume.pdf" download>Download CV</a>
+          <a className="gradient-bg text-white hover:brightness-110 rounded-full text-sm px-6 py-2.5 mt-2 font-bold uppercase tracking-wider shadow-lg shadow-sky-500/25 transition-all" href="Mark_Angelo_Isulat_Final_Resume.pdf" download>Download CV</a>
         </div>
 
         <div
