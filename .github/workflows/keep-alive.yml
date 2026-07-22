@@ -16,8 +16,27 @@ jobs:
             echo "SUPABASE_URL secret is not set, skipping ping."
             exit 0
           fi
-          echo "Pinging Supabase REST API..."
-          curl -s -o /dev/null -w "%{http_code}" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/"
-          echo "Supabase keep-alive ping complete."
+
+          # Clean inputs to strip any accidental whitespace, quotes, or trailing slashes
+          CLEAN_URL=$(echo "${{ secrets.SUPABASE_URL }}" | tr -d ' "' | sed 's#/*$##')
+          CLEAN_KEY=$(echo "${{ secrets.SUPABASE_ANON_KEY }}" | tr -d ' "')
+
+          FULL_ENDPOINT="${CLEAN_URL}/rest/v1/inquiries?select=id&limit=1"
+
+          echo "Pinging Supabase REST API at: ${FULL_ENDPOINT}"
+
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${CLEAN_KEY}" \
+            -H "Authorization: Bearer ${CLEAN_KEY}" \
+            "${FULL_ENDPOINT}")
+
+          echo "Response HTTP Status Code: ${HTTP_CODE}"
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+            echo "✅ Supabase keep-alive ping successful!"
+            exit 0
+          else
+            echo "❌ Supabase ping returned status code: ${HTTP_CODE}"
+            exit 1
+          fi
+
