@@ -389,6 +389,45 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     }
   }, [playClose, animateIcon, animateColor, animateText, onMenuClose]);
 
+  const handleNavClick = (link: string) => {
+    closeMenu();
+    if ((window as any).lenis) {
+      (window as any).lenis.start();
+    }
+    document.body.style.overflow = '';
+
+    try {
+      const targetUrl = new URL(link, window.location.origin);
+      const isSamePath = window.location.pathname === targetUrl.pathname;
+      const hash = targetUrl.hash ? targetUrl.hash.substring(1) : '';
+
+      if (isSamePath) {
+        if (hash) {
+          setTimeout(() => {
+            const el = document.getElementById(hash);
+            if (el) {
+              if ((window as any).lenis) {
+                (window as any).lenis.scrollTo(el, { offset: -80 });
+              } else {
+                el.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+          }, 150);
+        } else {
+          setTimeout(() => {
+            if ((window as any).lenis) {
+              (window as any).lenis.scrollTo(0, { immediate: true });
+            } else {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }, 150);
+        }
+      }
+    } catch (e) {
+      // Fallback
+    }
+  };
+
   React.useEffect(() => {
     if (!closeOnClickAway || !open) return;
 
@@ -523,7 +562,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                       to={it.link}
                       aria-label={it.ariaLabel}
                       data-index={idx + 1}
-                      onClick={closeMenu}
+                      onClick={() => handleNavClick(it.link)}
                     >
                       <span className="sm-panel-itemLabel inline-block [transform-origin:50%_100%] will-change-transform">
                         {it.label}

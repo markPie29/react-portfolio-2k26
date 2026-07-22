@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { navigationData } from '../../data/navigation';
 import { Menu, X, Sun, Moon } from 'lucide-react';
@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isAdminPage = location.pathname.startsWith('/admin');
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
@@ -43,14 +44,40 @@ const Navbar: React.FC = () => {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setMobileOpen(false);
-    const targetId = href.replace('#', '');
-    const element = document.getElementById(targetId);
-    if (element) {
-      if ((window as any).lenis) {
-        (window as any).lenis.scrollTo(element, { offset: -80 });
+
+    if (href.startsWith('/')) {
+      const [pathname, hash] = href.split('#');
+      const targetPath = pathname || '/';
+
+      if (location.pathname !== targetPath) {
+        navigate(href);
+      } else if (hash) {
+        const element = document.getElementById(hash);
+        if (element) {
+          if ((window as any).lenis) {
+            (window as any).lenis.scrollTo(element, { offset: -80 });
+          } else {
+            const top = element.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        }
       } else {
-        const top = element.getBoundingClientRect().top + window.scrollY - 80;
-        window.scrollTo({ top, behavior: 'smooth' });
+        if ((window as any).lenis) {
+          (window as any).lenis.scrollTo(0, { immediate: true });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    } else if (href.startsWith('#')) {
+      const targetId = href.replace('#', '');
+      const element = document.getElementById(targetId);
+      if (element) {
+        if ((window as any).lenis) {
+          (window as any).lenis.scrollTo(element, { offset: -80 });
+        } else {
+          const top = element.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
       }
     }
   };

@@ -3,10 +3,10 @@ import { useTheme } from '../context/ThemeContext';
 import StaggeredMenu from './StaggeredMenu';
 
 const menuItems = [
-  { label: 'Home', ariaLabel: 'Go to home page', link: '/#home' },
-  { label: 'About', ariaLabel: 'Learn about me', link: '/#about' },
-  { label: 'Experience', ariaLabel: 'View my experience', link: '/#experience' },
-  { label: 'Projects', ariaLabel: 'View my projects', link: '/#projects' },
+  { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
+  { label: 'About', ariaLabel: 'Learn about me', link: '/about' },
+  { label: 'Experience', ariaLabel: 'View my experience', link: '/about#credentials' },
+  { label: 'Projects', ariaLabel: 'View my projects', link: '/projects' },
   { label: 'Inquiry', ariaLabel: 'Project inquiry & discovery', link: '/#cta' }
 ];
 

@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import HomePage from '../pages/HomePage';
+import AboutPage from '../pages/AboutPage';
 import ProjectsPage from '../pages/ProjectsPage';
 
 // Admin imports
@@ -43,6 +44,7 @@ export default function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         {/* Public Routes */}
         <Route path="/" element={<PageWrapper><HomePage /></PageWrapper>} />
+        <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
         <Route path="/projects" element={<PageWrapper><ProjectsPage /></PageWrapper>} />
 
         {/* Admin Login */}
