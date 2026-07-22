@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { navigationData } from '../../data/navigation';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const Navbar: React.FC = () => {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
+    if (isAdminPage) return;
+
     const handleScroll = () => {
       const scrollPos = (window as any).lenis?.scroll ?? window.scrollY;
       setScrolled(scrollPos > 50);
@@ -29,7 +34,11 @@ const Navbar: React.FC = () => {
         (window as any).lenis.off('scroll', handleScroll);
       }
     };
-  }, []);
+  }, [isAdminPage]);
+
+  if (isAdminPage) {
+    return null;
+  }
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -59,7 +68,7 @@ const Navbar: React.FC = () => {
         <a
           href="#home"
           onClick={(e) => handleNavClick(e, '#home')}
-          className="font-neutralfacebold text-xl md:text-2xl tracking-tight text-gray-900 dark:text-white hover:text-accent transition-colors"
+          className="font-neutralfacebold text-xl md:text-2xl tracking-tight gradient-text hover:opacity-85 transition-opacity"
         >
           MARKY
         </a>
@@ -91,7 +100,7 @@ const Navbar: React.FC = () => {
           <a
             href="#cta"
             onClick={(e) => handleNavClick(e, '#cta')}
-            className="bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:text-black dark:hover:bg-gray-200 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 transform hover:-translate-y-0.5 shadow-md"
+            className="gradient-bg text-white hover:brightness-110 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 transform hover:-translate-y-0.5 shadow-md shadow-sky-500/20"
           >
             LETS WORK
           </a>
@@ -138,7 +147,7 @@ const Navbar: React.FC = () => {
               <a
                 href="#cta"
                 onClick={(e) => handleNavClick(e, '#cta')}
-                className="mt-2 text-center bg-gray-900 text-white dark:bg-white dark:text-black font-bold py-3 rounded-full uppercase tracking-wider text-xs"
+                className="mt-2 text-center gradient-bg text-white hover:brightness-110 font-bold py-3 rounded-full uppercase tracking-wider text-xs shadow-md shadow-sky-500/20 transition-all"
               >
                 LETS WORK
               </a>
