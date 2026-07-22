@@ -25,8 +25,8 @@
   - [x] Create clean Supabase migration file at `supabase/migrations/00001_init_schema.sql` (defines `inquiries`, `availability_slots`, `bookings` tables, RLS policies, and `inquiry-attachments` storage bucket).
   - [x] Create `supabase/config.toml` CLI configuration.
   - [x] Add `"db:push"` script to `package.json`.
-- [ ] **Push Migration to Live Supabase Project**
-  - [ ] Link your project via Supabase CLI (`npx supabase link --project-ref your-project-id`) or run `npm run db:push`.
+- [x] **Push Migration to Live Supabase Project**
+  - [x] Link your project via Supabase CLI (`npx supabase link --project-ref your-project-id`) or run `npm run db:push` (Verified: live database schema `inquiries`, `bookings`, `availability_slots` operational).
 - [x] **Frontend Supabase Client Integration**
   - [x] Refactor `src/services/inquiryService.ts` to upload attachments to Supabase Storage & insert rows directly into `inquiries`.
 
@@ -86,7 +86,7 @@
 
 ### Phase 6: Keep-Alive Cron, Free Notifications & Cleanup
 - [x] **GitHub Actions Keep-Alive Cron Workflow**
-  - [x] Create `.github/workflows/keep-alive.yml` to ping Supabase REST endpoint daily.
+  - [x] Create `.github/workflows/keep-alive.yml` to ping Supabase REST endpoint daily (GitHub Secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY` configured & sanitized).
 - [x] **Free Notification Workaround (Discord / Telegram Webhook)**
   - [x] Add lightweight webhook call upon new inquiry submission to send instant alert to Discord/Telegram (100% free, no custom domain needed).
 - [x] **Configuration Files**
