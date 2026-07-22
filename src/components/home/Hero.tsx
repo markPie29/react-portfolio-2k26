@@ -51,7 +51,7 @@ const Hero: React.FC = () => {
         {/* TextType Rotating Subtitle (Centered) */}
         <div className="mb-8 h-8 flex items-center justify-center text-center">
           <TextType
-            text={["Software Engineer", "UI/UX Designer", "Multimedia Specialist"]}
+            text={["Software Engineer", "Multimedia Designer", "Tech Enthusiast"]}
             typingSpeed={80}
             pauseDuration={1800}
             showCursor
