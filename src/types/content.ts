@@ -43,7 +43,7 @@ export interface ServiceItem {
 export interface ProjectItem {
   id: string;
   title: string;
-  category: "Graphic Design" | "Graphic Design & Video Editing" | "Software Development" | "Social Media Management";
+  category: "Graphic Design" | "Video Editing" | "Graphic Design & Video Editing" | "Software Development" | "Social Media Management" | string;
   description: string;
   longDescription?: string;
   techStack: string[];
