@@ -300,7 +300,11 @@ export const ProjectsManager: React.FC = () => {
         // Edit existing project
         const res = await updateProject(editingProject.id, formData, coverFile, galleryFiles);
         if (res.success && res.project) {
-          showToast('success', `Project "${res.project.title}" updated successfully!`);
+          const updated = res.project;
+          setProjects((prev) =>
+            prev.map((p) => (p.id === editingProject.id ? updated : p))
+          );
+          showToast('success', `Project "${updated.title}" updated successfully!`);
           setIsModalOpen(false);
           await loadProjectsData();
         } else {
@@ -328,11 +332,15 @@ export const ProjectsManager: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
+    const targetId = deleteTarget.id;
+    const targetTitle = deleteTarget.title;
+
     setIsSubmitting(true);
     try {
-      const res = await deleteProject(deleteTarget.id);
+      const res = await deleteProject(targetId);
       if (res.success) {
-        showToast('success', `Project "${deleteTarget.title}" deleted.`);
+        setProjects((prev) => prev.filter((p) => p.id !== targetId));
+        showToast('success', `Project "${targetTitle}" deleted.`);
         setDeleteTarget(null);
         await loadProjectsData();
       } else {
