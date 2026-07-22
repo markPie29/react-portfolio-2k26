@@ -394,6 +394,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     if ((window as any).lenis) {
       (window as any).lenis.start();
     }
+    // eslint-disable-next-line react-hooks/immutability
     document.body.style.overflow = '';
 
     try {

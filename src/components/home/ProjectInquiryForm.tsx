@@ -50,6 +50,7 @@ export const ProjectInquiryForm: React.FC = () => {
     }
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const clientFullName = watch('fullName');
   const clientEmailAddress = watch('email');
 
