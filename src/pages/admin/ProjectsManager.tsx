@@ -1,0 +1,1041 @@
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { 
+  fetchProjects, 
+  createProject, 
+  updateProject, 
+  deleteProject, 
+  ProjectFormData, 
+  MAX_FILE_SIZE_BYTES 
+} from '../../services/projectService';
+import { ProjectItem } from '../../types/content';
+import { isSupabaseConfigured } from '../../lib/supabase';
+import { 
+  FolderKanban, 
+  Plus, 
+  Search, 
+  Edit3, 
+  Trash2, 
+  X, 
+  Upload, 
+  Image as ImageIcon, 
+  AlertCircle, 
+  CheckCircle2, 
+  ExternalLink, 
+  Tag, 
+  Sparkles,
+  ListPlus,
+  FileWarning,
+  Film
+} from 'lucide-react';
+import { SiGithub } from 'react-icons/si';
+
+const CATEGORIES = [
+  'Software Development',
+  'Graphic Design',
+  'Video Editing',
+  'Social Media Management',
+  'Graphic Design & Video Editing',
+  'Other Custom Category',
+];
+
+export const ProjectsManager: React.FC = () => {
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [editingProject, setEditingProject] = useState<ProjectItem | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ProjectItem | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Form Fields State
+  const [title, setTitle] = useState<string>('');
+  const [category, setCategory] = useState<string>('Software Development');
+  const [customCategory, setCustomCategory] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [longDescription, setLongDescription] = useState<string>('');
+  const [role, setRole] = useState<string>('');
+  const [techStackInput, setTechStackInput] = useState<string>('');
+  const [techStack, setTechStack] = useState<string[]>([]);
+  const [featureInput, setFeatureInput] = useState<string>('');
+  const [features, setFeatures] = useState<string[]>([]);
+  const [liveUrl, setLiveUrl] = useState<string>('');
+  const [githubUrl, setGithubUrl] = useState<string>('');
+  const [coverUrl, setCoverUrl] = useState<string>('');
+  const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
+  const [videoUrl, setVideoUrl] = useState<string>('');
+  const [displayOrder, setDisplayOrder] = useState<number>(0);
+
+  // Files State & Size Alerts
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [fileSizeWarning, setFileSizeWarning] = useState<string | null>(null);
+  const [newGalleryUrlInput, setNewGalleryUrlInput] = useState<string>('');
+
+  const coverFileInputRef = useRef<HTMLInputElement>(null);
+  const galleryFileInputRef = useRef<HTMLInputElement>(null);
+
+  const loadProjectsData = async () => {
+    setIsLoading(true);
+    try {
+      const data = await fetchProjects();
+      setProjects(data);
+    } catch (err) {
+      console.error('Failed to load projects:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProjectsData();
+  }, []);
+
+  // Show temporary toast message
+  const showToast = (type: 'success' | 'error', text: string) => {
+    setToastMessage({ type, text });
+    setTimeout(() => setToastMessage(null), 5000);
+  };
+
+  // Open modal for Create
+  const handleOpenCreateModal = () => {
+    setEditingProject(null);
+    setTitle('');
+    setCategory('Software Development');
+    setCustomCategory('');
+    setDescription('');
+    setLongDescription('');
+    setRole('');
+    setTechStack([]);
+    setFeatures([]);
+    setLiveUrl('');
+    setGithubUrl('');
+    setCoverUrl('');
+    setGalleryUrls([]);
+    setVideoUrl('');
+    setDisplayOrder(projects.length + 1);
+    setCoverFile(null);
+    setGalleryFiles([]);
+    setFileSizeWarning(null);
+    setIsModalOpen(true);
+  };
+
+  // Open modal for Edit
+  const handleOpenEditModal = (project: ProjectItem) => {
+    setEditingProject(project);
+    setTitle(project.title);
+
+    if (CATEGORIES.includes(project.category)) {
+      setCategory(project.category);
+      setCustomCategory('');
+    } else {
+      setCategory('Other Custom Category');
+      setCustomCategory(project.category);
+    }
+
+    setDescription(project.description);
+    setLongDescription(project.longDescription || '');
+    setRole(project.role || '');
+    setTechStack(project.techStack || []);
+    setFeatures(project.features || []);
+    setLiveUrl(project.liveUrl || '');
+    setGithubUrl(project.githubUrl || '');
+    setCoverUrl(project.image || '');
+    setGalleryUrls(project.images || []);
+    setVideoUrl('');
+    setDisplayOrder(0);
+    setCoverFile(null);
+    setGalleryFiles([]);
+    setFileSizeWarning(null);
+    setIsModalOpen(true);
+  };
+
+  // Add Tech Tag
+  const handleAddTechTag = (e?: React.KeyboardEvent | React.MouseEvent) => {
+    if (e && 'key' in e && e.key !== 'Enter') return;
+    if (e) e.preventDefault();
+    const trimmed = techStackInput.trim();
+    if (trimmed && !techStack.includes(trimmed)) {
+      setTechStack((prev) => [...prev, trimmed]);
+      setTechStackInput('');
+    }
+  };
+
+  // Remove Tech Tag
+  const handleRemoveTechTag = (tagToRemove: string) => {
+    setTechStack((prev) => prev.filter((t) => t !== tagToRemove));
+  };
+
+  // Add Feature
+  const handleAddFeature = (e?: React.KeyboardEvent | React.MouseEvent) => {
+    if (e && 'key' in e && e.key !== 'Enter') return;
+    if (e) e.preventDefault();
+    const trimmed = featureInput.trim();
+    if (trimmed) {
+      setFeatures((prev) => [...prev, trimmed]);
+      setFeatureInput('');
+    }
+  };
+
+  // Remove Feature
+  const handleRemoveFeature = (idx: number) => {
+    setFeatures((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  // Add Gallery URL manually
+  const handleAddGalleryUrl = () => {
+    const trimmed = newGalleryUrlInput.trim();
+    if (trimmed && !galleryUrls.includes(trimmed)) {
+      setGalleryUrls((prev) => [...prev, trimmed]);
+      setNewGalleryUrlInput('');
+    }
+  };
+
+  // Remove Gallery URL
+  const handleRemoveGalleryUrl = (urlToRemove: string) => {
+    setGalleryUrls((prev) => prev.filter((u) => u !== urlToRemove));
+  };
+
+  // Handle Cover File Selection
+  const handleCoverFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      setFileSizeWarning(
+        `File "${file.name}" is ${sizeMb}MB (exceeds the 50MB Supabase Storage limit).\n💡 Suggestion: Place this file in /public/assets/projects/ and enter "/assets/projects/${file.name}" in the Cover Image URL field below instead!`
+      );
+      return;
+    }
+
+    setFileSizeWarning(null);
+    setCoverFile(file);
+  };
+
+  // Handle Gallery Files Selection
+  const handleGalleryFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const oversizedFiles = files.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
+    if (oversizedFiles.length > 0) {
+      const oversizedNames = oversizedFiles.map((f) => `${f.name} (${(f.size / (1024 * 1024)).toFixed(1)}MB)`).join(', ');
+      setFileSizeWarning(
+        `The following file(s) exceed 50MB: ${oversizedNames}.\n💡 Suggestion: Place large videos/images in /public/assets/projects/ and enter their path (e.g. /assets/projects/filename.mp4) using the "Add URL / Local Asset Path" input!`
+      );
+      return;
+    }
+
+    setFileSizeWarning(null);
+    setGalleryFiles((prev) => [...prev, ...files]);
+  };
+
+  // Handle Save / Submit
+  const handleSubmitForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!title.trim()) {
+      showToast('error', 'Project Name / Title is required.');
+      return;
+    }
+    if (!description.trim()) {
+      showToast('error', 'Project Short Description is required.');
+      return;
+    }
+
+    const finalCategory = category === 'Other Custom Category' ? customCategory.trim() || 'General' : category;
+
+    const formData: ProjectFormData = {
+      title: title.trim(),
+      category: finalCategory,
+      description: description.trim(),
+      longDescription: longDescription.trim() || undefined,
+      role: role.trim() || undefined,
+      techStack,
+      features,
+      image: coverUrl.trim() || undefined,
+      images: galleryUrls,
+      videoUrl: videoUrl.trim() || undefined,
+      liveUrl: liveUrl.trim() || undefined,
+      githubUrl: githubUrl.trim() || undefined,
+      displayOrder,
+    };
+
+    setIsSubmitting(true);
+
+    try {
+      if (editingProject) {
+        // Edit existing project
+        const res = await updateProject(editingProject.id, formData, coverFile, galleryFiles);
+        if (res.success && res.project) {
+          showToast('success', `Project "${res.project.title}" updated successfully!`);
+          setIsModalOpen(false);
+          await loadProjectsData();
+        } else {
+          showToast('error', res.error || 'Failed to update project.');
+        }
+      } else {
+        // Create new project
+        const res = await createProject(formData, coverFile, galleryFiles);
+        if (res.success && res.project) {
+          showToast('success', `Project "${res.project.title}" created successfully!`);
+          setIsModalOpen(false);
+          await loadProjectsData();
+        } else {
+          showToast('error', res.error || 'Failed to create project.');
+        }
+      }
+    } catch (err: any) {
+      showToast('error', err?.message || 'An error occurred while saving.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle Delete Confirmation
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+
+    setIsSubmitting(true);
+    try {
+      const res = await deleteProject(deleteTarget.id);
+      if (res.success) {
+        showToast('success', `Project "${deleteTarget.title}" deleted.`);
+        setDeleteTarget(null);
+        await loadProjectsData();
+      } else {
+        showToast('error', res.error || 'Failed to delete project.');
+      }
+    } catch (err: any) {
+      showToast('error', err?.message || 'Delete operation failed.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Filtered projects list
+  const filteredProjects = useMemo(() => {
+    return projects.filter((p) => {
+      const matchCat =
+        selectedCategory === 'ALL' ||
+        p.category.toLowerCase() === selectedCategory.toLowerCase();
+
+      const q = searchQuery.trim().toLowerCase();
+      if (!q) return matchCat;
+
+      const matchTitle = p.title.toLowerCase().includes(q);
+      const matchDesc = p.description.toLowerCase().includes(q);
+      const matchTech = p.techStack.some((t) => t.toLowerCase().includes(q));
+
+      return matchCat && (matchTitle || matchDesc || matchTech);
+    });
+  }, [projects, selectedCategory, searchQuery]);
+
+  return (
+    <div className="space-y-8 text-gray-100 pb-12">
+      {/* Banner / Header */}
+      <div className="p-6 bg-gradient-to-r from-sky-950/40 via-cyan-950/20 to-transparent border border-sky-500/20 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold uppercase tracking-wider mb-2">
+            <FolderKanban className="w-3.5 h-3.5" />
+            <span>Portfolio Projects</span>
+          </div>
+          <h1 className="font-neutralfacebold text-2xl uppercase tracking-tight text-white">
+            Project Showcase Manager
+          </h1>
+          <p className="text-xs text-gray-400 mt-1">
+            Add, edit, upload media, or reorder projects displayed on your portfolio website.
+          </p>
+        </div>
+
+        <button
+          onClick={handleOpenCreateModal}
+          className="px-5 py-2.5 rounded-xl gradient-bg hover:brightness-110 text-white font-neutralfacebold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-sky-500/25 self-start sm:self-auto cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add New Project</span>
+        </button>
+      </div>
+
+      {/* Supabase Local Fallback Indicator if unconfigured */}
+      {!isSupabaseConfigured && (
+        <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-start gap-3 text-xs text-amber-300">
+          <AlertCircle className="w-5 h-5 shrink-0 text-amber-400 mt-0.5" />
+          <div>
+            <span className="font-bold block text-amber-200">Supabase Credentials Operating in Local Preview Mode</span>
+            <span>
+              Your environment variables (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY) are set to placeholder values. Currently displaying the local hardcoded catalog. Connect your Supabase project in <code className="bg-black/30 px-1 py-0.5 rounded text-amber-200">.env</code> to persist uploaded projects.
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification Banner */}
+      {toastMessage && (
+        <div
+          className={`p-4 rounded-2xl border flex items-center gap-3 text-xs font-semibold shadow-xl transition-all ${
+            toastMessage.type === 'success'
+              ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+              : 'bg-red-500/15 border-red-500/30 text-red-300'
+          }`}
+        >
+          {toastMessage.type === 'success' ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+          )}
+          <span>{toastMessage.text}</span>
+        </div>
+      )}
+
+      {/* Search & Category Filter Controls */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        {/* Search Bar */}
+        <div className="relative flex-1">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="SEARCH PROJECTS BY NAME, TECH STACK, OR DESCRIPTION..."
+            className="w-full pl-10 pr-4 py-2.5 bg-[#0c1017] border border-white/10 rounded-xl text-xs text-white placeholder-gray-500 uppercase tracking-wider outline-none focus:border-sky-500 transition-colors"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Category Classification Filter */}
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider shrink-0">Filter:</span>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="bg-[#0c1017] border border-white/10 text-gray-200 text-xs font-semibold px-3 py-2.5 rounded-xl outline-none focus:border-sky-500 transition-colors cursor-pointer"
+          >
+            <option value="ALL">ALL CLASSIFICATIONS ({projects.length})</option>
+            {Array.from(new Set(projects.map((p) => p.category))).map((cat) => (
+              <option key={cat} value={cat}>
+                {cat.toUpperCase()}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Projects Cards Grid */}
+      {isLoading ? (
+        <div className="py-20 text-center text-xs text-gray-500 uppercase tracking-widest font-mono">
+          Loading project catalog...
+        </div>
+      ) : filteredProjects.length === 0 ? (
+        <div className="p-12 text-center bg-[#0c1017] border border-white/10 rounded-3xl space-y-3">
+          <FolderKanban className="w-10 h-10 text-gray-600 mx-auto" />
+          <h3 className="font-neutralfacebold text-base text-white uppercase">No Projects Found</h3>
+          <p className="text-xs text-gray-400 max-w-sm mx-auto">
+            No projects match your search query or filter. Click "Add New Project" to add your first work!
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project) => (
+            <div
+              key={project.id}
+              className="bg-[#0c1017] border border-white/10 hover:border-sky-500/40 rounded-2xl overflow-hidden flex flex-col justify-between transition-all group shadow-lg"
+            >
+              {/* Thumbnail Header */}
+              <div className="relative aspect-[16/9] bg-[#05070c] border-b border-white/10 flex items-center justify-center overflow-hidden">
+                {project.image ? (
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-1.5 text-gray-600">
+                    <ImageIcon className="w-8 h-8" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">No Cover Image</span>
+                  </div>
+                )}
+
+                {/* Category Pill Badge */}
+                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/10 text-sky-400 text-[10px] font-bold uppercase tracking-wider">
+                  {project.category}
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div className="space-y-2">
+                  <h3 className="font-neutralfacebold text-base text-white uppercase tracking-wide group-hover:text-sky-400 transition-colors">
+                    {project.title}
+                  </h3>
+
+                  {project.role && (
+                    <span className="text-[11px] text-gray-400 font-semibold block">
+                      Role: <span className="text-gray-300">{project.role}</span>
+                    </span>
+                  )}
+
+                  <p className="text-xs text-gray-400 leading-relaxed line-clamp-3 font-sans">
+                    {project.description}
+                  </p>
+                </div>
+
+                {/* Tech Stack Pills */}
+                <div className="flex flex-wrap gap-1.5 pt-3 border-t border-white/5">
+                  {project.techStack.map((tech, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-md text-[10px] font-semibold text-gray-300 uppercase tracking-wider"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Action Buttons Footer */}
+                <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    {project.liveUrl && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
+                        title="Live Link"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
+                        title="GitHub Repo"
+                      >
+                        <SiGithub className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleOpenEditModal(project)}
+                      className="px-3 py-1.5 rounded-lg bg-sky-500/15 border border-sky-500/30 text-sky-400 hover:bg-sky-500/25 transition-colors text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+
+                    <button
+                      onClick={() => setDeleteTarget(project)}
+                      className="p-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors text-xs cursor-pointer"
+                      title="Delete project"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* CREATE / EDIT PROJECT MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+          <div className="relative w-full max-w-3xl bg-[#0c1017] border border-white/15 rounded-3xl shadow-2xl overflow-hidden my-8">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-white/10 flex items-center justify-between bg-[#080a0f]">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                  <FolderKanban className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-neutralfacebold text-lg text-white uppercase tracking-tight">
+                    {editingProject ? 'Edit Project' : 'Add New Project'}
+                  </h2>
+                  <span className="text-[11px] text-gray-400 block font-mono">
+                    {editingProject ? `ID: ${editingProject.id}` : 'Fill in project specifications & media assets'}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body Form */}
+            <form onSubmit={handleSubmitForm} className="p-6 space-y-6 max-h-[78vh] overflow-y-auto">
+              
+              {/* File Size Warning / Hardcode Suggestion Banner */}
+              {fileSizeWarning && (
+                <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-amber-300">
+                    <FileWarning className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span>Supabase Storage 50MB Limit Exceeded</span>
+                  </div>
+                  <p className="whitespace-pre-line leading-relaxed text-[11.5px] font-sans">
+                    {fileSizeWarning}
+                  </p>
+                </div>
+              )}
+
+              {/* Title & Classification */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                    Project Name / Title <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="e.g. URSAC Hub 2.0"
+                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                    Classification / Category <span className="text-red-400">*</span>
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white outline-none focus:border-sky-500 transition-colors cursor-pointer"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Custom Category Input if selected */}
+              {category === 'Other Custom Category' && (
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                    Custom Classification Name <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={customCategory}
+                    onChange={(e) => setCustomCategory(e.target.value)}
+                    placeholder="e.g. Augmented Reality / Motion Graphics"
+                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                  />
+                </div>
+              )}
+
+              {/* Role & Display Order */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                    Your Role / Title
+                  </label>
+                  <input
+                    type="text"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    placeholder="e.g. Lead Full-Stack Developer & Designer"
+                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                    Display Order Index
+                  </label>
+                  <input
+                    type="number"
+                    value={displayOrder}
+                    onChange={(e) => setDisplayOrder(parseInt(e.target.value) || 0)}
+                    placeholder="0"
+                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Short Description */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                  Short Description (Card View) <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  rows={2}
+                  required
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="A concise 1-2 sentence overview of the project shown on project cards."
+                  className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors resize-y"
+                />
+              </div>
+
+              {/* Detailed Long Description */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                  Detailed Overview / Long Description (Modal View)
+                </label>
+                <textarea
+                  rows={4}
+                  value={longDescription}
+                  onChange={(e) => setLongDescription(e.target.value)}
+                  placeholder="In-depth project breakdown, problem statement, solution architecture, design choices, etc."
+                  className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors resize-y"
+                />
+              </div>
+
+              {/* Tech Stack Chips Manager */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
+                  <span>Tech Stack & Tools</span>
+                  <span className="text-gray-500 text-[10px] font-normal">Press Enter to add tag</span>
+                </label>
+
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                    <input
+                      type="text"
+                      value={techStackInput}
+                      onChange={(e) => setTechStackInput(e.target.value)}
+                      onKeyDown={handleAddTechTag}
+                      placeholder="e.g. React, Next.js, Premiere Pro, Figma, Tailwind CSS"
+                      className="w-full pl-9 pr-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddTechTag}
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    Add Tag
+                  </button>
+                </div>
+
+                {techStack.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {techStack.map((tech) => (
+                      <span
+                        key={tech}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-500/10 border border-sky-500/25 rounded-full text-xs font-semibold text-sky-300"
+                      >
+                        <span>{tech}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTechTag(tech)}
+                          className="hover:text-white transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Key Features Bullet List Manager */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
+                  <span>Key Highlights & Features</span>
+                  <span className="text-gray-500 text-[10px] font-normal">Press Enter to add bullet point</span>
+                </label>
+
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <ListPlus className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
+                    <input
+                      type="text"
+                      value={featureInput}
+                      onChange={(e) => setFeatureInput(e.target.value)}
+                      onKeyDown={handleAddFeature}
+                      placeholder="e.g. Real-time post feed with image attachments"
+                      className="w-full pl-9 pr-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddFeature}
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    Add Feature
+                  </button>
+                </div>
+
+                {features.length > 0 && (
+                  <ul className="space-y-1.5 pt-1">
+                    {features.map((feat, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-center justify-between p-2.5 bg-white/5 border border-white/5 rounded-xl text-xs text-gray-200"
+                      >
+                        <span className="flex items-center gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                          <span>{feat}</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFeature(idx)}
+                          className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* MEDIA ASSETS SECTION */}
+              <div className="p-5 bg-white/5 border border-white/10 rounded-2xl space-y-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-sky-400" />
+                  <h3 className="font-neutralfacebold text-xs uppercase text-white tracking-wider">
+                    Media Assets & Uploads (Supabase Storage Bucket "projects")
+                  </h3>
+                </div>
+
+                {/* Main Cover Image Upload & Path */}
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                    Cover Image
+                  </label>
+
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <input
+                      type="file"
+                      ref={coverFileInputRef}
+                      onChange={handleCoverFileChange}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => coverFileInputRef.current?.click()}
+                      className="px-4 py-2.5 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 text-sky-400 text-xs font-semibold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shrink-0"
+                    >
+                      <Upload className="w-4 h-4" />
+                      <span>{coverFile ? coverFile.name : 'Upload File to Supabase'}</span>
+                    </button>
+
+                    <div className="text-xs text-gray-500 text-center font-bold uppercase">OR</div>
+
+                    <input
+                      type="text"
+                      value={coverUrl}
+                      onChange={(e) => setCoverUrl(e.target.value)}
+                      placeholder="Enter Direct URL or Local Path (e.g. /assets/projects/ursac-hub.jpg)"
+                      className="flex-1 px-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                {/* Gallery Images & Videos Upload & Paths */}
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                    Gallery Images & Video Showcase Assets
+                  </label>
+
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <input
+                      type="file"
+                      ref={galleryFileInputRef}
+                      onChange={handleGalleryFilesChange}
+                      multiple
+                      accept="image/*,video/*"
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => galleryFileInputRef.current?.click()}
+                      className="px-4 py-2.5 bg-white/10 border border-white/15 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shrink-0"
+                    >
+                      <Film className="w-4 h-4" />
+                      <span>Upload Gallery Files</span>
+                    </button>
+
+                    <div className="flex-1 flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={newGalleryUrlInput}
+                        onChange={(e) => setNewGalleryUrlInput(e.target.value)}
+                        placeholder="Add Asset URL or Path (e.g. /assets/projects/heavy-video.mp4)"
+                        className="flex-1 px-4 py-2 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddGalleryUrl}
+                        className="px-3.5 py-2 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-colors cursor-pointer shrink-0"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* List of uploaded/added gallery files */}
+                  {(galleryFiles.length > 0 || galleryUrls.length > 0) && (
+                    <div className="space-y-1.5 pt-2">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
+                        Attached Gallery Items ({galleryFiles.length + galleryUrls.length}):
+                      </span>
+
+                      <div className="flex flex-wrap gap-2">
+                        {galleryFiles.map((f, idx) => (
+                          <span
+                            key={`file-${idx}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-lg text-xs"
+                          >
+                            <Upload className="w-3 h-3" />
+                            <span className="truncate max-w-[150px]">{f.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => setGalleryFiles((prev) => prev.filter((_, i) => i !== idx))}
+                              className="hover:text-white"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </span>
+                        ))}
+
+                        {galleryUrls.map((url) => (
+                          <span
+                            key={url}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 text-gray-300 rounded-lg text-xs"
+                          >
+                            <ImageIcon className="w-3 h-3 text-sky-400" />
+                            <span className="truncate max-w-[200px] font-mono">{url}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveGalleryUrl(url)}
+                              className="hover:text-red-400"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* External Links */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                    Live Preview URL
+                  </label>
+                  <input
+                    type="url"
+                    value={liveUrl}
+                    onChange={(e) => setLiveUrl(e.target.value)}
+                    placeholder="https://myproject.com"
+                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
+                    GitHub Repository URL
+                  </label>
+                  <input
+                    type="url"
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    placeholder="https://github.com/username/repo"
+                    className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons Footer */}
+              <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-6 py-2.5 rounded-xl gradient-bg hover:brightness-110 text-white font-neutralfacebold text-xs uppercase tracking-wider transition-all shadow-lg shadow-sky-500/25 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <span>Saving...</span>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>{editingProject ? 'Save Changes' : 'Publish Project'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="w-full max-w-md bg-[#0c1017] border border-red-500/30 rounded-3xl p-6 space-y-4 shadow-2xl text-center">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <h3 className="font-neutralfacebold text-lg uppercase text-white">Delete Project?</h3>
+            <p className="text-xs text-gray-400 leading-relaxed font-sans">
+              Are you sure you want to delete <strong className="text-white">"{deleteTarget.title}"</strong>? This action will remove the record from your Supabase database.
+            </p>
+
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="px-5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={isSubmitting}
+                className="px-5 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-red-500/20 cursor-pointer disabled:opacity-50"
+              >
+                {isSubmitting ? 'Deleting...' : 'Confirm Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { InquiryRow, BookingRow } from '../../types/database';
-import { Inbox, Calendar as CalendarIcon, Clock, CheckCircle2, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { Inbox, Calendar as CalendarIcon, Clock, CheckCircle2, ArrowRight, Sparkles, AlertCircle, FolderKanban } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const [inquiries, setInquiries] = useState<InquiryRow[]>([]);
@@ -75,15 +75,15 @@ export const AdminDashboard: React.FC = () => {
             Welcome back, Admin
           </h1>
           <p className="text-xs text-gray-400 mt-1">
-            Here is your current activity overview for inquiries & discovery call bookings.
+            Here is your current activity overview for project uploads, client inquiries & calls.
           </p>
         </div>
 
         <Link
-          to="/admin/inquiries"
-          className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-neutralfacebold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-sky-500/25 self-start sm:self-auto cursor-pointer"
+          to="/admin/projects"
+          className="px-5 py-2.5 rounded-xl gradient-bg hover:brightness-110 text-white font-neutralfacebold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-sky-500/25 self-start sm:self-auto cursor-pointer"
         >
-          <span>View Inquiries</span>
+          <span>Manage Projects</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -144,7 +144,22 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Quick Action Navigation Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Link
+          to="/admin/projects"
+          className="p-6 bg-[#0c1017] border border-sky-500/30 hover:border-sky-400 rounded-2xl space-y-3 transition-all group shadow-lg"
+        >
+          <div className="p-3 bg-sky-500/10 text-sky-400 rounded-xl w-fit">
+            <FolderKanban className="w-5 h-5" />
+          </div>
+          <h3 className="font-neutralfacebold text-base text-white group-hover:text-sky-400 transition-colors">
+            Upload & Manage Projects →
+          </h3>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            Add new portfolio projects, upload media assets to Supabase, set tech stack, and edit descriptions.
+          </p>
+        </Link>
+
         <Link
           to="/admin/inquiries"
           className="p-6 bg-[#0c1017] border border-white/10 hover:border-sky-500/40 rounded-2xl space-y-3 transition-all group"

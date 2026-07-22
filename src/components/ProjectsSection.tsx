@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import ScrollFloat from '../../components/ScrollFloat';
 import SpotlightCard from './SpotlightCard';
 import ProjectModal from './home/ProjectModal';
+import { fetchProjects } from '../services/projectService';
 import { projectsData } from '../data/projects';
 import { ProjectItem } from '../types/content';
 import { Search, X, ImageOff, ExternalLink, ArrowLeft } from 'lucide-react';
@@ -32,7 +33,7 @@ const getTechIcon = (name: string) => {
   if (lower.includes('firebase')) return <SiFirebase className="text-[#FFCA28]" />;
   if (lower.includes('express')) return <SiExpress className="text-gray-300" />;
   if (lower.includes('supabase')) return <SiSupabase className="text-[#3ECF8E]" />;
-  if (lower.includes('unity')) return <SiUnity className="text-white" />;
+  if (lower.includes('unity')) return <SiUnity className="text-white text-xs" />;
   if (lower.includes('figma')) return <SiFigma className="text-[#F24E1E]" />;
   if (lower.includes('framer')) return <SiFramer className="text-[#0055FF]" />;
   if (lower.includes('canva')) return <SiCanva className="text-[#00C4CC]" />;
@@ -90,13 +91,22 @@ interface ProjectsSectionProps {
 }
 
 const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true }) => {
+  const [projectsList, setProjectsList] = useState<ProjectItem[]>(projectsData);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
 
+  useEffect(() => {
+    fetchProjects().then((data) => {
+      if (data && data.length > 0) {
+        setProjectsList(data);
+      }
+    });
+  }, []);
+
   // Filter projects by category and search query
   const filteredProjects = useMemo(() => {
-    return projectsData.filter((project) => {
+    return projectsList.filter((project) => {
       // Category check
       const matchCategory =
         selectedCategory === 'ALL' ||
@@ -114,7 +124,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
 
       return matchCategory && (matchTitle || matchCategoryText || matchDesc || matchTech);
     });
-  }, [selectedCategory, searchQuery]);
+  }, [projectsList, selectedCategory, searchQuery]);
 
   return (
     <section id="projects" className="relative z-10 pt-8 md:pt-12 pb-24 px-4 sm:px-6 md:px-12 lg:px-20 min-h-screen">
