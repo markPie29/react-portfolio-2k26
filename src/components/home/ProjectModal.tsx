@@ -2,7 +2,16 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ProjectItem } from '../../types/content';
-import { X, ChevronLeft, ChevronRight, ExternalLink, CheckCircle2, ImageOff } from 'lucide-react';
+import { 
+  X, 
+  ChevronLeft, 
+  ChevronRight, 
+  ExternalLink, 
+  CheckCircle2, 
+  ImageOff,
+  Film,
+  Play
+} from 'lucide-react';
 import { SiGithub } from 'react-icons/si';
 
 interface ProjectModalProps {
@@ -10,11 +19,30 @@ interface ProjectModalProps {
   onClose: () => void;
 }
 
+interface MediaItem {
+  type: 'image' | 'video';
+  url: string;
+}
+
+const isVideoUrl = (url: string) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return (
+    lower.endsWith('.mp4') ||
+    lower.endsWith('.webm') ||
+    lower.endsWith('.mov') ||
+    lower.endsWith('.ogg') ||
+    lower.includes('youtube.com') ||
+    lower.includes('youtu.be') ||
+    lower.includes('vimeo.com')
+  );
+};
+
 const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [imageError, setImageError] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [mediaError, setMediaError] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const modalContainerRef = useRef<HTMLDivElement>(null);
+  const modalDetailsRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   // Motion scroll progress tracking using useMotionValue and useSpring
@@ -27,7 +55,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
   });
 
   const updateScrollProgress = useCallback(() => {
-    const el = modalContainerRef.current;
+    const el = modalDetailsRef.current;
     if (!el) return;
 
     const maxScroll = el.scrollHeight - el.clientHeight;
@@ -43,13 +71,42 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
     setMounted(true);
   }, []);
 
+  // Construct unified media list (images & videos)
+  const mediaList: MediaItem[] = React.useMemo(() => {
+    if (!project) return [];
+    const items: MediaItem[] = [];
+
+    // Add explicit videoUrl if present
+    if (project.videoUrl) {
+      items.push({ type: 'video', url: project.videoUrl });
+    }
+
+    // Extract images & detect video paths
+    const rawImages = project.images && project.images.length > 0
+      ? project.images
+      : project.image
+      ? [project.image]
+      : [];
+
+    rawImages.forEach((url) => {
+      if (url && !items.some((item) => item.url === url)) {
+        if (isVideoUrl(url)) {
+          items.push({ type: 'video', url });
+        } else {
+          items.push({ type: 'image', url });
+        }
+      }
+    });
+
+    return items;
+  }, [project]);
+
   // Track scroll position & observe height changes dynamically
   useEffect(() => {
-    const el = modalContainerRef.current;
+    const el = modalDetailsRef.current;
     if (!el || !project) return;
 
     updateScrollProgress();
-
     el.addEventListener('scroll', updateScrollProgress, { passive: true });
 
     const resizeObserver = new ResizeObserver(() => {
@@ -66,16 +123,15 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
     };
   }, [project, updateScrollProgress]);
 
-  // Reset image index, image error & scroll position when modal opens with a new project
+  // Reset index & scroll position when modal opens with a new project
   useEffect(() => {
     if (project) {
-      setCurrentImageIndex(0);
-      setImageError(false);
-      if (modalContainerRef.current) {
-        modalContainerRef.current.scrollTop = 0;
+      setCurrentMediaIndex(0);
+      setMediaError(false);
+      if (modalDetailsRef.current) {
+        modalDetailsRef.current.scrollTop = 0;
       }
       scrollProgress.set(0);
-      // Set focus to close button for proper screen focus alignment & accessibility
       setTimeout(() => {
         closeButtonRef.current?.focus();
       }, 50);
@@ -83,8 +139,8 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
   }, [project, scrollProgress]);
 
   useEffect(() => {
-    setImageError(false);
-  }, [currentImageIndex]);
+    setMediaError(false);
+  }, [currentMediaIndex]);
 
   // Lock background scrolling (both standard body scroll and Lenis smooth scroll) + ESC key handler
   useEffect(() => {
@@ -113,28 +169,24 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
 
   if (!mounted) return null;
 
-  const imagesList = project?.images && project.images.length > 0
-    ? project.images
-    : project?.image
-    ? [project.image]
-    : [];
-
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === 0 ? imagesList.length - 1 : prev - 1));
+    setCurrentMediaIndex((prev) => (prev === 0 ? mediaList.length - 1 : prev - 1));
   };
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev === imagesList.length - 1 ? 0 : prev + 1));
+    setCurrentMediaIndex((prev) => (prev === mediaList.length - 1 ? 0 : prev + 1));
   };
+
+  const currentMedia = mediaList[currentMediaIndex];
 
   return createPortal(
     <AnimatePresence>
       {project && (
         <div
           key="project-modal-backdrop-wrapper"
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 md:p-8 overflow-hidden pointer-events-auto"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-5 md:p-6 overflow-hidden pointer-events-auto"
         >
           {/* Backdrop overlay focused on modal */}
           <motion.div
@@ -147,22 +199,22 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
             className="fixed inset-0 bg-black/85 backdrop-blur-md"
           />
 
-          {/* Modal Window Container */}
+          {/* Modal Window Container (Landscape Widescreen Split Layout) */}
           <motion.div
             key="modal-card"
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.96, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            exit={{ opacity: 0, scale: 0.96, y: 15 }}
+            transition={{ type: 'spring', damping: 26, stiffness: 320 }}
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-project-title"
-            className="relative z-10 w-full max-w-4xl max-h-[85vh] sm:max-h-[90vh] my-auto bg-white dark:bg-[#0c0f17] border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl flex flex-col text-gray-900 dark:text-white outline-none overflow-hidden"
+            className="relative z-10 w-full max-w-6xl h-[88vh] sm:h-[90vh] my-auto bg-white dark:bg-[#0c0f17] border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl flex flex-col text-gray-900 dark:text-white outline-none overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header (Fixed at top of modal frame) */}
-            <div className="relative p-5 sm:p-7 border-b border-slate-200 dark:border-white/10 flex items-start justify-between gap-4 bg-white/95 dark:bg-[#0c0f17]/95 backdrop-blur-md flex-shrink-0 z-20 rounded-t-3xl">
+            <div className="relative px-6 py-4.5 sm:px-8 sm:py-5 border-b border-slate-200 dark:border-white/10 flex items-center justify-between gap-4 bg-white/95 dark:bg-[#0c0f17]/95 backdrop-blur-md flex-shrink-0 z-20 rounded-t-3xl">
               {/* Brand Blue Gradient Scroll Progress Bar */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-slate-200/50 dark:bg-white/10 overflow-hidden z-30 rounded-t-3xl">
                 <motion.div
@@ -172,14 +224,14 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
               </div>
 
               <div>
-                <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-accent mb-1 block">
+                <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-accent mb-0.5 block">
                   {project.category}
                 </span>
-                <h2 id="modal-project-title" className="font-neutralfacebold text-xl sm:text-2xl md:text-3xl uppercase tracking-wide leading-tight">
+                <h2 id="modal-project-title" className="font-neutralfacebold text-lg sm:text-xl md:text-2xl uppercase tracking-wide leading-tight">
                   {project.title}
                 </h2>
                 {project.role && (
-                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-[11px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5">
                     Role: <span className="text-gray-700 dark:text-gray-300">{project.role}</span>
                   </p>
                 )}
@@ -195,105 +247,145 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
               </button>
             </div>
 
-            {/* Modal Content Scrollable Body (Dedicated scroll container) */}
-            <div
-              ref={modalContainerRef}
-              data-lenis-prevent="true"
-              data-lenis-prevent-wheel="true"
-              data-lenis-prevent-touch="true"
-              tabIndex={0}
-              className="flex-1 overflow-y-auto overscroll-contain modal-scrollbar p-5 sm:p-8 flex flex-col gap-8 outline-none"
-            >
-              {/* Image Carousel Section or Fallback Placeholder */}
-              <div className="flex flex-col gap-3">
-                {imagesList.length > 0 && !imageError ? (
-                  <div className="relative w-full aspect-[16/9] max-h-[380px] sm:max-h-[440px] bg-slate-900 rounded-2xl overflow-hidden group shadow-inner border border-slate-200/50 dark:border-white/10 flex items-center justify-center flex-shrink-0">
-                    <AnimatePresence mode="wait">
-                      <motion.img
-                        key={currentImageIndex}
-                        src={imagesList[currentImageIndex]}
-                        alt={`${project.title} screenshot ${currentImageIndex + 1}`}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="w-full h-full object-cover"
-                        onError={() => setImageError(true)}
-                      />
-                    </AnimatePresence>
+            {/* Split View Container (Left: Media, Right: General Details) */}
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-y-auto lg:overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-slate-200 dark:divide-white/10">
+              
+              {/* LEFT COLUMN: Media Section (Images & Videos with full aspect preservation) */}
+              <div className="lg:col-span-7 flex flex-col p-4 sm:p-6 bg-slate-950/90 dark:bg-[#06080e] min-h-[350px] lg:min-h-0 justify-between overflow-hidden relative">
+                
+                {/* Main Media Viewer Stage */}
+                <div className="relative w-full flex-1 min-h-[260px] sm:min-h-[320px] lg:min-h-0 bg-black/90 rounded-2xl border border-slate-800 dark:border-white/10 overflow-hidden flex items-center justify-center group shadow-2xl">
+                  
+                  {mediaList.length > 0 && !mediaError && currentMedia ? (
+                    <>
+                      {/* Ambient background glow for contained media */}
+                      {currentMedia.type === 'image' && (
+                        <div
+                          className="absolute inset-0 bg-cover bg-center opacity-25 filter blur-2xl scale-110 pointer-events-none transition-all duration-700"
+                          style={{ backgroundImage: `url(${currentMedia.url})` }}
+                        />
+                      )}
 
-                    {/* Previous / Next Arrow Controls */}
-                    {imagesList.length > 1 && (
-                      <>
-                        <button
-                          onClick={handlePrev}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 cursor-pointer shadow-lg"
-                          aria-label="Previous image"
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={currentMediaIndex}
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.2 }}
+                          className="w-full h-full flex items-center justify-center p-2 relative z-10"
                         >
-                          <ChevronLeft size={20} />
-                        </button>
-                        <button
-                          onClick={handleNext}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 cursor-pointer shadow-lg"
-                          aria-label="Next image"
-                        >
-                          <ChevronRight size={20} />
-                        </button>
+                          {currentMedia.type === 'video' ? (
+                            <video
+                              src={currentMedia.url}
+                              controls
+                              autoPlay
+                              muted
+                              loop
+                              className="w-full h-full max-h-full max-w-full object-contain rounded-lg shadow-xl"
+                              onError={() => setMediaError(true)}
+                            />
+                          ) : (
+                            <img
+                              src={currentMedia.url}
+                              alt={`${project.title} asset ${currentMediaIndex + 1}`}
+                              className="w-full h-full max-h-full max-w-full object-contain rounded-lg shadow-xl"
+                              onError={() => setMediaError(true)}
+                            />
+                          )}
+                        </motion.div>
+                      </AnimatePresence>
 
-                        {/* Index Counter Badge */}
-                        <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/75 text-white text-xs font-bold tracking-wider backdrop-blur-md">
-                          {currentImageIndex + 1} / {imagesList.length}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <div className="relative w-full aspect-[16/9] max-h-[380px] sm:max-h-[440px] bg-slate-100 dark:bg-slate-900/80 rounded-2xl overflow-hidden shadow-inner border border-slate-200 dark:border-white/10 flex flex-col items-center justify-center p-6 sm:p-8 text-center group flex-shrink-0">
-                    <div className="absolute inset-0 bg-radial from-accent/10 via-transparent to-transparent opacity-60 pointer-events-none" />
-                    
-                    <div className="relative mb-3.5 p-4 rounded-2xl bg-slate-200/60 dark:bg-white/5 border border-slate-300 dark:border-white/10 backdrop-blur-md shadow-md text-accent flex items-center justify-center">
-                      <ImageOff size={32} className="text-accent" />
+                      {/* Navigation Arrow Controls */}
+                      {mediaList.length > 1 && (
+                        <>
+                          <button
+                            onClick={handlePrev}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-black/75 hover:bg-black/95 text-white backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 cursor-pointer shadow-lg border border-white/10"
+                            aria-label="Previous asset"
+                          >
+                            <ChevronLeft size={20} />
+                          </button>
+                          <button
+                            onClick={handleNext}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-black/75 hover:bg-black/95 text-white backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 cursor-pointer shadow-lg border border-white/10"
+                            aria-label="Next asset"
+                          >
+                            <ChevronRight size={20} />
+                          </button>
+
+                          {/* Media Counter / Indicator Badge */}
+                          <div className="absolute bottom-3 right-3 z-20 px-3 py-1 rounded-full bg-black/80 border border-white/10 text-white text-xs font-bold tracking-wider backdrop-blur-md flex items-center gap-1.5">
+                            {currentMedia.type === 'video' && <Film size={12} className="text-accent" />}
+                            <span>
+                              {currentMediaIndex + 1} / {mediaList.length}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    /* Fallback when no media assets available or error loading */
+                    <div className="relative w-full h-full flex flex-col items-center justify-center p-6 text-center">
+                      <div className="mb-3 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md text-accent">
+                        <ImageOff size={32} />
+                      </div>
+                      <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-accent/10 text-accent border border-accent/20 mb-2">
+                        No Preview Available
+                      </span>
+                      <p className="text-xs sm:text-sm font-medium text-gray-400 max-w-xs leading-relaxed">
+                        Visual assets for this project are currently unavailable.
+                      </p>
                     </div>
+                  )}
+                </div>
 
-                    <span className="inline-block px-3.5 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest bg-accent/10 text-accent border border-accent/20 mb-2 font-helvetica-neue-medium">
-                      No Available Image Yet
-                    </span>
-
-                    <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 max-w-sm leading-relaxed">
-                      Screenshots and visual assets for this project are currently unavailable.
-                    </p>
-                  </div>
-                )}
-
-                {/* Thumbnails Navigation */}
-                {imagesList.length > 1 && !imageError && (
-                  <div className="flex items-center gap-3 overflow-x-auto pb-1 modal-scrollbar">
-                    {imagesList.map((img, idx) => (
+                {/* Thumbnails Navigation Strip */}
+                {mediaList.length > 1 && !mediaError && (
+                  <div className="flex items-center gap-3 overflow-x-auto pt-4 pb-1 modal-scrollbar">
+                    {mediaList.map((item, idx) => (
                       <button
                         key={idx}
-                        onClick={() => setCurrentImageIndex(idx)}
-                        className={`relative w-20 sm:w-24 aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${
-                          idx === currentImageIndex
-                            ? 'border-accent shadow-md scale-105'
+                        onClick={() => setCurrentMediaIndex(idx)}
+                        className={`relative w-20 sm:w-24 aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer bg-black ${
+                          idx === currentMediaIndex
+                            ? 'border-accent shadow-md scale-105 ring-2 ring-accent/30'
                             : 'border-transparent opacity-50 hover:opacity-100'
                         }`}
                       >
-                        <img
-                          src={img}
-                          alt={`Thumbnail ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                          onError={() => {}}
-                        />
+                        {item.type === 'video' ? (
+                          <div className="w-full h-full flex items-center justify-center bg-slate-900 relative">
+                            <Film size={18} className="text-white z-10" />
+                            <div className="absolute inset-0 bg-accent/20 flex items-center justify-center">
+                              <Play size={12} className="text-white fill-white" />
+                            </div>
+                          </div>
+                        ) : (
+                          <img
+                            src={item.url}
+                            alt={`Thumbnail ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={() => {}}
+                          />
+                        )}
                       </button>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Project Details */}
-              <div className="flex flex-col gap-6">
+              {/* RIGHT COLUMN: General Details Panel (Scrollable content) */}
+              <div
+                ref={modalDetailsRef}
+                data-lenis-prevent="true"
+                data-lenis-prevent-wheel="true"
+                data-lenis-prevent-touch="true"
+                tabIndex={0}
+                className="lg:col-span-5 flex flex-col p-6 sm:p-8 overflow-y-auto overscroll-contain modal-scrollbar bg-white dark:bg-[#0c0f17] gap-6 outline-none"
+              >
+                {/* Project Overview */}
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-accent mb-2">
                     Project Overview
                   </h3>
                   <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
@@ -301,13 +393,13 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
                   </p>
                 </div>
 
-                {/* Key Features List */}
+                {/* Key Features & Highlights */}
                 {project.features && project.features.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
+                  <div className="pt-4 border-t border-slate-200 dark:border-white/10">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-accent mb-3">
                       Key Features & Highlights
                     </h3>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <ul className="flex flex-col gap-2.5">
                       {project.features.map((feat, idx) => (
                         <li
                           key={idx}
@@ -322,47 +414,52 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
                 )}
 
                 {/* Technologies Used Badges */}
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
-                    Technologies & Tools
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {project.techStack.map((tech, idx) => (
-                      <span
-                        key={idx}
-                        className="text-xs font-semibold uppercase tracking-wider px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-white/10 text-gray-800 dark:text-gray-200 border border-slate-200 dark:border-white/10"
-                      >
-                        {tech}
-                      </span>
-                    ))}
+                {project.techStack && project.techStack.length > 0 && (
+                  <div className="pt-4 border-t border-slate-200 dark:border-white/10">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-accent mb-3">
+                      Technologies & Tools
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {project.techStack.map((tech, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs font-semibold uppercase tracking-wider px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-white/10 text-gray-800 dark:text-gray-200 border border-slate-200 dark:border-white/10"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* External Links / Action Buttons */}
-                <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
-                  {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0077b6] via-[#00b4d8] to-[#48cae4] text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md hover:opacity-95 transition-opacity"
-                    >
-                      <span>Live Preview</span>
-                      <ExternalLink size={15} />
-                    </a>
-                  )}
-                  {project.githubUrl && (
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-slate-100 dark:bg-white/10 text-gray-800 dark:text-white hover:bg-slate-200 dark:hover:bg-white/20 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
-                    >
-                      <SiGithub size={15} />
-                      <span>Source Code</span>
-                    </a>
-                  )}
-                </div>
+                {/* Action Links / Buttons */}
+                {(project.liveUrl || project.githubUrl) && (
+                  <div className="flex flex-wrap items-center gap-3 pt-5 mt-auto border-t border-slate-200 dark:border-white/10">
+                    {project.liveUrl && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0077b6] via-[#00b4d8] to-[#48cae4] text-white px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md hover:opacity-95 transition-opacity"
+                      >
+                        <span>Live Preview</span>
+                        <ExternalLink size={14} />
+                      </a>
+                    )}
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-slate-100 dark:bg-white/10 text-gray-800 dark:text-white hover:bg-slate-200 dark:hover:bg-white/20 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+                      >
+                        <SiGithub size={14} />
+                        <span>Source Code</span>
+                      </a>
+                    )}
+                  </div>
+                )}
+
               </div>
             </div>
           </motion.div>

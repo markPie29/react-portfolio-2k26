@@ -173,7 +173,7 @@ export const ProjectsManager: React.FC = () => {
     setGithubUrl(project.githubUrl || '');
     setCoverUrl(project.image || '');
     setGalleryUrls(project.images || []);
-    setVideoUrl('');
+    setVideoUrl(project.videoUrl || '');
     setDisplayOrder(0);
     setCoverFile(null);
     setGalleryFiles([]);

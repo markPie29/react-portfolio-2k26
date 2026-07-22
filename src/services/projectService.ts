@@ -37,6 +37,7 @@ export const mapRowToProjectItem = (row: ProjectRow): ProjectItem => {
     features: row.features || [],
     image: row.image || undefined,
     images: row.images && row.images.length > 0 ? row.images : row.image ? [row.image] : [],
+    videoUrl: row.video_url || undefined,
     liveUrl: row.live_url || undefined,
     githubUrl: row.github_url || undefined,
     href: row.href || '#',

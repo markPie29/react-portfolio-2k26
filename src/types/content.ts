@@ -50,6 +50,7 @@ export interface ProjectItem {
   image?: string;
   images?: string[];
   features?: string[];
+  videoUrl?: string;
   liveUrl?: string;
   githubUrl?: string;
   role?: string;
