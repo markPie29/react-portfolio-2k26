@@ -6,7 +6,8 @@ import {
   updateProject, 
   deleteProject, 
   ProjectFormData, 
-  MAX_FILE_SIZE_BYTES 
+  MAX_FILE_SIZE_BYTES,
+  uploadProjectMedia
 } from '../../services/projectService';
 import { ProjectItem } from '../../types/content';
 import { isSupabaseConfigured } from '../../lib/supabase';
@@ -32,7 +33,6 @@ import {
   Maximize2,
   ChevronLeft,
   ChevronRight,
-  Play,
   ImageOff,
   Video
 } from 'lucide-react';
@@ -52,6 +52,8 @@ import {
 } from 'react-icons/si';
 import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from '../../components/CustomIcons';
 import SpotlightCard from '../../components/SpotlightCard';
+
+type GalleryItem = { id: string; type: 'url'; value: string } | { id: string; type: 'file'; value: File };
 
 const CATEGORIES = [
   'Software Development',
@@ -446,19 +448,18 @@ export const ProjectsManager: React.FC = () => {
   const [liveUrl, setLiveUrl] = useState<string>('');
   const [githubUrl, setGithubUrl] = useState<string>('');
   const [coverUrl, setCoverUrl] = useState<string>('');
-  const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [displayOrder, setDisplayOrder] = useState<number>(0);
 
   // Files State & Size Alerts
   const [coverFile, setCoverFile] = useState<File | null>(null);
-  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [fileSizeWarning, setFileSizeWarning] = useState<string | null>(null);
   const [newGalleryUrlInput, setNewGalleryUrlInput] = useState<string>('');
 
   const coverFileInputRef = useRef<HTMLInputElement>(null);
   const galleryFileInputRef = useRef<HTMLInputElement>(null);
-  const modalScrollRef = useRef<HTMLDivElement>(null);
+  const modalScrollRef = useRef<HTMLFormElement>(null);
 
   const loadProjectsData = async () => {
     setIsLoading(true);
@@ -522,11 +523,10 @@ export const ProjectsManager: React.FC = () => {
     setLiveUrl('');
     setGithubUrl('');
     setCoverUrl('');
-    setGalleryUrls([]);
+    setGalleryItems([]);
     setVideoUrl('');
     setDisplayOrder(projects.length + 1);
     setCoverFile(null);
-    setGalleryFiles([]);
     setFileSizeWarning(null);
     setModalViewMode('split');
     setSplitPreviewTab('card');
@@ -551,14 +551,13 @@ export const ProjectsManager: React.FC = () => {
     setRole(project.role || '');
     setTechStack(project.techStack || []);
     setFeatures(project.features || []);
-    setLiveUrl(project.liveUrl || '');
-    setGithubUrl(project.githubUrl || '');
-    setCoverUrl(project.image || '');
-    setGalleryUrls(project.images || []);
+    const cover = project.image || '';
+    setCoverUrl(cover);
+    const rawGallery = (project.images || []).filter((url) => !cover || url !== cover);
+    setGalleryItems(rawGallery.map((url) => ({ id: Math.random().toString(36).substring(7), type: 'url', value: url })));
     setVideoUrl(project.videoUrl || '');
     setDisplayOrder(0);
     setCoverFile(null);
-    setGalleryFiles([]);
     setFileSizeWarning(null);
     setModalViewMode('split');
     setSplitPreviewTab('card');
@@ -578,23 +577,18 @@ export const ProjectsManager: React.FC = () => {
       }
     }
 
-    const uploadedGalleryUrls = galleryFiles
-      .map((f) => {
+    const mappedGalleryUrls = galleryItems
+      .map((item) => {
+        if (item.type === 'url') return item.value;
         try {
-          return URL.createObjectURL(f);
+          return URL.createObjectURL(item.value);
         } catch (e) {
           return '';
         }
       })
       .filter(Boolean);
 
-    const allImages = Array.from(
-      new Set([
-        ...(coverImg ? [coverImg] : []),
-        ...uploadedGalleryUrls,
-        ...galleryUrls,
-      ])
-    );
+    const allImages = mappedGalleryUrls;
 
     return {
       id: editingProject ? editingProject.id : 'preview-id',
@@ -623,8 +617,7 @@ export const ProjectsManager: React.FC = () => {
     features,
     coverUrl,
     coverFile,
-    galleryUrls,
-    galleryFiles,
+    galleryItems,
     videoUrl,
     liveUrl,
     githubUrl,
@@ -665,15 +658,15 @@ export const ProjectsManager: React.FC = () => {
   // Add Gallery URL manually
   const handleAddGalleryUrl = () => {
     const trimmed = newGalleryUrlInput.trim();
-    if (trimmed && !galleryUrls.includes(trimmed)) {
-      setGalleryUrls((prev) => [...prev, trimmed]);
+    if (trimmed && !galleryItems.some(i => i.type === 'url' && i.value === trimmed)) {
+      setGalleryItems((prev) => [...prev, { id: Math.random().toString(36).substring(7), type: 'url', value: trimmed }]);
       setNewGalleryUrlInput('');
     }
   };
 
   // Remove Gallery URL
-  const handleRemoveGalleryUrl = (urlToRemove: string) => {
-    setGalleryUrls((prev) => prev.filter((u) => u !== urlToRemove));
+  const handleRemoveGalleryItem = (idToRemove: string) => {
+    setGalleryItems((prev) => prev.filter((item) => item.id !== idToRemove));
   };
 
   // Handle Cover File Selection
@@ -708,7 +701,14 @@ export const ProjectsManager: React.FC = () => {
     }
 
     setFileSizeWarning(null);
-    setGalleryFiles((prev) => [...prev, ...files]);
+    setGalleryItems((prev) => [
+      ...prev,
+      ...files.map((file) => ({
+        id: Math.random().toString(36).substring(7),
+        type: 'file' as const,
+        value: file,
+      })),
+    ]);
   };
 
   // Handle Save / Submit
@@ -726,27 +726,38 @@ export const ProjectsManager: React.FC = () => {
 
     const finalCategory = category === 'Other Custom Category' ? customCategory.trim() || 'General' : category;
 
-    const formData: ProjectFormData = {
-      title: title.trim(),
-      category: finalCategory,
-      description: description.trim(),
-      longDescription: longDescription.trim() || undefined,
-      role: role.trim() || undefined,
-      techStack,
-      features,
-      image: coverUrl.trim() || undefined,
-      images: galleryUrls,
-      videoUrl: videoUrl.trim() || undefined,
-      liveUrl: liveUrl.trim() || undefined,
-      githubUrl: githubUrl.trim() || undefined,
-      displayOrder,
-    };
-
     setIsSubmitting(true);
 
     try {
+      // Handle galleryItems upload preserving order
+      const finalGalleryUrls: string[] = [];
+      for (const item of galleryItems) {
+        if (item.type === 'file' && isSupabaseConfigured) {
+          const url = await uploadProjectMedia(item.value);
+          finalGalleryUrls.push(url);
+        } else if (item.type === 'url') {
+          finalGalleryUrls.push(item.value);
+        }
+      }
+
+      const formData: ProjectFormData = {
+        title: title.trim(),
+        category: finalCategory,
+        description: description.trim(),
+        longDescription: longDescription.trim() || undefined,
+        role: role.trim() || undefined,
+        techStack,
+        features,
+        image: coverUrl.trim() || undefined,
+        images: finalGalleryUrls,
+        videoUrl: videoUrl.trim() || undefined,
+        liveUrl: liveUrl.trim() || undefined,
+        githubUrl: githubUrl.trim() || undefined,
+        displayOrder,
+      };
+
       if (editingProject) {
-        const res = await updateProject(editingProject.id, formData, coverFile, galleryFiles);
+        const res = await updateProject(editingProject.id, formData, coverFile, []);
         if (res.success && res.project) {
           const updated = res.project;
           setProjects((prev) =>
@@ -759,7 +770,7 @@ export const ProjectsManager: React.FC = () => {
           showToast('error', res.error || 'Failed to update project.');
         }
       } else {
-        const res = await createProject(formData, coverFile, galleryFiles);
+        const res = await createProject(formData, coverFile, []);
         if (res.success && res.project) {
           showToast('success', `Project "${res.project.title}" created successfully!`);
           setIsModalOpen(false);
@@ -1046,44 +1057,84 @@ export const ProjectsManager: React.FC = () => {
               </div>
             </div>
 
-            {(galleryFiles.length > 0 || galleryUrls.length > 0) && (
+            {galleryItems.length > 0 && (
               <div className="space-y-1.5 pt-2">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                  Attached Assets ({galleryFiles.length + galleryUrls.length}):
+                  Attached Assets ({galleryItems.length}) - Drag to reorder:
                 </span>
-                <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto modal-scrollbar p-1">
-                  {galleryFiles.map((f, idx) => (
-                    <span
-                      key={`file-${idx}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-lg text-xs"
-                    >
-                      <Upload className="w-3 h-3" />
-                      <span className="truncate max-w-[140px]">{f.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => setGalleryFiles((prev) => prev.filter((_, i) => i !== idx))}
-                        className="hover:text-white"
+                <div className="flex flex-wrap gap-2.5 max-h-36 overflow-y-auto modal-scrollbar p-1">
+                  {galleryItems.map((item, idx) => {
+                    let mediaUrl = '';
+                    let isVideo = false;
+
+                    if (item.type === 'url') {
+                      mediaUrl = item.value;
+                      isVideo = isVideoUrl(item.value);
+                    } else {
+                      try {
+                        mediaUrl = URL.createObjectURL(item.value);
+                      } catch (e) {
+                        mediaUrl = '';
+                      }
+                      isVideo = item.value.type.startsWith('video/');
+                    }
+
+                    return (
+                      <div
+                        key={item.id}
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.effectAllowed = 'move';
+                          e.dataTransfer.setData('text/plain', idx.toString());
+                        }}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          const draggedIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                          if (isNaN(draggedIdx) || draggedIdx === idx) return;
+
+                          setGalleryItems((prev) => {
+                            const newItems = [...prev];
+                            const [draggedItem] = newItems.splice(draggedIdx, 1);
+                            newItems.splice(idx, 0, draggedItem);
+                            return newItems;
+                          });
+                        }}
+                        className="relative group w-20 h-20 rounded-xl overflow-hidden border border-white/15 bg-black/60 cursor-move flex-shrink-0 shadow-md hover:border-sky-400 transition-all"
                       >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </span>
-                  ))}
-                  {galleryUrls.map((url) => (
-                    <span
-                      key={url}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 text-gray-300 rounded-lg text-xs"
-                    >
-                      <ImageIcon className="w-3 h-3 text-sky-400" />
-                      <span className="truncate max-w-[180px] font-mono">{url}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveGalleryUrl(url)}
-                        className="hover:text-red-400"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </span>
-                  ))}
+                        {isVideo ? (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900/80 p-1 text-center">
+                            <Film className="w-6 h-6 text-sky-400 mb-1" />
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-gray-300">Video</span>
+                          </div>
+                        ) : (
+                          <img
+                            src={mediaUrl}
+                            alt={`Gallery asset ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        )}
+
+                        {/* Order Badge */}
+                        <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white leading-none pointer-events-none">
+                          {idx + 1}
+                        </div>
+
+                        {/* Remove Button */}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveGalleryItem(item.id)}
+                          className="absolute top-1 right-1 p-1 rounded-full bg-black/70 hover:bg-red-500 text-white transition-colors cursor-pointer"
+                          title="Remove asset"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

@@ -199,11 +199,6 @@ export const createProject = async (
       }
     }
 
-    // Ensure cover URL is included in gallery images if empty
-    if (coverUrl && !galleryUrls.includes(coverUrl)) {
-      galleryUrls.unshift(coverUrl);
-    }
-
     const newId = crypto.randomUUID();
 
     const payload = {
@@ -215,7 +210,7 @@ export const createProject = async (
       role: form.role || null,
       tech_stack: form.techStack,
       features: form.features || [],
-      image: coverUrl || (galleryUrls[0] ?? null),
+      image: coverUrl || null,
       images: galleryUrls,
       video_url: form.videoUrl || null,
       live_url: form.liveUrl || null,
@@ -268,10 +263,6 @@ export const updateProject = async (
       }
     }
 
-    if (coverUrl && !galleryUrls.includes(coverUrl)) {
-      galleryUrls.unshift(coverUrl);
-    }
-
     const isUuid = IS_UUID_REGEX.test(id);
     const targetId = isUuid ? id : crypto.randomUUID();
 
@@ -289,7 +280,7 @@ export const updateProject = async (
       role: form.role || undefined,
       techStack: form.techStack,
       features: form.features || [],
-      image: coverUrl || (galleryUrls[0] ?? undefined),
+      image: coverUrl || undefined,
       images: galleryUrls,
       videoUrl: form.videoUrl || undefined,
       liveUrl: form.liveUrl || undefined,
@@ -310,7 +301,7 @@ export const updateProject = async (
         role: form.role || null,
         tech_stack: form.techStack,
         features: form.features || [],
-        image: coverUrl || (galleryUrls[0] ?? null),
+        image: coverUrl || null,
         images: galleryUrls,
         video_url: form.videoUrl || null,
         live_url: form.liveUrl || null,
