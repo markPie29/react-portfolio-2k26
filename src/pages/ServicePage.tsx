@@ -4,6 +4,7 @@ import { servicesData } from '../data/services';
 import FadeContent from '../../components/FadeContent';
 import CtaSection from '../components/home/CtaSection';
 import Footer from '../components/layout/Footer';
+import GraphicsBento from '../components/services/GraphicsBento';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 const ServicePage: React.FC = () => {
@@ -89,6 +90,9 @@ const ServicePage: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Graphics Bento Gallery (only for graphic design service) */}
+          {service.slug === 'graphic-design' && <GraphicsBento />}
         </FadeContent>
 
         {/* CTA section */}
