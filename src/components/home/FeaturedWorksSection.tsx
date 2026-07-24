@@ -75,7 +75,7 @@ const FeaturedWorksSection: React.FC = () => {
               <div
                 key={project.id}
                 onClick={() => setSelectedProject(project)}
-                className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-accent/50 transition-all duration-300 group shadow-sm backdrop-blur-sm cursor-pointer transform hover:-translate-y-1 hover:shadow-xl"
+                className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-accent/50 transition-all duration-300 group shadow-sm backdrop-blur-sm cursor-pointer transform hover:-translate-y-1 hover:shadow-xl"
               >
                 {/* Thumbnail Container */}
                 <div className="w-full aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center">

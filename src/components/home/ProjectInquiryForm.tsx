@@ -108,7 +108,7 @@ export const ProjectInquiryForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white/80 dark:bg-[#0c1017]/90 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300">
+    <div className="w-full max-w-4xl mx-auto bg-white/80 dark:bg-[#080a0f]/40 backdrop-blur-xl border border-gray-200 dark:border-[#48cae4]/20 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300">
       {!isSuccess ? (
         <>
           {/* Top Progress Bar & Steps */}

@@ -26,7 +26,7 @@ const ServicesSection: React.FC = () => {
             {servicesData.map((service) => (
               <div
                 key={service.slug}
-                className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm backdrop-blur-sm"
+                className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 rounded-2xl p-8 flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm backdrop-blur-sm"
               >
                 <div>
                   <h3 className="font-neutralfacebold text-xl sm:text-2xl tracking-wide uppercase mb-4 text-gray-900 dark:text-white group-hover:text-accent transition-colors">

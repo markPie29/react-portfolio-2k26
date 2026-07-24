@@ -24,7 +24,7 @@ const StatsSection: React.FC = () => {
                 colors={['#0077b6', '#00b4d8', '#48cae4']}
                 className="w-full"
               >
-                <div className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center aspect-square md:aspect-auto md:min-h-[160px] shadow-sm backdrop-blur-sm transition-all group w-full">
+                <div className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center aspect-square md:aspect-auto md:min-h-[160px] shadow-sm backdrop-blur-sm transition-all group w-full">
                   <DecryptedText
                     text={stat.value}
                     speed={130}

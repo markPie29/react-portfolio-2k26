@@ -29,7 +29,7 @@ const TestimonialsSection: React.FC = () => {
             {testimonialsData.map((item) => (
               <div
                 key={item.id}
-                className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm backdrop-blur-sm relative"
+                className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 rounded-2xl p-8 flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm backdrop-blur-sm relative"
               >
                 {/* Quote Icon Background Accent */}
                 <div className="absolute top-6 right-6 text-accent/15 dark:text-accent/20 group-hover:text-accent/30 transition-colors">
