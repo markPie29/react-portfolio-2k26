@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ScrollFloat from '../../../components/ScrollFloat';
 import FadeContent from '../../../components/FadeContent';
 import { servicesData } from '../../data/services';
+import { ArrowRight } from 'lucide-react';
 
 const ServicesSection: React.FC = () => {
   return (
@@ -53,23 +54,11 @@ const ServicesSection: React.FC = () => {
 
                 <div>
                   <Link
-                    to={service.href || `#`}
+                    to={service.href || `/services/${service.slug}`}
                     className="text-xs font-bold tracking-widest uppercase text-gray-800 dark:text-gray-200 group-hover:text-accent inline-flex items-center gap-2 transition-colors"
                   >
                     <span>LEARN MORE</span>
-                    <svg
-                      className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2.5"
-                        d="M17 8l4 4m0 0l-4 4m4-4H3"
-                      />
-                    </svg>
+                    <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
               </div>
