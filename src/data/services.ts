@@ -2,8 +2,8 @@ import { ServiceItem } from '../types/content';
 
 export const servicesData: ServiceItem[] = [
   {
-    slug: 'graphic-design-video-editing',
-    title: 'GRAPHIC DESIGN & VIDEO EDITING',
+    slug: 'graphic-design',
+    title: 'GRAPHIC DESIGN',
     description:
       'Crafting compelling visual identities, marketing collateral, motion graphics, video editing, and digital media assets that elevate brand presence and resonate with target audiences.',
     bullets: [
@@ -13,7 +13,7 @@ export const servicesData: ServiceItem[] = [
       'Apparel Design',
       'Product & Email Ads',
     ],
-    href: '#',
+    href: '/services/graphic-design',
   },
   {
     slug: 'software-development',
@@ -27,7 +27,7 @@ export const servicesData: ServiceItem[] = [
       'Real-Time Systems',
       'Mobile & AR Applications',
     ],
-    href: '#',
+    href: '/services/software-development',
   },
   {
     slug: 'social-media-management',
@@ -41,6 +41,6 @@ export const servicesData: ServiceItem[] = [
       'Analytics & Reporting',
       'Campaign Execution',
     ],
-    href: '#',
+    href: '/services/social-media-management',
   },
 ];

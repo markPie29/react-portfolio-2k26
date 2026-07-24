@@ -90,7 +90,7 @@ const ExperienceCardItem: React.FC<{ item: typeof experienceItems[0] }> = ({ ite
 
   return (
     <SpotlightCard
-      className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm relative overflow-hidden transition-all group hover:border-accent/40"
+      className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 rounded-2xl p-6 shadow-sm relative overflow-hidden transition-all group hover:border-accent/40"
       spotlightColor="rgba(72, 202, 228, 0.12)"
     >
       <div className="flex flex-col gap-3">
@@ -208,7 +208,7 @@ const CredentialsSection: React.FC = () => {
               colors={['#0077b6', '#00b4d8', '#48cae4']}
               className="w-full"
             >
-              <div className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm backdrop-blur-sm flex flex-col gap-2">
+              <div className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 rounded-2xl p-6 shadow-sm backdrop-blur-sm flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-accent/15 text-accent">
                     EDUCATION
@@ -232,7 +232,7 @@ const CredentialsSection: React.FC = () => {
               {certificatesData.map((cert) => (
                 <div
                   key={cert.id}
-                  className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-accent/40 rounded-xl p-5 shadow-sm transition-all flex items-start justify-between gap-3 group"
+                  className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 hover:border-accent/40 rounded-xl p-5 shadow-sm transition-all flex items-start justify-between gap-3 group"
                 >
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">

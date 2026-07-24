@@ -1,6 +1,7 @@
 export interface NavLink {
   label: string;
   href: string;
+  sublinks?: NavLink[];
 }
 
 export interface SocialLink {
@@ -43,15 +44,17 @@ export interface ServiceItem {
 export interface ProjectItem {
   id: string;
   title: string;
-  category: "Graphic Design" | "Graphic Design & Video Editing" | "Software Development" | "Social Media Management";
+  category: "Graphic Design" | "Video Editing" | "Graphic Design & Video Editing" | "Software Development" | "Social Media Management" | string;
   description: string;
   longDescription?: string;
   techStack: string[];
   image?: string;
   images?: string[];
   features?: string[];
+  videoUrl?: string;
   liveUrl?: string;
   githubUrl?: string;
   role?: string;
   href?: string;
+  isFeatured?: boolean;
 }

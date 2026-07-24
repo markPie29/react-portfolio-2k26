@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ScrollFloat from '../../../components/ScrollFloat';
 import FadeContent from '../../../components/FadeContent';
+import { fetchProjects } from '../../services/projectService';
 import { projectsData } from '../../data/projects';
 import { ProjectItem } from '../../types/content';
 import ProjectModal from './ProjectModal';
@@ -40,7 +41,18 @@ const ProjectCardImage: React.FC<{ project: ProjectItem }> = ({ project }) => {
 };
 
 const FeaturedWorksSection: React.FC = () => {
+  const [projectsList, setProjectsList] = useState<ProjectItem[]>(projectsData);
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+
+  useEffect(() => {
+    fetchProjects().then((data) => {
+      if (data && data.length > 0) {
+        setProjectsList(data);
+      }
+    });
+  }, []);
+
+  const featuredProjects = projectsList.filter((p) => p.isFeatured);
 
   return (
     <section id="works" className="py-16 md:py-24 px-6 md:px-12 lg:px-24">
@@ -61,11 +73,11 @@ const FeaturedWorksSection: React.FC = () => {
 
         <FadeContent blur duration={1} ease="power3.out" delay={0.2}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {projectsData.map((project) => (
+            {featuredProjects.map((project) => (
               <div
                 key={project.id}
                 onClick={() => setSelectedProject(project)}
-                className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-accent/50 transition-all duration-300 group shadow-sm backdrop-blur-sm cursor-pointer transform hover:-translate-y-1 hover:shadow-xl"
+                className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-accent/50 transition-all duration-300 group shadow-sm backdrop-blur-sm cursor-pointer transform hover:-translate-y-1 hover:shadow-xl"
               >
                 {/* Thumbnail Container */}
                 <div className="w-full aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center">

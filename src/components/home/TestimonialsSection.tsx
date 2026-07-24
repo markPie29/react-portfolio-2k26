@@ -1,6 +1,5 @@
 import React from 'react';
-import ScrollFloat from '../../../components/ScrollFloat';
-import FadeContent from '../../../components/FadeContent';
+import { motion } from 'motion/react';
 import { testimonialsData } from '../../data/testimonials';
 import { Quote, Star } from 'lucide-react';
 
@@ -8,26 +7,29 @@ const TestimonialsSection: React.FC = () => {
   return (
     <section id="testimonials" className="py-8 md:py-12 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <ScrollFloat
-            animationDuration={1}
-            ease="back.inOut(2)"
-            scrollStart="center bottom+=50%"
-            scrollEnd="bottom bottom-=40%"
-            stagger={0.03}
-            textClassName="font-neutralfacebold text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase !leading-none text-gray-900 dark:text-white"
-            containerClassName="text-left w-fit !my-0"
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-8"
+        >
+          <h2 className="font-neutralfacebold text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase !leading-none text-gray-900 dark:text-white text-left w-fit !my-0">
             TESTIMONIALS
-          </ScrollFloat>
-        </div>
+          </h2>
+        </motion.div>
 
-        <FadeContent blur duration={1} ease="power3.out" delay={0.2}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonialsData.map((item) => (
               <div
                 key={item.id}
-                className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm backdrop-blur-sm relative"
+                className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 rounded-2xl p-8 flex flex-col justify-between hover:border-accent/40 transition-all group shadow-sm backdrop-blur-sm relative"
               >
                 {/* Quote Icon Background Accent */}
                 <div className="absolute top-6 right-6 text-accent/15 dark:text-accent/20 group-hover:text-accent/30 transition-colors">
@@ -71,7 +73,7 @@ const TestimonialsSection: React.FC = () => {
               </div>
             ))}
           </div>
-        </FadeContent>
+        </motion.div>
       </div>
     </section>
   );

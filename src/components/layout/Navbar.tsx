@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { navigationData } from '../../data/navigation';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const Navbar: React.FC = () => {
@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
   const isDark = theme === 'dark';
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAdminPage) return;
@@ -47,6 +48,7 @@ const Navbar: React.FC = () => {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setMobileOpen(false);
+    setDropdownOpen(null);
 
     if (href.startsWith('/')) {
       const [pathname, hash] = href.split('#');
@@ -110,14 +112,58 @@ const Navbar: React.FC = () => {
         {/* Center Nav Links - Desktop */}
         <nav className="hidden md:flex items-center gap-8">
           {navigationData.map((link) => (
-            <a
+            <div
               key={link.label}
-              href={link.href}
-              onClick={(e) => handleNavClick(e, link.href)}
-              className="text-xs md:text-sm font-semibold tracking-wider text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-accent transition-colors uppercase"
+              className="relative py-2"
+              onMouseEnter={() => link.sublinks && setDropdownOpen(link.label)}
+              onMouseLeave={() => link.sublinks && setDropdownOpen(null)}
             >
-              {link.label}
-            </a>
+              <a
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="text-xs md:text-sm font-semibold tracking-wider text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-accent transition-colors uppercase flex items-center gap-1.5"
+              >
+                <span>{link.label}</span>
+                {link.sublinks && (
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${
+                      dropdownOpen === link.label ? 'rotate-180 text-accent' : ''
+                    }`}
+                  />
+                )}
+              </a>
+
+              {link.sublinks && (
+                <AnimatePresence>
+                  {dropdownOpen === link.label && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      className="absolute left-1/2 -translate-x-1/2 top-full pt-3 w-64 z-50"
+                    >
+                      <div className="bg-white/95 dark:bg-[#080a0f]/95 backdrop-blur-xl border border-gray-200 dark:border-[#48cae4]/20 rounded-2xl p-2 shadow-2xl dark:shadow-sky-950/40 flex flex-col gap-1">
+                        {link.sublinks.map((sublink) => (
+                          <a
+                            key={sublink.label}
+                            href={sublink.href}
+                            onClick={(e) => handleNavClick(e, sublink.href)}
+                            className="text-xs font-semibold tracking-wider text-gray-700 dark:text-gray-300 hover:text-accent dark:hover:text-accent hover:bg-gray-100/80 dark:hover:bg-white/5 px-3.5 py-2.5 rounded-xl transition-all flex items-center justify-between group/item uppercase"
+                          >
+                            <span>{sublink.label}</span>
+                            <span className="opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-0.5 transition-all text-accent font-bold">
+                              →
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              )}
+            </div>
           ))}
         </nav>
 
@@ -169,14 +215,29 @@ const Navbar: React.FC = () => {
           >
             <div className="flex flex-col gap-4">
               {navigationData.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className="text-base font-neutralfacebold text-gray-800 dark:text-gray-200 hover:text-accent tracking-wider uppercase py-1"
-                >
-                  {link.label}
-                </a>
+                <div key={link.label} className="flex flex-col gap-2">
+                  <a
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className="text-base font-neutralfacebold text-gray-800 dark:text-gray-200 hover:text-accent tracking-wider uppercase py-1 flex items-center justify-between"
+                  >
+                    <span>{link.label}</span>
+                  </a>
+                  {link.sublinks && (
+                    <div className="pl-4 flex flex-col gap-2.5 border-l border-accent/40 my-1">
+                      {link.sublinks.map((sublink) => (
+                        <a
+                          key={sublink.label}
+                          href={sublink.href}
+                          onClick={(e) => handleNavClick(e, sublink.href)}
+                          className="text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-accent tracking-wider uppercase"
+                        >
+                          {sublink.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
               <a
                 href="#cta"

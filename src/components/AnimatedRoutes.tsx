@@ -3,10 +3,12 @@ import { AnimatePresence, motion } from 'motion/react';
 import HomePage from '../pages/HomePage';
 import AboutPage from '../pages/AboutPage';
 import ProjectsPage from '../pages/ProjectsPage';
+import ServicePage from '../pages/ServicePage';
 
 // Admin imports
 import { AdminLogin } from '../pages/admin/AdminLogin';
 import { AdminDashboard } from '../pages/admin/AdminDashboard';
+import { ProjectsManager } from '../pages/admin/ProjectsManager';
 import { InquiriesPage } from '../pages/admin/InquiriesPage';
 import { CalendarPage } from '../pages/admin/CalendarPage';
 import { AvailabilityManager } from '../pages/admin/AvailabilityManager';
@@ -46,6 +48,7 @@ export default function AnimatedRoutes() {
         <Route path="/" element={<PageWrapper><HomePage /></PageWrapper>} />
         <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
         <Route path="/projects" element={<PageWrapper><ProjectsPage /></PageWrapper>} />
+        <Route path="/services/:slug" element={<PageWrapper><ServicePage /></PageWrapper>} />
 
         {/* Admin Login */}
         <Route path="/admin/login" element={<PageWrapper><AdminLogin /></PageWrapper>} />
@@ -57,6 +60,16 @@ export default function AnimatedRoutes() {
             <ProtectedRoute>
               <AdminLayout>
                 <AdminDashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/projects"
+          element={
+            <ProtectedRoute>
+              <AdminLayout>
+                <ProjectsManager />
               </AdminLayout>
             </ProtectedRoute>
           }

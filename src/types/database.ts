@@ -63,3 +63,25 @@ export interface BookingRow {
   created_at: string;
   updated_at: string;
 }
+
+export interface ProjectRow {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  long_description: string | null;
+  role: string | null;
+  tech_stack: string[];
+  features: string[] | null;
+  image: string | null;
+  images: string[] | null;
+  video_url: string | null;
+  live_url: string | null;
+  github_url: string | null;
+  href: string | null;
+  display_order: number;
+  is_featured?: boolean | null;
+  created_at: string;
+  updated_at: string;
+}
+
