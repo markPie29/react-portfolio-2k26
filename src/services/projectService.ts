@@ -20,6 +20,7 @@ export interface ProjectFormData {
   githubUrl?: string;
   href?: string;
   displayOrder?: number;
+  isFeatured?: boolean;
 }
 
 /**
@@ -41,6 +42,7 @@ export const mapRowToProjectItem = (row: ProjectRow): ProjectItem => {
     liveUrl: row.live_url || undefined,
     githubUrl: row.github_url || undefined,
     href: row.href || '#',
+    isFeatured: row.is_featured ?? false,
   };
 };
 
@@ -217,6 +219,7 @@ export const createProject = async (
       github_url: form.githubUrl || null,
       href: form.href || '#',
       display_order: form.displayOrder ?? 0,
+      is_featured: form.isFeatured ?? false,
     };
 
     const { data, error } = await supabase
@@ -286,6 +289,7 @@ export const updateProject = async (
       liveUrl: form.liveUrl || undefined,
       githubUrl: form.githubUrl || undefined,
       href: form.href || '#',
+      isFeatured: form.isFeatured ?? false,
     };
 
     // Save override locally for instant preview / fallback persistence
@@ -308,6 +312,7 @@ export const updateProject = async (
         github_url: form.githubUrl || null,
         href: form.href || '#',
         display_order: form.displayOrder ?? 0,
+        is_featured: form.isFeatured ?? false,
         updated_at: new Date().toISOString(),
       };
 

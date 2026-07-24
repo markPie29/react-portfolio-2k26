@@ -52,6 +52,8 @@ const FeaturedWorksSection: React.FC = () => {
     });
   }, []);
 
+  const featuredProjects = projectsList.filter((p) => p.isFeatured);
+
   return (
     <section id="works" className="py-16 md:py-24 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
@@ -71,7 +73,7 @@ const FeaturedWorksSection: React.FC = () => {
 
         <FadeContent blur duration={1} ease="power3.out" delay={0.2}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {projectsList.map((project) => (
+            {featuredProjects.map((project) => (
               <div
                 key={project.id}
                 onClick={() => setSelectedProject(project)}

@@ -26,6 +26,7 @@ export const projectsData: ProjectItem[] = [
     liveUrl: '',
     githubUrl: '',
     href: '#',
+    isFeatured: true,
   },
   {
     id: 'ursac-hub-2',
@@ -52,6 +53,7 @@ export const projectsData: ProjectItem[] = [
     liveUrl: '',
     githubUrl: '',
     href: '#',
+    isFeatured: true,
   },
   {
     id: 'sk-logistics',
@@ -78,6 +80,7 @@ export const projectsData: ProjectItem[] = [
     liveUrl: '',
     githubUrl: '',
     href: '#',
+    isFeatured: true,
   },
   {
     id: 'arduino-ar',

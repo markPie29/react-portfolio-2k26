@@ -34,7 +34,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ImageOff,
-  Video
+  Video,
+  Star
 } from 'lucide-react';
 import { 
   SiGithub, 
@@ -451,6 +452,7 @@ export const ProjectsManager: React.FC = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [displayOrder, setDisplayOrder] = useState<number>(0);
+  const [isFeatured, setIsFeatured] = useState<boolean>(false);
 
   // Files State & Size Alerts
   const [coverFile, setCoverFile] = useState<File | null>(null);
@@ -526,6 +528,7 @@ export const ProjectsManager: React.FC = () => {
     setGalleryItems([]);
     setVideoUrl('');
     setDisplayOrder(projects.length + 1);
+    setIsFeatured(false);
     setCoverFile(null);
     setFileSizeWarning(null);
     setModalViewMode('split');
@@ -557,6 +560,7 @@ export const ProjectsManager: React.FC = () => {
     setGalleryItems(rawGallery.map((url) => ({ id: Math.random().toString(36).substring(7), type: 'url', value: url })));
     setVideoUrl(project.videoUrl || '');
     setDisplayOrder(0);
+    setIsFeatured(project.isFeatured ?? false);
     setCoverFile(null);
     setFileSizeWarning(null);
     setModalViewMode('split');
@@ -604,6 +608,7 @@ export const ProjectsManager: React.FC = () => {
       videoUrl: videoUrl.trim() || undefined,
       liveUrl: liveUrl.trim() || undefined,
       githubUrl: githubUrl.trim() || undefined,
+      isFeatured: isFeatured,
     };
   }, [
     editingProject,
@@ -621,6 +626,7 @@ export const ProjectsManager: React.FC = () => {
     videoUrl,
     liveUrl,
     githubUrl,
+    isFeatured,
   ]);
 
   // Add Tech Tag
@@ -754,6 +760,7 @@ export const ProjectsManager: React.FC = () => {
         liveUrl: liveUrl.trim() || undefined,
         githubUrl: githubUrl.trim() || undefined,
         displayOrder,
+        isFeatured,
       };
 
       if (editingProject) {
@@ -783,6 +790,34 @@ export const ProjectsManager: React.FC = () => {
       showToast('error', err?.message || 'An error occurred while saving.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Toggle Featured status directly from card
+  const handleToggleFeatured = async (project: ProjectItem) => {
+    const updatedStatus = !project.isFeatured;
+    const formData: ProjectFormData = {
+      title: project.title,
+      category: project.category,
+      description: project.description,
+      longDescription: project.longDescription,
+      role: project.role,
+      techStack: project.techStack,
+      features: project.features,
+      image: project.image,
+      images: project.images,
+      videoUrl: project.videoUrl,
+      liveUrl: project.liveUrl,
+      githubUrl: project.githubUrl,
+      href: project.href,
+      isFeatured: updatedStatus,
+    };
+    const res = await updateProject(project.id, formData);
+    if (res.success && res.project) {
+      showToast('success', `Project "${project.title}" ${updatedStatus ? 'featured on homepage' : 'removed from featured works'}!`);
+      await loadProjectsData();
+    } else {
+      showToast('error', res.error || 'Failed to update feature status.');
     }
   };
 
@@ -916,6 +951,28 @@ export const ProjectsManager: React.FC = () => {
               className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
             />
           </div>
+        </div>
+
+        {/* Featured Toggle */}
+        <div className="p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-amber-500/20 rounded-xl text-amber-400">
+              <Star className="w-4 h-4 fill-amber-400" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-amber-200 uppercase tracking-wider">Feature on Homepage</h4>
+              <p className="text-[11px] text-amber-300/70">Enable this to highlight this project under "Featured Works" on the homepage.</p>
+            </div>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer shrink-0">
+            <input
+              type="checkbox"
+              checked={isFeatured}
+              onChange={(e) => setIsFeatured(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+          </label>
         </div>
 
         <div className="space-y-1.5">
@@ -1376,6 +1433,12 @@ export const ProjectsManager: React.FC = () => {
                 <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/10 text-sky-400 text-[10px] font-bold uppercase tracking-wider">
                   {project.category}
                 </div>
+                {project.isFeatured && (
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-300 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 backdrop-blur-md">
+                    <Star className="w-3 h-3 fill-amber-300 text-amber-300" />
+                    <span>Featured</span>
+                  </div>
+                )}
               </div>
 
               {/* Card Body */}
@@ -1434,6 +1497,18 @@ export const ProjectsManager: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleToggleFeatured(project)}
+                      className={`p-1.5 rounded-lg border transition-colors text-xs cursor-pointer ${
+                        project.isFeatured 
+                          ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 hover:bg-amber-500/30' 
+                          : 'bg-white/5 border-white/10 text-gray-400 hover:text-amber-300 hover:bg-white/10'
+                      }`}
+                      title={project.isFeatured ? "Unfeature project" : "Feature project"}
+                    >
+                      <Star className={`w-4 h-4 ${project.isFeatured ? 'fill-amber-300 text-amber-300' : ''}`} />
+                    </button>
+
                     <button
                       onClick={() => handleOpenEditModal(project)}
                       className="px-3 py-1.5 rounded-lg bg-sky-500/15 border border-sky-500/30 text-sky-400 hover:bg-sky-500/25 transition-colors text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"

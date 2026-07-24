@@ -80,6 +80,7 @@ export interface ProjectRow {
   github_url: string | null;
   href: string | null;
   display_order: number;
+  is_featured?: boolean | null;
   created_at: string;
   updated_at: string;
 }

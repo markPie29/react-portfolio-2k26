@@ -56,4 +56,5 @@ export interface ProjectItem {
   githubUrl?: string;
   role?: string;
   href?: string;
+  isFeatured?: boolean;
 }
