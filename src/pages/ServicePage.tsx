@@ -47,46 +47,44 @@ const ServicePage: React.FC = () => {
       <main className="flex-grow w-full px-6 md:px-12 lg:px-24 py-12">
         {/* Service Details */}
         <FadeContent blur duration={1} ease="power3.out" delay={0.1}>
-          <div className="mb-20">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
-              {/* LEFT SIDE: Name of Service & SERVICES sub-label */}
-              <div className="lg:col-span-5 flex flex-col justify-start py-2">
-                <h1 className="font-neutralfacebold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tighter uppercase leading-[0.9] text-gray-900 dark:text-white mb-4">
-                  {service.title}
-                </h1>
-                <p className="font-mono text-sm sm:text-base font-bold tracking-widest text-gray-500 dark:text-gray-400 uppercase">
-                  SERVICES
+          <div className="max-w-6xl mx-auto mb-16 sm:mb-20">
+            {/* Header: Sub-label on top, Title below */}
+            <div className="mb-8 sm:mb-10">
+              <p className="font-mono text-xs sm:text-sm font-bold tracking-widest text-gray-500 dark:text-gray-400 uppercase mb-2">
+                SERVICES
+              </p>
+              <h1 className="font-neutralfacebold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tighter uppercase leading-[0.95] text-gray-900 dark:text-white">
+                {service.title}
+              </h1>
+            </div>
+
+            {/* Vertical Stacked Content */}
+            <div className="flex flex-col gap-8 sm:gap-10">
+              {/* 1. Description Text (No container box) */}
+              <div>
+                <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-300 leading-relaxed font-normal max-w-4xl">
+                  {service.description}
                 </p>
               </div>
 
-              {/* RIGHT SIDE: Description & Scope */}
-              <div className="lg:col-span-7 flex flex-col gap-10">
-                {/* Top: Description */}
-                <div>
-                  <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-normal">
-                    {service.description}
-                  </p>
-                </div>
+              {/* 2. Key Capabilities & Scope Block */}
+              <div className="bg-white/80 dark:bg-[#080a0f]/40 border border-slate-200 dark:border-[#48cae4]/20 rounded-2xl p-6 sm:p-8 backdrop-blur-sm shadow-sm">
+                <h3 className="text-xs font-mono font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6">
+                  KEY CAPABILITIES & SCOPE
+                </h3>
 
-                {/* Bottom: Scope & Key Capabilities */}
-                <div className="pt-6 border-t border-slate-200 dark:border-white/10">
-                  <h3 className="text-xs font-mono font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6">
-                    KEY CAPABILITIES & SCOPE
-                  </h3>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {service.bullets.map((bullet, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-3"
-                      >
-                        <CheckCircle2 size={18} className="text-accent shrink-0 mt-0.5" />
-                        <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 tracking-wide">
-                          {bullet}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                  {service.bullets.map((bullet, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3"
+                    >
+                      <CheckCircle2 size={18} className="text-accent shrink-0 mt-0.5" />
+                      <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 tracking-wide">
+                        {bullet}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
