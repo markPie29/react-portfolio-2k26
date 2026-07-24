@@ -1,6 +1,7 @@
 export interface NavLink {
   label: string;
   href: string;
+  sublinks?: NavLink[];
 }
 
 export interface SocialLink {
