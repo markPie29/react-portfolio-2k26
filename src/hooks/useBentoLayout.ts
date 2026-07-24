@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { GraphicProject, GraphicProjectImage } from '../data/graphicProjects';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export interface ExtendedImage extends GraphicProjectImage {
   projectId: string;
@@ -96,6 +97,13 @@ export function useBentoLayout(projects: GraphicProject[], columnCount: number) 
 
     return cols;
   }, [validImages, aspectRatios, columnCount]);
+
+  // 5. Refresh GSAP ScrollTrigger whenever aspect ratios update layout dimensions
+  useEffect(() => {
+    if (Object.keys(aspectRatios).length > 0) {
+      ScrollTrigger.refresh();
+    }
+  }, [aspectRatios]);
 
   const handleImageError = (src: string) => {
     setBrokenImages((prev) => {

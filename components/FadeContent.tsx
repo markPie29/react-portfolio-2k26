@@ -19,6 +19,7 @@ interface FadeContentProps extends React.HTMLAttributes<HTMLDivElement> {
   disappearEase?: string;
   onComplete?: () => void;
   onDisappearanceComplete?: () => void;
+  once?: boolean;
 }
 
 const FadeContent: React.FC<FadeContentProps> = ({
@@ -35,6 +36,7 @@ const FadeContent: React.FC<FadeContentProps> = ({
   disappearEase = 'power2.in',
   onComplete,
   onDisappearanceComplete,
+  once = false,
   className = '',
   ...props
 }) => {
@@ -89,9 +91,13 @@ const FadeContent: React.FC<FadeContentProps> = ({
       scroller: scrollerTarget || window,
       start: `top ${startPct}%`,
       onEnter: () => tl.restart(),
-      onLeave: () => tl.pause(0),
+      onLeave: () => {
+        if (!once) tl.pause(0);
+      },
       onEnterBack: () => tl.restart(),
-      onLeaveBack: () => tl.pause(0)
+      onLeaveBack: () => {
+        if (!once) tl.pause(0);
+      }
     });
 
     return () => {
@@ -99,7 +105,7 @@ const FadeContent: React.FC<FadeContentProps> = ({
       tl.kill();
       gsap.killTweensOf(el);
     };
-  }, [container, blur, duration, ease, delay, threshold, initialOpacity, disappearAfter, disappearDuration, disappearEase, onComplete, onDisappearanceComplete, className]);
+  }, [container, blur, duration, ease, delay, threshold, initialOpacity, disappearAfter, disappearDuration, disappearEase, onComplete, onDisappearanceComplete, once, className]);
 
   return (
     <div ref={ref} className={className} {...props}>

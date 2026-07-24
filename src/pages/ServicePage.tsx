@@ -47,7 +47,7 @@ const ServicePage: React.FC = () => {
     <div className="relative min-h-screen bg-transparent text-foreground flex flex-col pt-28">
       <main className="flex-grow w-full px-6 md:px-12 lg:px-24 py-12">
         {/* Service Details */}
-        <FadeContent blur duration={1} ease="power3.out" delay={0.1}>
+        <FadeContent blur duration={1} ease="power3.out" delay={0.1} once>
           <div className="max-w-6xl mx-auto mb-16 sm:mb-20">
             {/* Header: Sub-label on top, Title below */}
             <div className="mb-8 sm:mb-10">
@@ -90,10 +90,10 @@ const ServicePage: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Graphics Bento Gallery (only for graphic design service) */}
-          {service.slug === 'graphic-design' && <GraphicsBento />}
         </FadeContent>
+
+        {/* Graphics Bento Gallery (only for graphic design service) */}
+        {service.slug === 'graphic-design' && <GraphicsBento />}
 
         {/* CTA section */}
         <CtaSection />
