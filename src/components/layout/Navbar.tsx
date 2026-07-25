@@ -101,16 +101,18 @@ const Navbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
         {/* Logo */}
-        <a
-          href="/"
-          onClick={(e) => handleNavClick(e, '/')}
-          className="font-neutralfacebold text-xl md:text-2xl tracking-tight gradient-text hover:opacity-85 transition-opacity"
-        >
-          MARKY
-        </a>
+        <div className="flex-1 flex items-center justify-start">
+          <a
+            href="/"
+            onClick={(e) => handleNavClick(e, '/')}
+            className="font-neutralfacebold text-xl md:text-2xl tracking-tight gradient-text hover:opacity-85 transition-opacity"
+          >
+            MARKY
+          </a>
+        </div>
 
         {/* Center Nav Links - Desktop */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center justify-center gap-8">
           {navigationData.map((link) => (
             <div
               key={link.label}
@@ -168,7 +170,7 @@ const Navbar: React.FC = () => {
         </nav>
 
         {/* Right CTA Button & Theme Toggle */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex flex-1 items-center justify-end gap-4">
           <button
             onClick={toggleTheme}
             className="p-2 rounded-full border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all cursor-pointer"
