@@ -66,17 +66,17 @@ const AboutHeroHeader: React.FC = () => {
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="lg:col-span-7 flex flex-col items-start gap-6 text-left"
+          className="lg:col-span-7 flex flex-col items-center lg:items-start gap-6 text-center lg:text-left"
         >
           {/* Main Display Headline (Stacked DESIGN, DEVELOP, DEPLOY) */}
-          <div className="w-full">
+          <div className="w-full flex justify-center lg:justify-start">
             <GradientText
               colors={['#0077b6', '#0096c7', '#00b4d8', '#48cae4', '#90e0ef']}
               animationSpeed={6}
               showBorder={false}
-              className="!mx-0 font-neutralfacebold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-none text-left"
+              className="mx-auto lg:!mx-0 font-neutralfacebold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-none text-center lg:text-left"
             >
-              <div className="flex flex-col items-start gap-1 sm:gap-2">
+              <div className="flex flex-col items-center lg:items-start gap-1 sm:gap-2">
                 <span>DESIGN</span>
                 <span>DEVELOP</span>
                 <span>DEPLOY</span>
@@ -85,7 +85,7 @@ const AboutHeroHeader: React.FC = () => {
           </div>
 
           {/* Intro Bio Subtext */}
-          <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl lg:max-w-2xl text-left font-sans">
+          <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl lg:max-w-2xl text-center lg:text-left font-sans">
             My name is Mark Angelo A. Isulat, but people call me Marky. I started as a simple tech enthusiast as a kid, which led me to begin learning programming at the age of 16 and enter the design world at 18. Currently a 4th-year student in BS Computer Engineering and a DOST Scholar, I have worked with different brands and businesses both locally and internationally.
           </p>
 
@@ -94,7 +94,7 @@ const AboutHeroHeader: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap items-center justify-start gap-4 sm:gap-6 pt-2"
+            className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 pt-2"
           >
             {/* DOWNLOAD CV Button */}
             <a

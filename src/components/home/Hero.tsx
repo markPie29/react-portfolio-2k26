@@ -13,7 +13,7 @@ const Hero: React.FC = () => {
     >
       <div className="max-w-6xl mx-auto w-full flex flex-col items-center justify-center text-center z-10">
         {/* BlurText Social Tag Pills (Centered above name) */}
-        <div className="mb-6 w-full flex justify-center">
+        <div className="mb-4 sm:mb-6 w-full flex justify-center">
           <BlurText
             text={socialsData.map((s) => (
               <a
@@ -21,23 +21,24 @@ const Hero: React.FC = () => {
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-gray-200 text-gray-800 dark:bg-white/10 dark:text-gray-200 hover-gradient-blue shadow-sm inline-flex items-center gap-2 cursor-pointer"
+                className="p-1.5 sm:px-4 sm:py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-transparent dark:bg-transparent sm:bg-gray-200 sm:dark:bg-white/10 hover-gradient-blue shadow-none sm:shadow-sm inline-flex items-center justify-center gap-2 cursor-pointer text-gray-800 dark:text-gray-200"
+                title={s.label}
               >
-                <i className={s.iconClass}></i>
-                <span>{s.label}</span>
+                <i className={`${s.iconClass} text-2xl sm:text-base`}></i>
+                <span className="hidden sm:inline">{s.label}</span>
               </a>
             ))}
             delay={100}
             animateBy="words"
-            className="flex flex-wrap justify-center gap-2.5 sm:gap-3"
+            className="flex flex-wrap justify-center gap-5 sm:gap-3"
           />
         </div>
 
         {/* SplitText Display Name (Centered, Single Line) */}
-        <div className="mb-4 w-full flex justify-center text-center overflow-visible">
+        <div className="mb-3 sm:mb-4 w-full flex justify-center text-center overflow-visible">
           <SplitText
             text="MARKY ISULAT"
-            className="font-neutralfacebold text-2xl sm:text-4xl md:text-6xl lg:text-[75px] xl:text-[85px] leading-[0.95] tracking-tight uppercase whitespace-nowrap inline-block"
+            className="font-neutralfacebold text-[34px] sm:text-4xl md:text-6xl lg:text-[75px] xl:text-[85px] leading-[0.95] tracking-tight uppercase whitespace-nowrap inline-block"
             delay={40}
             duration={0.8}
             ease="power3.out"
@@ -49,7 +50,7 @@ const Hero: React.FC = () => {
         </div>
 
         {/* TextType Rotating Subtitle (Centered) */}
-        <div className="mb-8 h-8 flex items-center justify-center text-center">
+        <div className="mb-6 sm:mb-8 h-8 flex items-center justify-center text-center">
           <TextType
             text={["Software Engineer", "Multimedia Designer", "Tech Enthusiast"]}
             typingSpeed={80}
@@ -57,7 +58,7 @@ const Hero: React.FC = () => {
             showCursor
             cursorCharacter="_"
             deletingSpeed={40}
-            className="text-base sm:text-xl font-helvetica-neue-medium text-accent uppercase tracking-wider"
+            className="text-sm sm:text-xl font-helvetica-neue-medium text-accent uppercase tracking-wider"
           />
         </div>
 
@@ -71,11 +72,11 @@ const Hero: React.FC = () => {
           <a
             href="/Mark_Angelo_Isulat_Final_Resume.pdf"
             download
-            className="gradient-bg text-white hover:brightness-110 px-8 py-3 rounded-full text-sm font-bold uppercase tracking-widest transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-sky-500/25 inline-flex items-center gap-3"
+            className="gradient-bg text-white hover:brightness-110 px-5 py-2.5 sm:px-8 sm:py-3 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-sky-500/25 inline-flex items-center gap-2 sm:gap-3"
           >
             <span>DOWNLOAD CV</span>
             <svg
-              className="w-4 h-4"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
