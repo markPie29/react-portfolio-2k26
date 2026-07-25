@@ -36,15 +36,21 @@ const FadeContent: React.FC<FadeContentProps> = ({
   disappearEase = 'power2.in',
   onComplete,
   onDisappearanceComplete,
-  once = false,
+  once = true,
   className = '',
   ...props
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const animatedRef = useRef<boolean>(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    if (once && animatedRef.current) {
+      gsap.set(el, { autoAlpha: 1, filter: 'none' });
+      return;
+    }
 
     let scrollerTarget: Element | string | null = container || document.getElementById('snap-main-container') || null;
 
@@ -65,6 +71,7 @@ const FadeContent: React.FC<FadeContentProps> = ({
       paused: true,
       delay: getSeconds(delay),
       onComplete: () => {
+        animatedRef.current = true;
         if (onComplete) onComplete();
         if (disappearAfter > 0) {
           gsap.to(el, {
@@ -90,11 +97,14 @@ const FadeContent: React.FC<FadeContentProps> = ({
       trigger: el,
       scroller: scrollerTarget || window,
       start: `top ${startPct}%`,
-      onEnter: () => tl.restart(),
+      once: once,
+      onEnter: () => tl.play(),
       onLeave: () => {
         if (!once) tl.pause(0);
       },
-      onEnterBack: () => tl.restart(),
+      onEnterBack: () => {
+        if (!once) tl.play();
+      },
       onLeaveBack: () => {
         if (!once) tl.pause(0);
       }
@@ -103,9 +113,8 @@ const FadeContent: React.FC<FadeContentProps> = ({
     return () => {
       st.kill();
       tl.kill();
-      gsap.killTweensOf(el);
     };
-  }, [container, blur, duration, ease, delay, threshold, initialOpacity, disappearAfter, disappearDuration, disappearEase, onComplete, onDisappearanceComplete, once, className]);
+  }, [container, blur, duration, ease, delay, threshold, initialOpacity, disappearAfter, disappearDuration, disappearEase, onComplete, onDisappearanceComplete, once]);
 
   return (
     <div ref={ref} className={className} {...props}>

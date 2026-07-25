@@ -128,13 +128,9 @@ const IS_UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{
  * Fetches all projects from Supabase. Fallbacks to local hardcoded data if table is empty or Supabase is unconfigured.
  */
 export const fetchProjects = async (): Promise<ProjectItem[]> => {
-  const deletedIds = getDeletedProjectIds();
-  const editedMap = getEditedProjectsMap();
   let resultProjects: ProjectItem[] = [];
 
-  if (!isSupabaseConfigured) {
-    resultProjects = projectsData;
-  } else {
+  if (isSupabaseConfigured) {
     try {
       const { data, error } = await supabase
         .from('projects')
@@ -142,21 +138,25 @@ export const fetchProjects = async (): Promise<ProjectItem[]> => {
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
 
-      if (error || !data || data.length === 0) {
-        if (error) {
-          console.warn('Supabase fetch projects error, using hardcoded fallback:', error.message);
-        }
-        resultProjects = projectsData;
-      } else {
-        resultProjects = data.map((row: ProjectRow) => mapRowToProjectItem(row));
+      if (!error && data) {
+        // Return live Supabase database content directly when configured
+        return data.map((row: ProjectRow) => mapRowToProjectItem(row));
+      }
+
+      if (error) {
+        console.warn('Supabase fetch projects error, using hardcoded fallback:', error.message);
       }
     } catch (err) {
       console.error('Unexpected error fetching projects:', err);
-      resultProjects = projectsData;
     }
+    resultProjects = projectsData;
+  } else {
+    resultProjects = projectsData;
   }
 
-  // Apply edited overrides
+  // Fallback preview mode (Supabase unconfigured or fetch error): apply local storage overrides
+  const deletedIds = getDeletedProjectIds();
+  const editedMap = getEditedProjectsMap();
   const mergedProjects = resultProjects.map((p) => editedMap[p.id] || p);
 
   // Include any newly created/migrated override projects that aren't in resultProjects yet
