@@ -57,12 +57,9 @@ import SpotlightCard from '../../components/SpotlightCard';
 type GalleryItem = { id: string; type: 'url'; value: string } | { id: string; type: 'file'; value: File };
 
 const CATEGORIES = [
-  'Software Development',
   'Graphic Design',
-  'Video Editing',
+  'Software Development',
   'Social Media Management',
-  'Graphic Design & Video Editing',
-  'Other Custom Category',
 ];
 
 const getTechIcon = (name: string) => {
@@ -437,8 +434,7 @@ export const ProjectsManager: React.FC = () => {
 
   // Form Fields State
   const [title, setTitle] = useState<string>('');
-  const [category, setCategory] = useState<string>('Software Development');
-  const [customCategory, setCustomCategory] = useState<string>('');
+  const [category, setCategory] = useState<string>('Graphic Design');
   const [description, setDescription] = useState<string>('');
   const [longDescription, setLongDescription] = useState<string>('');
   const [role, setRole] = useState<string>('');
@@ -515,8 +511,7 @@ export const ProjectsManager: React.FC = () => {
   const handleOpenCreateModal = () => {
     setEditingProject(null);
     setTitle('');
-    setCategory('Software Development');
-    setCustomCategory('');
+    setCategory('Graphic Design');
     setDescription('');
     setLongDescription('');
     setRole('');
@@ -541,13 +536,7 @@ export const ProjectsManager: React.FC = () => {
     setEditingProject(project);
     setTitle(project.title);
 
-    if (CATEGORIES.includes(project.category)) {
-      setCategory(project.category);
-      setCustomCategory('');
-    } else {
-      setCategory('Other Custom Category');
-      setCustomCategory(project.category);
-    }
+    setCategory(project.category);
 
     setDescription(project.description);
     setLongDescription(project.longDescription || '');
@@ -570,8 +559,6 @@ export const ProjectsManager: React.FC = () => {
 
   // Construct Dynamic 1:1 Preview Object
   const previewProject: ProjectItem = useMemo(() => {
-    const finalCategory = category === 'Other Custom Category' ? customCategory.trim() || 'General' : category;
-
     let coverImg = coverUrl.trim() || undefined;
     if (coverFile) {
       try {
@@ -597,7 +584,7 @@ export const ProjectsManager: React.FC = () => {
     return {
       id: editingProject ? editingProject.id : 'preview-id',
       title: title.trim() || 'Project Title Preview',
-      category: finalCategory,
+      category: category as any,
       description: description.trim() || 'Short project description preview will appear here...',
       longDescription: longDescription.trim() || undefined,
       role: role.trim() || undefined,
@@ -614,7 +601,6 @@ export const ProjectsManager: React.FC = () => {
     editingProject,
     title,
     category,
-    customCategory,
     description,
     longDescription,
     role,
@@ -730,8 +716,6 @@ export const ProjectsManager: React.FC = () => {
       return;
     }
 
-    const finalCategory = category === 'Other Custom Category' ? customCategory.trim() || 'General' : category;
-
     setIsSubmitting(true);
 
     try {
@@ -748,7 +732,7 @@ export const ProjectsManager: React.FC = () => {
 
       const formData: ProjectFormData = {
         title: title.trim(),
-        category: finalCategory,
+        category: category,
         description: description.trim(),
         longDescription: longDescription.trim() || undefined,
         role: role.trim() || undefined,
@@ -851,7 +835,7 @@ export const ProjectsManager: React.FC = () => {
     return projects.filter((p) => {
       const matchCat =
         selectedCategory === 'ALL' ||
-        p.category.toLowerCase() === selectedCategory.toLowerCase();
+        (p.category || '').toLowerCase() === selectedCategory.toLowerCase();
 
       const q = searchQuery.trim().toLowerCase();
       if (!q) return matchCat;
@@ -908,22 +892,6 @@ export const ProjectsManager: React.FC = () => {
             </select>
           </div>
         </div>
-
-        {category === 'Other Custom Category' && (
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-              Custom Classification Name <span className="text-red-400">*</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={customCategory}
-              onChange={(e) => setCustomCategory(e.target.value)}
-              placeholder="e.g. Augmented Reality / Motion Graphics"
-              className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white placeholder-gray-600 outline-none focus:border-sky-500 transition-colors"
-            />
-          </div>
-        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
@@ -1374,7 +1342,7 @@ export const ProjectsManager: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto pb-1 modal-scrollbar">
-          {['ALL', ...CATEGORIES.filter((c) => c !== 'Other Custom Category')].map((cat) => {
+          {['ALL', ...CATEGORIES].map((cat) => {
             const isActive = selectedCategory.toLowerCase() === cat.toLowerCase();
             return (
               <button

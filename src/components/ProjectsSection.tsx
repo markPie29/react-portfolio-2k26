@@ -80,9 +80,8 @@ const ProjectCardImage: React.FC<{ project: ProjectItem }> = ({ project }) => {
 const FILTER_CATEGORIES = [
   'ALL',
   'GRAPHIC DESIGN',
-  'VIDEO EDITING',
-  'SOCIAL MEDIA MANAGEMENT',
   'SOFTWARE DEVELOPMENT',
+  'SOCIAL MEDIA MANAGEMENT',
 ];
 
 interface ProjectsSectionProps {
