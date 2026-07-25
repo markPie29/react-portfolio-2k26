@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'motion/react';
@@ -16,7 +16,11 @@ import { InquirySuccess } from './inquiry/InquirySuccess';
 import { submitProjectInquiry } from '../../services/inquiryService';
 import { ArrowLeft, ArrowRight, Loader2, Send } from 'lucide-react';
 
-export const ProjectInquiryForm: React.FC = () => {
+interface ProjectInquiryFormProps {
+  initialServices?: string[];
+}
+
+export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialServices }) => {
   const [step, setStep] = useState<number>(1);
   const [attachments, setAttachments] = useState<InquiryFileAttachment[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -41,7 +45,7 @@ export const ProjectInquiryForm: React.FC = () => {
       email: '',
       phone: '',
       website: '',
-      services: [],
+      services: initialServices || [],
       budget: '',
       timeline: '',
       projectType: '',
@@ -49,6 +53,12 @@ export const ProjectInquiryForm: React.FC = () => {
       description: ''
     }
   });
+
+  useEffect(() => {
+    if (initialServices && initialServices.length > 0) {
+      setValue('services', initialServices, { shouldValidate: true });
+    }
+  }, [initialServices, setValue]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const clientFullName = watch('fullName');

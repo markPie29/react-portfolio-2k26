@@ -1,15 +1,30 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { servicesData } from '../data/services';
 import FadeContent from '../../components/FadeContent';
 import CtaSection from '../components/home/CtaSection';
 import Footer from '../components/layout/Footer';
 import GraphicsBento from '../components/services/GraphicsBento';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Send } from 'lucide-react';
+
+const getInitialServicesForSlug = (slug: string): string[] => {
+  switch (slug) {
+    case 'graphic-design':
+    case 'graphic-design-video-editing':
+      return ['Graphic Design'];
+    case 'software-development':
+      return ['Custom Software', 'Website Development'];
+    case 'social-media-management':
+      return ['Graphic Design', 'Other'];
+    default:
+      return [];
+  }
+};
 
 const ServicePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const service = servicesData.find(
     (s) =>
@@ -17,12 +32,38 @@ const ServicePage: React.FC = () => {
       (slug === 'graphic-design-video-editing' && s.slug === 'graphic-design')
   );
 
+  const scrollToInquiry = () => {
+    const element = document.getElementById('inquiry');
+    if (element) {
+      if ((window as any).lenis) {
+        (window as any).lenis.scrollTo(element, { offset: -80 });
+      } else {
+        const top = element.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }
+  };
+
   useEffect(() => {
+    if (location.hash === '#inquiry' || location.hash === '#cta') {
+      const element = document.getElementById('inquiry');
+      if (element) {
+        setTimeout(() => {
+          if ((window as any).lenis) {
+            (window as any).lenis.scrollTo(element, { offset: -80 });
+          } else {
+            const top = element.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        }, 150);
+        return;
+      }
+    }
     window.scrollTo(0, 0);
     if ((window as any).lenis) {
       (window as any).lenis.scrollTo(0, { immediate: true });
     }
-  }, [slug]);
+  }, [slug, location.hash]);
 
   if (!service) {
     return (
@@ -43,25 +84,40 @@ const ServicePage: React.FC = () => {
     );
   }
 
+  const initialServices = getInitialServicesForSlug(service.slug);
+
   return (
     <div className="relative min-h-screen bg-transparent text-foreground flex flex-col pt-28">
       <main className="flex-grow w-full px-6 md:px-12 lg:px-24 py-12">
         {/* Service Details */}
         <FadeContent blur duration={1} ease="power3.out" delay={0.1} once>
           <div className="max-w-6xl mx-auto mb-16 sm:mb-20">
-            {/* Header: Sub-label on top, Title below */}
-            <div className="mb-8 sm:mb-10">
-              <p className="font-mono text-xs sm:text-sm font-bold tracking-widest text-gray-500 dark:text-gray-400 uppercase mb-2">
-                SERVICES
-              </p>
-              <h1 className="font-neutralfacebold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tighter uppercase leading-[0.95] text-gray-900 dark:text-white">
-                {service.title}
-              </h1>
+            {/* Header: Sub-label & Title with Top CTA Button */}
+            <div className="mb-8 sm:mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              <div>
+                <p className="font-mono text-xs sm:text-sm font-bold tracking-widest text-gray-500 dark:text-gray-400 uppercase mb-2">
+                  SERVICES
+                </p>
+                <h1 className="font-neutralfacebold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tighter uppercase leading-[0.95] text-gray-900 dark:text-white">
+                  {service.title}
+                </h1>
+              </div>
+
+              {/* Centered Action CTA Button in Header Container */}
+              <div className="flex items-center justify-center shrink-0 self-center">
+                <button
+                  onClick={scrollToInquiry}
+                  className="gradient-bg text-white font-neutralfacebold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full shadow-lg shadow-sky-500/25 hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer group"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>INQUIRE</span>
+                </button>
+              </div>
             </div>
 
             {/* Vertical Stacked Content */}
             <div className="flex flex-col gap-8 sm:gap-10">
-              {/* 1. Description Text (No container box) */}
+              {/* 1. Description Text */}
               <div>
                 <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-300 leading-relaxed font-normal max-w-4xl">
                   {service.description}
@@ -95,8 +151,8 @@ const ServicePage: React.FC = () => {
         {/* Graphics Bento Gallery (only for graphic design service) */}
         {service.slug === 'graphic-design' && <GraphicsBento />}
 
-        {/* CTA section */}
-        <CtaSection />
+        {/* CTA section with prefilled initialServices */}
+        <CtaSection initialServices={initialServices} />
       </main>
 
       <Footer />

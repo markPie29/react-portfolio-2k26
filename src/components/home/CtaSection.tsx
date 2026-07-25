@@ -4,7 +4,11 @@ import GradientText from '../../../components/GradientText';
 import { ProjectInquiryForm } from './ProjectInquiryForm';
 import { Calendar, ChevronDown, Sparkles } from 'lucide-react';
 
-const CtaSection: React.FC = () => {
+interface CtaSectionProps {
+  initialServices?: string[];
+}
+
+const CtaSection: React.FC<CtaSectionProps> = ({ initialServices }) => {
   const [showDirectForm, setShowDirectForm] = useState(true);
 
   return (
@@ -65,7 +69,7 @@ const CtaSection: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <ProjectInquiryForm />
+          <ProjectInquiryForm initialServices={initialServices} />
         </motion.div>
       </div>
     </section>
