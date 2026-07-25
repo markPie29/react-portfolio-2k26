@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import ScrollFloat from '../../components/ScrollFloat';
@@ -7,7 +7,7 @@ import ProjectModal from './home/ProjectModal';
 import { fetchProjects } from '../services/projectService';
 import { projectsData } from '../data/projects';
 import { ProjectItem } from '../types/content';
-import { Search, X, ImageOff, ExternalLink, ArrowLeft } from 'lucide-react';
+import { Search, X, ImageOff, ExternalLink, ArrowLeft, ChevronDown, Check } from 'lucide-react';
 import { 
   SiReact, 
   SiNextdotjs, 
@@ -95,6 +95,20 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     fetchProjects().then((data) => {
@@ -133,7 +147,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
         {/* Header Navigation & Subtitle */}
         <div className="w-full flex flex-col items-center gap-2 mb-4 relative">
           {isProjectsPage && (
-            <div className="self-start mb-2">
+            <div className="self-start mb-2 hidden md:block">
               <Link
                 to="/"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent/20 bg-[#080a0f] hover:bg-accent/10 hover:border-accent text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white transition-all duration-300 shadow-[0_4px_14px_0_rgba(72,202,228,0.08)]"
@@ -151,17 +165,56 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
 
           {/* Headline DESIGNED, DEVELOPED, DEPLOYED */}
           <div className="mt-1 mb-4 w-full">
-            <ScrollFloat
-              animationDuration={1}
-              ease="back.inOut(2)"
-              scrollStart="center bottom+=50%"
-              scrollEnd="bottom bottom-=40%"
-              stagger={0.03}
-              textClassName="font-neutralfacebold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight uppercase !leading-tight text-center"
-              containerClassName="text-center w-full justify-center !my-0"
-            >
-              {"DESIGNED, DEVELOPED, DEPLOYED"}
-            </ScrollFloat>
+            {/* Desktop View */}
+            <div className="hidden md:block">
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+                textClassName="font-neutralfacebold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight uppercase !leading-tight text-center"
+                containerClassName="text-center w-full justify-center !my-0"
+              >
+                {"DESIGNED, DEVELOPED, DEPLOYED"}
+              </ScrollFloat>
+            </div>
+            {/* Mobile View */}
+            <div className="md:hidden flex flex-col items-center gap-1">
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+                textClassName="font-neutralfacebold text-3xl text-white tracking-tight uppercase !leading-tight text-center"
+                containerClassName="text-center w-full justify-center !my-0"
+              >
+                {"DESIGNED,"}
+              </ScrollFloat>
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+                textClassName="font-neutralfacebold text-3xl text-white tracking-tight uppercase !leading-tight text-center"
+                containerClassName="text-center w-full justify-center !my-0"
+              >
+                {"DEVELOPED,"}
+              </ScrollFloat>
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+                textClassName="font-neutralfacebold text-3xl text-white tracking-tight uppercase !leading-tight text-center"
+                containerClassName="text-center w-full justify-center !my-0"
+              >
+                {"DEPLOYED"}
+              </ScrollFloat>
+            </div>
           </div>
         </div>
 
@@ -188,8 +241,8 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
           </div>
         </div>
 
-        {/* Category Filter Pills */}
-        <div className="w-full flex items-center justify-center flex-wrap gap-2.5 sm:gap-3 mb-12 max-w-5xl px-2">
+        {/* Category Filter Pills (Desktop View) */}
+        <div className="hidden md:flex w-full items-center justify-center flex-wrap gap-2.5 sm:gap-3 mb-12 max-w-5xl px-2">
           {FILTER_CATEGORIES.map((category) => {
             const isActive = selectedCategory === category;
             return (
@@ -213,6 +266,63 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
               </button>
             );
           })}
+        </div>
+
+        {/* Category Filter Dropdown (Mobile View) */}
+        <div ref={dropdownRef} className="md:hidden w-full mb-12 px-2 relative max-w-2xl z-30">
+          {/* Dropdown Trigger Button */}
+          <button
+            type="button"
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+            className={`w-full py-3.5 px-6 rounded-full bg-[#0e121d]/90 border text-white text-xs font-bold uppercase tracking-widest outline-none transition-all duration-300 shadow-[0_4px_20px_0_rgba(0,0,0,0.4)] backdrop-blur-md flex items-center justify-between font-sans ${
+              isDropdownOpen ? 'border-accent ring-2 ring-accent/20' : 'border-white/15 hover:border-accent/40'
+            }`}
+          >
+            <span>{selectedCategory}</span>
+            <motion.div
+              animate={{ rotate: isDropdownOpen ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="text-gray-400 w-4 h-4" />
+            </motion.div>
+          </button>
+
+          {/* Animated Floating Menu */}
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 4, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="absolute left-2 right-2 mt-2 bg-[#0d111a]/95 border border-white/15 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-xl overflow-hidden z-50 p-1.5"
+              >
+                <div className="flex flex-col gap-1">
+                  {FILTER_CATEGORIES.map((category) => {
+                    const isSelected = selectedCategory === category;
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full text-left py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-between font-sans ${
+                          isSelected
+                            ? 'bg-accent/15 text-accent border border-accent/30'
+                            : 'text-gray-300 hover:text-white hover:bg-white/5 border border-transparent'
+                        }`}
+                      >
+                        <span>{category}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-accent" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* 3-Column Projects Grid */}
