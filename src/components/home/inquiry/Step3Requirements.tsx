@@ -40,14 +40,37 @@ export const Step3Requirements: React.FC<Step3Props> = ({
 
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
+
+    if (attachments.length + files.length > 5) {
+      alert('Maximum 5 attachments allowed per inquiry.');
+      return;
+    }
+
+    const currentTotalSize = attachments.reduce((sum, f) => sum + f.size, 0);
     const newFiles: InquiryFileAttachment[] = [];
+    const allowedExtensions = ['pdf', 'png', 'jpg', 'jpeg', 'svg', 'zip', 'fig'];
+
+    let addedSize = 0;
 
     Array.from(files).forEach((file) => {
-      // Limit file size to 5MB per file
-      if (file.size > 5 * 1024 * 1024) {
-        alert(`File ${file.name} exceeds 5MB limit.`);
+      const ext = file.name.split('.').pop()?.toLowerCase() || '';
+
+      if (!allowedExtensions.includes(ext)) {
+        alert(`File ${file.name} is not a supported file format.`);
         return;
       }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`File ${file.name} exceeds the 5MB limit.`);
+        return;
+      }
+
+      if (currentTotalSize + addedSize + file.size > 15 * 1024 * 1024) {
+        alert('Total attachments size cannot exceed 15MB.');
+        return;
+      }
+
+      addedSize += file.size;
 
       const reader = new FileReader();
       reader.onload = (e) => {

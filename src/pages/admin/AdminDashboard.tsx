@@ -7,6 +7,7 @@ import { Inbox, Calendar as CalendarIcon, Clock, CheckCircle2, ArrowRight, Spark
 export const AdminDashboard: React.FC = () => {
   const [inquiries, setInquiries] = useState<InquiryRow[]>([]);
   const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [totalInquiryCount, setTotalInquiryCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -35,18 +36,21 @@ export const AdminDashboard: React.FC = () => {
           },
         ]);
         setBookings([]);
+        setTotalInquiryCount(1);
         setIsLoading(false);
         return;
       }
 
       try {
-        const [inqRes, bookRes] = await Promise.all([
+        const [inqRes, bookRes, countRes] = await Promise.all([
           supabase.from('inquiries').select('*').order('created_at', { ascending: false }).limit(5),
           supabase.from('bookings').select('*').order('booked_date', { ascending: true }),
+          supabase.from('inquiries').select('*', { count: 'exact', head: true }),
         ]);
 
         if (inqRes.data) setInquiries(inqRes.data);
         if (bookRes.data) setBookings(bookRes.data);
+        if (countRes.count !== null) setTotalInquiryCount(countRes.count);
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
       } finally {
@@ -57,7 +61,7 @@ export const AdminDashboard: React.FC = () => {
     fetchData();
   }, []);
 
-  const totalInquiries = inquiries.length;
+  const totalInquiries = totalInquiryCount || inquiries.length;
   const newInquiries = inquiries.filter((i) => i.status === 'new').length;
   const confirmedBookings = bookings.filter((b) => b.status === 'confirmed').length;
   const completedCalls = bookings.filter((b) => b.status === 'completed').length;

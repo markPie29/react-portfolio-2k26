@@ -60,10 +60,23 @@ export const FEATURE_CHIPS_OPTIONS = [
 
 // Zod validation schema for Step 1
 export const step1Schema = z.object({
-  fullName: z.string().min(2, 'Full name is required (at least 2 characters)'),
-  company: z.string().optional(),
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
-  phone: z.string().optional(),
+  fullName: z
+    .string()
+    .min(2, 'Full name is required (at least 2 characters)')
+    .max(100, 'Full name cannot exceed 100 characters'),
+  company: z.string().max(200, 'Company name cannot exceed 200 characters').optional(),
+  email: z
+    .string()
+    .min(1, 'Email is required')
+    .email('Invalid email address')
+    .max(150, 'Email address is too long'),
+  phone: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || val.trim() === '' || /^[\d\s+\-()]{7,25}$/.test(val),
+      { message: 'Invalid phone number format (e.g. +63 912 345 6789)' }
+    ),
   website: z
     .string()
     .trim()
@@ -86,7 +99,7 @@ export const step1Schema = z.object({
 
 // Zod validation schema for Step 2
 export const step2Schema = z.object({
-  services: z.array(z.string()).min(1, 'Please select at least one service'),
+  services: z.array(z.string()).min(1, 'Please select at least one service').max(10, 'Too many services selected'),
   budget: z.string().min(1, 'Please select a budget range'),
   timeline: z.string().min(1, 'Please select a timeline'),
   projectType: z.string().min(1, 'Please select a project type')
@@ -95,7 +108,10 @@ export const step2Schema = z.object({
 // Zod validation schema for Step 3
 export const step3Schema = z.object({
   featureChips: z.array(z.string()).optional(),
-  description: z.string().min(15, 'Please provide a project description (at least 15 characters)')
+  description: z
+    .string()
+    .min(15, 'Please provide a project description (at least 15 characters)')
+    .max(5000, 'Description exceeds 5,000 character limit')
 });
 
 // Combined schema

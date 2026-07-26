@@ -45,23 +45,38 @@ const formatTimeLabel = (time24: string): string => {
   return `${hour}:${minStr || '00'} ${period}`;
 };
 
+// Client-side rate limiting for bookings
+const checkBookingRateLimit = (): boolean => {
+  try {
+    const key = 'booking_last_submit_time';
+    const now = Date.now();
+    const last = parseInt(sessionStorage.getItem(key) || '0', 10);
+    if (now - last < 20000) {
+      return false;
+    }
+    sessionStorage.setItem(key, now.toString());
+    return true;
+  } catch {
+    return true;
+  }
+};
+
 export const fetchAvailableSlotsForDate = async (
   dateStr: string // YYYY-MM-DD
 ): Promise<AvailableTimeSlot[]> => {
   if (!isSupabaseConfigured) {
-    // Return mock slots for local preview
     return DEFAULT_BUSINESS_SLOTS.map((time, idx) => ({
       time,
       label: formatTimeLabel(time),
-      isAvailable: idx !== 2, // Mock 11:00 AM as booked for testing UI
+      isAvailable: idx !== 2,
     }));
   }
 
   try {
     const selectedDate = new Date(dateStr);
-    const dayOfWeek = selectedDate.getDay(); // 0=Sun..6=Sat
+    const dayOfWeek = selectedDate.getDay();
 
-    // 1. Fetch active custom rules for this day of week or specific date
+    // 1. Fetch active custom rules
     const { data: slotsData, error: slotsError } = await supabase
       .from('availability_slots')
       .select('*')
@@ -69,10 +84,9 @@ export const fetchAvailableSlotsForDate = async (
       .or(`day_of_week.eq.${dayOfWeek},specific_date.eq.${dateStr}`);
 
     if (slotsError) {
-      console.warn('Error fetching availability_slots, using default slots:', slotsError);
+      console.warn('Error fetching availability_slots:', slotsError);
     }
 
-    // Determine base times
     let baseTimes: string[] = DEFAULT_BUSINESS_SLOTS;
 
     if (slotsData && slotsData.length > 0) {
@@ -96,7 +110,7 @@ export const fetchAvailableSlotsForDate = async (
       }
     }
 
-    // 2. Fetch existing bookings for this date to check booked slots
+    // 2. Fetch existing bookings for date
     const { data: existingBookings, error: bookingsError } = await supabase
       .from('bookings')
       .select('booked_time, status')
@@ -129,6 +143,13 @@ export const fetchAvailableSlotsForDate = async (
 export const createBooking = async (
   payload: CreateBookingPayload
 ): Promise<BookingResponse> => {
+  if (!checkBookingRateLimit()) {
+    return {
+      success: false,
+      message: 'Please wait a moment before trying to book another slot.',
+    };
+  }
+
   if (!isSupabaseConfigured) {
     console.log('Simulating booking creation (Supabase env missing):', payload);
     return {
@@ -140,34 +161,36 @@ export const createBooking = async (
 
   try {
     const bookingId = crypto.randomUUID();
+    const sanitizedClientName = payload.clientName.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const sanitizedClientEmail = payload.clientEmail.trim();
 
-    const { error } = await supabase
-      .from('bookings')
-      .insert([
-        {
-          id: bookingId,
-          inquiry_id: payload.inquiryId || null,
-          client_name: payload.clientName,
-          client_email: payload.clientEmail,
-          booked_date: payload.bookedDate,
-          booked_time: payload.bookedTime,
-          duration: payload.duration || 30,
-          meeting_type: payload.meetingType || 'discovery',
-          status: 'confirmed',
-          notes: payload.notes || null,
-        },
-      ]);
+    const { error } = await supabase.from('bookings').insert([
+      {
+        id: bookingId,
+        inquiry_id: payload.inquiryId || null,
+        client_name: sanitizedClientName,
+        client_email: sanitizedClientEmail,
+        booked_date: payload.bookedDate,
+        booked_time: payload.bookedTime,
+        duration: payload.duration || 30,
+        meeting_type: payload.meetingType || 'discovery',
+        status: 'confirmed',
+        notes: payload.notes ? payload.notes.trim().replace(/</g, '&lt;') : null,
+      },
+    ]);
 
     if (error) {
       console.error('Supabase Booking Insert Error:', error);
+      const isDuplicate = error.message?.includes('unique') || error.code === '23505';
       return {
         success: false,
-        message: 'Failed to confirm booking. Please try another time slot.',
+        message: isDuplicate
+          ? 'This time slot was just booked by another client. Please select another slot.'
+          : 'Failed to confirm booking. Please try another time slot.',
         error: error.message,
       };
     }
 
-    // Update status of linked inquiry to 'booked'
     if (payload.inquiryId) {
       await supabase
         .from('inquiries')

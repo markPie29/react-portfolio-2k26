@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'motion/react';
@@ -6,15 +6,13 @@ import {
   projectInquirySchema,
   ProjectInquiryFormData,
   InquiryFileAttachment,
-  step1Schema,
-  step2Schema
 } from '../../types/inquirySchema';
 import { Step1PersonalInfo } from './inquiry/Step1PersonalInfo';
 import { Step2ProjectInfo } from './inquiry/Step2ProjectInfo';
 import { Step3Requirements } from './inquiry/Step3Requirements';
 import { InquirySuccess } from './inquiry/InquirySuccess';
 import { submitProjectInquiry } from '../../services/inquiryService';
-import { ArrowLeft, ArrowRight, Loader2, Send } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Send, ShieldCheck } from 'lucide-react';
 
 interface ProjectInquiryFormProps {
   initialServices?: string[];
@@ -27,6 +25,13 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [inquiryId, setInquiryId] = useState<string | undefined>(undefined);
+  const [turnstileToken, setTurnstileToken] = useState<string | undefined>(undefined);
+
+  // Security refs: load timestamp & submission lock
+  const mountTimeRef = useRef<number>(Date.now());
+  const isSubmittingRef = useRef<boolean>(false);
+
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   const {
     register,
@@ -55,12 +60,45 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
   });
 
   useEffect(() => {
+    mountTimeRef.current = Date.now();
     if (initialServices && initialServices.length > 0) {
       setValue('services', initialServices, { shouldValidate: true });
     }
   }, [initialServices, setValue]);
 
-  // eslint-disable-next-line react-hooks/incompatible-library
+  // Load Turnstile Widget script dynamically if site key configured
+  useEffect(() => {
+    if (!turnstileSiteKey) return;
+
+    const existingScript = document.getElementById('cloudflare-turnstile-script');
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.id = 'cloudflare-turnstile-script';
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+
+      (window as any).onloadTurnstileCallback = () => {
+        if ((window as any).turnstile) {
+          (window as any).turnstile.render('#turnstile-container', {
+            sitekey: turnstileSiteKey,
+            callback: (token: string) => setTurnstileToken(token),
+          });
+        }
+      };
+    } else if ((window as any).turnstile) {
+      try {
+        (window as any).turnstile.render('#turnstile-container', {
+          sitekey: turnstileSiteKey,
+          callback: (token: string) => setTurnstileToken(token),
+        });
+      } catch (e) {
+        // Already rendered
+      }
+    }
+  }, [turnstileSiteKey, step]);
+
   const clientFullName = watch('fullName');
   const clientEmailAddress = watch('email');
 
@@ -68,7 +106,7 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
     let isValid = false;
 
     if (step === 1) {
-      isValid = await trigger(['fullName', 'email', 'website']);
+      isValid = await trigger(['fullName', 'email', 'website', 'phone']);
     } else if (step === 2) {
       isValid = await trigger(['services', 'budget', 'timeline', 'projectType']);
     }
@@ -83,13 +121,32 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
   };
 
   const onSubmit = async (data: ProjectInquiryFormData) => {
+    // 1. Anti-bot honeypot check (Check if hidden honeypot trap field filled)
+    const hpInput = (document.getElementById('hp_website_trap') as HTMLInputElement)?.value;
+    if (hpInput && hpInput.trim() !== '') {
+      console.warn('Bot submission blocked via honeypot.');
+      setIsSuccess(true);
+      return;
+    }
+
+    // 2. Anti-bot submission speed check (< 3 seconds total form duration)
+    const timeSpentMs = Date.now() - mountTimeRef.current;
+    if (timeSpentMs < 3000) {
+      setSubmitError('Submission too fast. Please take a moment to review your details.');
+      return;
+    }
+
+    // 3. Prevent duplicate in-flight requests
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setIsSubmitting(true);
     setSubmitError(null);
 
     try {
       const response = await submitProjectInquiry({
         ...data,
-        attachments
+        attachments,
+        turnstileToken,
       });
 
       if (response.success) {
@@ -98,7 +155,7 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
       } else {
         setSubmitError(
           response.error
-            ? `${response.message} Details: ${response.error}`
+            ? `${response.message} (${response.error})`
             : response.message || 'Failed to submit inquiry.'
         );
       }
@@ -106,6 +163,7 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
       setSubmitError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
+      isSubmittingRef.current = false;
     }
   };
 
@@ -115,6 +173,7 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
     setStep(1);
     setIsSuccess(false);
     setSubmitError(null);
+    mountTimeRef.current = Date.now();
   };
 
   return (
@@ -173,14 +232,26 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
                   />
                 )}
                 {step === 3 && (
-                  <Step3Requirements
-                    register={register}
-                    watch={watch}
-                    setValue={setValue}
-                    errors={errors}
-                    attachments={attachments}
-                    setAttachments={setAttachments}
-                  />
+                  <div className="space-y-6">
+                    <Step3Requirements
+                      register={register}
+                      watch={watch}
+                      setValue={setValue}
+                      errors={errors}
+                      attachments={attachments}
+                      setAttachments={setAttachments}
+                    />
+
+                    {/* Cloudflare Turnstile Container if configured */}
+                    {turnstileSiteKey && (
+                      <div className="pt-2 flex flex-col items-center justify-center space-y-2">
+                        <div id="turnstile-container" className="my-2" />
+                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                          <ShieldCheck className="w-3 h-3 text-sky-500" /> Protected by Cloudflare Turnstile CAPTCHA
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 )}
               </motion.div>
             </AnimatePresence>
