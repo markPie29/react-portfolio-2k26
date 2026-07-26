@@ -26,7 +26,7 @@ export interface AvailabilitySlotRow {
   created_at: string;
 }
 
-export type BookingStatus = 'confirmed' | 'cancelled' | 'completed' | 'no-show';
+export type BookingStatus = 'new' | 'confirmed' | 'cancelled' | 'completed' | 'no-show';
 export type MeetingType = 'discovery' | 'follow-up' | 'consultation';
 
 export interface BookingRow {

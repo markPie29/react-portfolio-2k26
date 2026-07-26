@@ -174,7 +174,7 @@ export const createBooking = async (
         booked_time: payload.bookedTime,
         duration: payload.duration || 30,
         meeting_type: payload.meetingType || 'discovery',
-        status: 'confirmed',
+        status: 'new',
         notes: payload.notes ? payload.notes.trim().replace(/</g, '&lt;') : null,
       },
     ]);
@@ -191,12 +191,7 @@ export const createBooking = async (
       };
     }
 
-    if (payload.inquiryId) {
-      await supabase
-        .from('inquiries')
-        .update({ status: 'confirmed' })
-        .eq('id', payload.inquiryId);
-    }
+    // Inquiry status remains 'new' until admin manually confirms it after sending an email
 
     return {
       success: true,
