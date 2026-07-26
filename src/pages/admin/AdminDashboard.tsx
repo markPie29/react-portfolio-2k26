@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { InquiryRow, BookingRow } from '../../types/database';
-import { Inbox, Calendar as CalendarIcon, Clock, CheckCircle2, ArrowRight, Sparkles, AlertCircle, FolderKanban } from 'lucide-react';
+import { Inbox, Clock, CheckCircle2, ArrowRight, Sparkles, AlertCircle, FolderKanban } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const [inquiries, setInquiries] = useState<InquiryRow[]>([]);
@@ -22,13 +22,8 @@ export const AdminDashboard: React.FC = () => {
             email: 'alex@nexustech.io',
             phone: null,
             website: 'nexustech.io',
-            services: ['Software Development'],
-            budget: '₱50,000 – ₱100,000',
-            timeline: 'Within 1 Month',
-            project_type: 'New Project',
-            feature_chips: ['Dashboard'],
+            project_type: 'Software',
             description: 'Building SaaS dashboard.',
-            attachments: [],
             status: 'new',
             notes: null,
             created_at: new Date().toISOString(),
@@ -63,8 +58,8 @@ export const AdminDashboard: React.FC = () => {
 
   const totalInquiries = totalInquiryCount || inquiries.length;
   const newInquiries = inquiries.filter((i) => i.status === 'new').length;
-  const confirmedBookings = bookings.filter((b) => b.status === 'confirmed').length;
-  const completedCalls = bookings.filter((b) => b.status === 'completed').length;
+  const confirmedInquiries = inquiries.filter((i) => i.status === 'confirmed').length;
+  const cancelledInquiries = inquiries.filter((i) => i.status === 'cancelled').length;
 
   return (
     <div className="space-y-8 text-gray-100">
@@ -79,7 +74,7 @@ export const AdminDashboard: React.FC = () => {
             Welcome back, Admin
           </h1>
           <p className="text-xs text-gray-400 mt-1">
-            Here is your current activity overview for project uploads, client inquiries & calls.
+            Here is your activity overview for projects, client inquiries, and schedule availability.
           </p>
         </div>
 
@@ -104,51 +99,54 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <p className="text-3xl font-neutralfacebold text-white">{totalInquiries}</p>
-          <span className="text-[10px] text-gray-500 block">Submitted via public portfolio</span>
+          <span className="text-[10px] text-gray-500 block">Submitted via portfolio</span>
         </div>
 
         <div className="p-5 bg-[#0c1017] border border-white/10 rounded-2xl space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-gray-400 tracking-wider">
-              New Unreviewed
+            <span className="text-xs font-semibold uppercase text-blue-400 tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-blue-400" />
+              New / Unreviewed
             </span>
-            <div className="p-2 bg-amber-500/10 text-amber-400 rounded-xl">
+            <div className="p-2 bg-blue-500/10 text-blue-400 rounded-xl">
               <AlertCircle className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-neutralfacebold text-amber-400">{newInquiries}</p>
-          <span className="text-[10px] text-gray-500 block">Requires your review</span>
+          <p className="text-3xl font-neutralfacebold text-blue-400">{newInquiries}</p>
+          <span className="text-[10px] text-gray-500 block">Requires your attention</span>
         </div>
 
         <div className="p-5 bg-[#0c1017] border border-white/10 rounded-2xl space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-gray-400 tracking-wider">
-              Scheduled Calls
+            <span className="text-xs font-semibold uppercase text-emerald-400 tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              Confirmed
             </span>
             <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">
-              <CalendarIcon className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-3xl font-neutralfacebold text-emerald-400">{confirmedBookings}</p>
-          <span className="text-[10px] text-gray-500 block">Confirmed 1-on-1 discovery calls</span>
-        </div>
-
-        <div className="p-5 bg-[#0c1017] border border-white/10 rounded-2xl space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-gray-400 tracking-wider">
-              Completed Calls
-            </span>
-            <div className="p-2 bg-sky-500/10 text-sky-400 rounded-xl">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-3xl font-neutralfacebold text-sky-400">{completedCalls}</p>
-          <span className="text-[10px] text-gray-500 block">Finished consultations</span>
+          <p className="text-3xl font-neutralfacebold text-emerald-400">{confirmedInquiries}</p>
+          <span className="text-[10px] text-gray-500 block">Confirmed inquiries & calls</span>
+        </div>
+
+        <div className="p-5 bg-[#0c1017] border border-white/10 rounded-2xl space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase text-red-400 tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-red-400" />
+              Cancelled / No-show
+            </span>
+            <div className="p-2 bg-red-500/10 text-red-400 rounded-xl">
+              <Clock className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-3xl font-neutralfacebold text-red-400">{cancelledInquiries}</p>
+          <span className="text-[10px] text-gray-500 block">Cancelled leads</span>
         </div>
       </div>
 
       {/* Quick Action Navigation Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link
           to="/admin/projects"
           className="p-6 bg-[#0c1017] border border-sky-500/30 hover:border-sky-400 rounded-2xl space-y-3 transition-all group shadow-lg"
@@ -160,7 +158,7 @@ export const AdminDashboard: React.FC = () => {
             Upload & Manage Projects →
           </h3>
           <p className="text-xs text-gray-400 leading-relaxed">
-            Add new portfolio projects, upload media assets to Supabase, set tech stack, and edit descriptions.
+            Add new portfolio projects, upload media assets, update tech stack, and set display order.
           </p>
         </Link>
 
@@ -172,25 +170,10 @@ export const AdminDashboard: React.FC = () => {
             <Inbox className="w-5 h-5" />
           </div>
           <h3 className="font-neutralfacebold text-base text-white group-hover:text-sky-400 transition-colors">
-            Manage Client Inquiries →
+            Inquiries Calendar Hub →
           </h3>
           <p className="text-xs text-gray-400 leading-relaxed">
-            Review detailed project briefs, feature requests, budget constraints, and client uploads.
-          </p>
-        </Link>
-
-        <Link
-          to="/admin/calendar"
-          className="p-6 bg-[#0c1017] border border-white/10 hover:border-sky-500/40 rounded-2xl space-y-3 transition-all group"
-        >
-          <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl w-fit">
-            <CalendarIcon className="w-5 h-5" />
-          </div>
-          <h3 className="font-neutralfacebold text-base text-white group-hover:text-sky-400 transition-colors">
-            Calendar & Meeting Links →
-          </h3>
-          <p className="text-xs text-gray-400 leading-relaxed">
-            View upcoming client calls and attach Google Meet / Zoom links manually.
+            View inquiry dates on calendar, update status colors (blue/green/red), and add Google Meet links.
           </p>
         </Link>
 
@@ -205,7 +188,7 @@ export const AdminDashboard: React.FC = () => {
             Set Availability Rules →
           </h3>
           <p className="text-xs text-gray-400 leading-relaxed">
-            Configure weekly recurring hours and specific date overrides for client booking options.
+            Configure weekly working hours and specific date overrides for discovery call availability.
           </p>
         </Link>
       </div>
@@ -217,7 +200,7 @@ export const AdminDashboard: React.FC = () => {
             Recent Client Inquiries
           </h2>
           <Link to="/admin/inquiries" className="text-xs text-sky-400 hover:underline font-semibold">
-            View All ({totalInquiries})
+            View Calendar Hub ({totalInquiries})
           </Link>
         </div>
 
@@ -237,8 +220,8 @@ export const AdminDashboard: React.FC = () => {
                   <span className="text-[11px] text-gray-400 font-mono">{inq.email}</span>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-sky-400 block">{inq.budget}</span>
-                  <span className="text-[10px] text-gray-500 uppercase">{inq.services[0]}</span>
+                  <span className="font-bold text-sky-400 block">{inq.project_type}</span>
+                  <span className="text-[10px] text-gray-500 uppercase">{inq.status}</span>
                 </div>
               </div>
             ))}

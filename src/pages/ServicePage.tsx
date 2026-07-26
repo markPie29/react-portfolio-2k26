@@ -7,20 +7,6 @@ import Footer from '../components/layout/Footer';
 import GraphicsBento from '../components/services/GraphicsBento';
 import { ArrowLeft, CheckCircle2, Send } from 'lucide-react';
 
-const getInitialServicesForSlug = (slug: string): string[] => {
-  switch (slug) {
-    case 'graphic-design':
-    case 'graphic-design-video-editing':
-      return ['Graphic Design'];
-    case 'software-development':
-      return ['Custom Software', 'Website Development'];
-    case 'social-media-management':
-      return ['Graphic Design', 'Other'];
-    default:
-      return [];
-  }
-};
-
 const ServicePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -83,8 +69,6 @@ const ServicePage: React.FC = () => {
       </div>
     );
   }
-
-  const initialServices = getInitialServicesForSlug(service.slug);
 
   return (
     <div className="relative min-h-screen bg-transparent text-foreground flex flex-col pt-28">
@@ -151,8 +135,8 @@ const ServicePage: React.FC = () => {
         {/* Graphics Bento Gallery (only for graphic design service) */}
         {service.slug === 'graphic-design' && <GraphicsBento />}
 
-        {/* CTA section with prefilled initialServices */}
-        <CtaSection initialServices={initialServices} />
+        {/* CTA section */}
+        <CtaSection />
       </main>
 
       <Footer />

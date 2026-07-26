@@ -5,22 +5,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   projectInquirySchema,
   ProjectInquiryFormData,
-  InquiryFileAttachment,
 } from '../../types/inquirySchema';
 import { Step1PersonalInfo } from './inquiry/Step1PersonalInfo';
-import { Step2ProjectInfo } from './inquiry/Step2ProjectInfo';
-import { Step3Requirements } from './inquiry/Step3Requirements';
+import { Step2ProjectDetails } from './inquiry/Step2ProjectDetails';
 import { InquirySuccess } from './inquiry/InquirySuccess';
 import { submitProjectInquiry } from '../../services/inquiryService';
 import { ArrowLeft, ArrowRight, Loader2, Send, ShieldCheck } from 'lucide-react';
 
-interface ProjectInquiryFormProps {
-  initialServices?: string[];
-}
-
-export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialServices }) => {
+export const ProjectInquiryForm: React.FC = () => {
   const [step, setStep] = useState<number>(1);
-  const [attachments, setAttachments] = useState<InquiryFileAttachment[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -50,21 +43,14 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
       email: '',
       phone: '',
       website: '',
-      services: initialServices || [],
-      budget: '',
-      timeline: '',
       projectType: '',
-      featureChips: [],
       description: ''
     }
   });
 
   useEffect(() => {
     mountTimeRef.current = Date.now();
-    if (initialServices && initialServices.length > 0) {
-      setValue('services', initialServices, { shouldValidate: true });
-    }
-  }, [initialServices, setValue]);
+  }, []);
 
   // Load Turnstile Widget script dynamically if site key configured
   useEffect(() => {
@@ -103,25 +89,20 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
   const clientEmailAddress = watch('email');
 
   const handleNextStep = async () => {
-    let isValid = false;
-
     if (step === 1) {
-      isValid = await trigger(['fullName', 'email', 'website', 'phone']);
-    } else if (step === 2) {
-      isValid = await trigger(['services', 'budget', 'timeline', 'projectType']);
-    }
-
-    if (isValid) {
-      setStep((prev) => prev + 1);
+      const isValid = await trigger(['fullName', 'email', 'website', 'phone']);
+      if (isValid) {
+        setStep(2);
+      }
     }
   };
 
   const handlePrevStep = () => {
-    setStep((prev) => Math.max(1, prev - 1));
+    setStep(1);
   };
 
   const onSubmit = async (data: ProjectInquiryFormData) => {
-    // 1. Anti-bot honeypot check (Check if hidden honeypot trap field filled)
+    // 1. Anti-bot honeypot check
     const hpInput = (document.getElementById('hp_website_trap') as HTMLInputElement)?.value;
     if (hpInput && hpInput.trim() !== '') {
       console.warn('Bot submission blocked via honeypot.');
@@ -145,7 +126,6 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
     try {
       const response = await submitProjectInquiry({
         ...data,
-        attachments,
         turnstileToken,
       });
 
@@ -169,7 +149,6 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
 
   const handleResetForm = () => {
     reset();
-    setAttachments([]);
     setStep(1);
     setIsSuccess(false);
     setSubmitError(null);
@@ -187,10 +166,7 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
                 01. Contact Details
               </span>
               <span className={step >= 2 ? 'text-sky-500' : 'text-gray-400'}>
-                02. Scope & Budget
-              </span>
-              <span className={step >= 3 ? 'text-sky-500' : 'text-gray-400'}>
-                03. Brief & Files
+                02. Project Details
               </span>
             </div>
 
@@ -198,8 +174,8 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
             <div className="w-full h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-sky-500 to-cyan-400"
-                initial={{ width: '33.3%' }}
-                animate={{ width: `${(step / 3) * 100}%` }}
+                initial={{ width: '50%' }}
+                animate={{ width: `${(step / 2) * 100}%` }}
                 transition={{ duration: 0.3 }}
               />
             </div>
@@ -225,21 +201,12 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
                   <Step1PersonalInfo register={register} errors={errors} />
                 )}
                 {step === 2 && (
-                  <Step2ProjectInfo
-                    watch={watch}
-                    setValue={setValue}
-                    errors={errors}
-                  />
-                )}
-                {step === 3 && (
                   <div className="space-y-6">
-                    <Step3Requirements
+                    <Step2ProjectDetails
                       register={register}
                       watch={watch}
                       setValue={setValue}
                       errors={errors}
-                      attachments={attachments}
-                      setAttachments={setAttachments}
                     />
 
                     {/* Cloudflare Turnstile Container if configured */}
@@ -271,7 +238,7 @@ export const ProjectInquiryForm: React.FC<ProjectInquiryFormProps> = ({ initialS
                 <div />
               )}
 
-              {step < 3 ? (
+              {step < 2 ? (
                 <button
                   type="button"
                   onClick={handleNextStep}

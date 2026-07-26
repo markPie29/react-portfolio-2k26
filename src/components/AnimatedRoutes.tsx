@@ -10,7 +10,6 @@ import { AdminLogin } from '../pages/admin/AdminLogin';
 import { AdminDashboard } from '../pages/admin/AdminDashboard';
 import { ProjectsManager } from '../pages/admin/ProjectsManager';
 import { InquiriesPage } from '../pages/admin/InquiriesPage';
-import { CalendarPage } from '../pages/admin/CalendarPage';
 import { AvailabilityManager } from '../pages/admin/AvailabilityManager';
 import { AdminLayout } from './admin/AdminLayout';
 import { ProtectedRoute } from './admin/ProtectedRoute';
@@ -80,16 +79,6 @@ export default function AnimatedRoutes() {
             <ProtectedRoute>
               <AdminLayout>
                 <InquiriesPage />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/calendar"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <CalendarPage />
               </AdminLayout>
             </ProtectedRoute>
           }

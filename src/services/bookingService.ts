@@ -194,7 +194,7 @@ export const createBooking = async (
     if (payload.inquiryId) {
       await supabase
         .from('inquiries')
-        .update({ status: 'booked' })
+        .update({ status: 'confirmed' })
         .eq('id', payload.inquiryId);
     }
 

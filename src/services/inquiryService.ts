@@ -1,9 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { ProjectInquiryFormData, InquiryFileAttachment } from '../types/inquirySchema';
-import { InquiryAttachment } from '../types/database';
+import { ProjectInquiryFormData } from '../types/inquirySchema';
 
 export interface SubmitInquiryPayload extends ProjectInquiryFormData {
-  attachments?: InquiryFileAttachment[];
   turnstileToken?: string;
 }
 
@@ -13,21 +11,6 @@ export interface InquiryResponse {
   inquiryId?: string;
   error?: string;
 }
-
-// Convert Base64 data URL to Blob for Supabase Storage Upload
-const base64ToBlob = (base64Data: string): Blob => {
-  const parts = base64Data.split(';base64,');
-  const contentType = parts[0].split(':')[1] || 'application/octet-stream';
-  const raw = window.atob(parts[1] || parts[0]);
-  const rawLength = raw.length;
-  const uInt8Array = new Uint8Array(rawLength);
-
-  for (let i = 0; i < rawLength; ++i) {
-    uInt8Array[i] = raw.charCodeAt(i);
-  }
-
-  return new Blob([uInt8Array], { type: contentType });
-};
 
 // Sanitize strings (trim and escape raw script tags)
 const sanitizeText = (str: string | undefined | null): string => {
@@ -107,9 +90,9 @@ const triggerNotification = async (payload: SubmitInquiryPayload, inquiryId: str
                 fields: [
                   { name: 'Client Name', value: payload.fullName, inline: true },
                   { name: 'Email', value: payload.email, inline: true },
-                  { name: 'Services', value: payload.services.join(', '), inline: false },
-                  { name: 'Budget', value: payload.budget, inline: true },
-                  { name: 'Timeline', value: payload.timeline, inline: true },
+                  { name: 'Project Type', value: payload.projectType, inline: true },
+                  { name: 'Company', value: payload.company || 'N/A', inline: true },
+                  { name: 'Phone', value: payload.phone || 'N/A', inline: true },
                   { name: 'Description', value: payload.description, inline: false },
                 ],
                 footer: { text: `Inquiry ID: ${inquiryId}` },
@@ -145,6 +128,7 @@ export const submitProjectInquiry = async (
     email: payload.email.trim(),
     phone: payload.phone ? sanitizeText(payload.phone) : undefined,
     website: payload.website ? payload.website.trim() : undefined,
+    projectType: sanitizeText(payload.projectType),
     description: sanitizeText(payload.description),
   };
 
@@ -160,53 +144,9 @@ export const submitProjectInquiry = async (
   }
 
   try {
-    const processedAttachments: InquiryAttachment[] = [];
-
-    // 1. Process attachments if provided (limit max 5)
-    const filesToUpload = (sanitizedPayload.attachments || []).slice(0, 5);
-
-    for (const file of filesToUpload) {
-      if (file.content) {
-        try {
-          const blob = base64ToBlob(file.content);
-          const rawExt = file.name.split('.').pop()?.toLowerCase() || 'bin';
-          const safeExt = ['pdf', 'png', 'jpg', 'jpeg', 'svg', 'zip', 'fig'].includes(rawExt)
-            ? rawExt
-            : 'bin';
-          const filePath = `inquiry-${Date.now()}-${Math.random().toString(36).substring(7)}.${safeExt}`;
-
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('inquiry-attachments')
-            .upload(filePath, blob);
-
-          if (!uploadError && uploadData) {
-            const { data: urlData } = supabase.storage
-              .from('inquiry-attachments')
-              .getPublicUrl(uploadData.path);
-
-            processedAttachments.push({
-              name: sanitizeText(file.name),
-              size: file.size,
-              type: file.type,
-              url: urlData.publicUrl,
-            });
-            continue;
-          }
-        } catch (e) {
-          console.warn('Storage upload exception, storing metadata fallback:', e);
-        }
-      }
-
-      processedAttachments.push({
-        name: sanitizeText(file.name),
-        size: file.size,
-        type: file.type,
-      });
-    }
-
     const inquiryId = crypto.randomUUID();
 
-    // 2. Insert into Supabase `inquiries` table
+    // Insert into Supabase `inquiries` table
     const { error } = await supabase.from('inquiries').insert([
       {
         id: inquiryId,
@@ -215,13 +155,8 @@ export const submitProjectInquiry = async (
         email: sanitizedPayload.email,
         phone: sanitizedPayload.phone || null,
         website: sanitizedPayload.website || null,
-        services: sanitizedPayload.services,
-        budget: sanitizedPayload.budget,
-        timeline: sanitizedPayload.timeline,
         project_type: sanitizedPayload.projectType,
-        feature_chips: sanitizedPayload.featureChips || [],
         description: sanitizedPayload.description,
-        attachments: processedAttachments,
         status: 'new',
       },
     ]);
@@ -239,7 +174,7 @@ export const submitProjectInquiry = async (
       };
     }
 
-    // 3. Trigger server-side notification (Discord webhook)
+    // Trigger server-side notification (Discord webhook)
     triggerNotification(sanitizedPayload, inquiryId);
 
     return {

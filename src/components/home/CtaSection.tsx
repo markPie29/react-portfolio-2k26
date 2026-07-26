@@ -1,16 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import GradientText from '../../../components/GradientText';
 import { ProjectInquiryForm } from './ProjectInquiryForm';
-import { Calendar, ChevronDown, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
-interface CtaSectionProps {
-  initialServices?: string[];
-}
-
-const CtaSection: React.FC<CtaSectionProps> = ({ initialServices }) => {
-  const [showDirectForm, setShowDirectForm] = useState(true);
-
+const CtaSection: React.FC = () => {
   return (
     <section
       id="cta"
@@ -41,35 +35,16 @@ const CtaSection: React.FC<CtaSectionProps> = ({ initialServices }) => {
               <span className="block">TOGETHER</span>
             </GradientText>
           </motion.div>
-
-          {/* Quick Schedule Call Link */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col items-center md:items-end gap-2"
-          >
-            <a
-              href={import.meta.env.VITE_DISCOVERY_CALL_URL || 'https://cal.com'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-semibold tracking-wider text-sky-500 hover:text-sky-400 inline-flex items-center gap-2 transition-colors uppercase cursor-pointer"
-            >
-              <Calendar className="w-4 h-4" />
-              <span>Skip form & book call directly</span>
-            </a>
-          </motion.div>
         </div>
 
-        {/* Multi-Step Interactive Form */}
+        {/* 2-Step Interactive Form */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <ProjectInquiryForm initialServices={initialServices} />
+          <ProjectInquiryForm />
         </motion.div>
       </div>
     </section>

@@ -15,18 +15,14 @@ export const handler = async (event: any) => {
       email,
       phone,
       website,
-      services,
-      budget,
-      timeline,
       projectType,
-      featureChips,
       description,
       inquiryId,
       turnstileToken
     } = body;
 
     // 1. Basic validation
-    if (!fullName || !email || !description || !services || !budget || !timeline) {
+    if (!fullName || !email || !description || !projectType) {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -59,7 +55,6 @@ export const handler = async (event: any) => {
     // 3. Send Discord Webhook Notification securely from backend
     const webhookUrl = process.env.DISCORD_WEBHOOK_URL || process.env.VITE_DISCORD_WEBHOOK_URL;
     if (webhookUrl) {
-      const formattedServices = Array.isArray(services) ? services.join(', ') : String(services || '');
       const discordPayload = {
         embeds: [
           {
@@ -68,11 +63,8 @@ export const handler = async (event: any) => {
             fields: [
               { name: 'Client Name', value: String(fullName).substring(0, 100), inline: true },
               { name: 'Email', value: String(email).substring(0, 150), inline: true },
-              { name: 'Company', value: company ? String(company).substring(0, 100) : 'N/A', inline: true },
-              { name: 'Services', value: formattedServices.substring(0, 250), inline: false },
-              { name: 'Budget', value: String(budget || 'N/A'), inline: true },
-              { name: 'Timeline', value: String(timeline || 'N/A'), inline: true },
               { name: 'Project Type', value: String(projectType || 'N/A'), inline: true },
+              { name: 'Company', value: company ? String(company).substring(0, 100) : 'N/A', inline: true },
               { name: 'Phone', value: phone ? String(phone) : 'N/A', inline: true },
               { name: 'Website', value: website ? String(website) : 'N/A', inline: true },
               { name: 'Description', value: String(description).substring(0, 1000), inline: false },
