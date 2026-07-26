@@ -5,6 +5,7 @@ import StatsSection from '../components/home/StatsSection';
 import TechStackSection from '../components/home/TechStackSection';
 import CredentialsSection from '../components/about/CredentialsSection';
 import TestimonialsSection from '../components/home/TestimonialsSection';
+import PersonalLifeSection from '../components/about/PersonalLifeSection';
 import CtaSection from '../components/home/CtaSection';
 import Footer from '../components/layout/Footer';
 
@@ -52,13 +53,16 @@ const AboutPage: React.FC = () => {
       {/* 4. Testimonials Section */}
       <TestimonialsSection />
 
-      {/* 5. Stats Grid (10+ Brands, 20+ Clients, 5+ Software Shipped, 3yr+ Experience) - Moved below Testimonials */}
+      {/* 5. Stats Grid */}
       <StatsSection />
 
-      {/* 6. Let's Work Together CTA */}
+      {/* 6. Personal Life Section */}
+      <PersonalLifeSection />
+
+      {/* 7. Let's Work Together CTA */}
       <CtaSection />
 
-      {/* 7. Footer */}
+      {/* 8. Footer */}
       <Footer />
     </div>
   );
