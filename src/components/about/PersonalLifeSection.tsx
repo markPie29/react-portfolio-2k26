@@ -22,8 +22,8 @@ const socials = [
   {
     platform: 'TikTok',
     handle: '@_markpie29 • marky_write on ig💻',
-    statsPrimary: '1,400+ Followers',
-    statsSecondary: '133K+ Likes',
+    statsPrimary: '1,900+ Followers',
+    statsSecondary: '170K+ Likes',
     url: 'https://www.tiktok.com/@_markpie29',
     icon: FaTiktok,
   },
