@@ -1,22 +1,54 @@
-import React, { useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { servicesData } from '../data/services';
 import FadeContent from '../../components/FadeContent';
 import CtaSection from '../components/home/CtaSection';
 import Footer from '../components/layout/Footer';
 import GraphicsBento from '../components/services/GraphicsBento';
-import { ArrowLeft, CheckCircle2, Send } from 'lucide-react';
+import ProjectCard from '../components/ProjectCard';
+import ProjectModal from '../components/home/ProjectModal';
+import { fetchProjects } from '../services/projectService';
+import { ProjectItem } from '../types/content';
+import { ArrowLeft, CheckCircle2, Send, ArrowRight } from 'lucide-react';
 
 const ServicePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const [projectsList, setProjectsList] = useState<ProjectItem[]>([]);
+  const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+
+  useEffect(() => {
+    fetchProjects().then((data) => {
+      if (data && data.length > 0) {
+        setProjectsList(data);
+      }
+    });
+  }, []);
 
   const service = servicesData.find(
     (s) =>
       s.slug === slug ||
       (slug === 'graphic-design-video-editing' && s.slug === 'graphic-design')
   );
+
+  const serviceProjects = useMemo(() => {
+    if (!service) return [];
+    const serviceSlug = service.slug.toLowerCase();
+
+    const matches = projectsList.filter((p) => {
+      const cat = p.category.toLowerCase();
+      if (serviceSlug.includes('graphic') && cat.includes('graphic')) return true;
+      if (serviceSlug.includes('software') && cat.includes('software')) return true;
+      if ((serviceSlug.includes('social') || serviceSlug.includes('media')) && (cat.includes('social') || cat.includes('media'))) return true;
+      return false;
+    });
+
+    const featured = matches.filter((p) => p.isFeatured);
+    const nonFeatured = matches.filter((p) => !p.isFeatured);
+
+    return [...featured, ...nonFeatured].slice(0, 3);
+  }, [projectsList, service]);
 
   const scrollToInquiry = () => {
     const element = document.getElementById('inquiry');
@@ -128,9 +160,43 @@ const ServicePage: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {/* 3. Featured Projects Showcase Section (Max 3 projects for this service) */}
+              {serviceProjects.length > 0 && (
+                <div className="flex flex-col gap-6 pt-4 pb-2">
+                  <div className="flex flex-row items-center justify-between gap-4">
+                    <h3 className="text-xs font-mono font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                      FEATURED PROJECTS ({serviceProjects.length})
+                    </h3>
+                    <Link
+                      to={`/projects?category=${service.slug}`}
+                      className="inline-flex items-center gap-2 text-xs font-mono font-bold text-accent hover:underline uppercase tracking-wider group"
+                    >
+                      <span>VIEW MORE</span>
+                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {serviceProjects.map((project) => (
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        onClick={() => setSelectedProject(project)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </FadeContent>
+
+        {/* Project Detail Modal */}
+        <ProjectModal
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
 
         {/* Graphics Bento Gallery (only for graphic design service) */}
         {service.slug === 'graphic-design' && <GraphicsBento />}
