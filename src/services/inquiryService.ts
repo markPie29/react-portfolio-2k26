@@ -3,6 +3,8 @@ import { ProjectInquiryFormData } from '../types/inquirySchema';
 
 export interface SubmitInquiryPayload extends ProjectInquiryFormData {
   turnstileToken?: string;
+  bookedDate?: string;
+  bookedTime?: string;
 }
 
 export interface InquiryResponse {
@@ -19,6 +21,16 @@ const sanitizeText = (str: string | undefined | null): string => {
     .trim()
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+};
+
+const formatTimeLabel = (time24: string): string => {
+  if (!time24) return '';
+  const [hourStr, minStr] = time24.split(':');
+  let hour = parseInt(hourStr, 10);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  if (hour === 0) hour = 12;
+  else if (hour > 12) hour -= 12;
+  return `${hour}:${minStr || '00'} ${period}`;
 };
 
 // Client-side rate limiting check using sessionStorage
@@ -62,11 +74,11 @@ const checkRateLimit = (): { allowed: boolean; message?: string } => {
   }
 };
 
-// Trigger serverless Netlify function (or direct fallback in local preview mode)
-const triggerNotification = async (payload: SubmitInquiryPayload, inquiryId: string) => {
+// Trigger serverless function (Vercel / Netlify or direct fallback in local preview mode)
+export const triggerNotification = async (payload: SubmitInquiryPayload, inquiryId: string) => {
   try {
-    // Try calling Netlify serverless function first (handles Discord notification securely)
-    const res = await fetch('/.netlify/functions/inquiry', {
+    // 1. Try Vercel API function first
+    let res = await fetch('/api/inquiry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -75,26 +87,50 @@ const triggerNotification = async (payload: SubmitInquiryPayload, inquiryId: str
       }),
     });
 
+    // 2. Fallback to Netlify function if on Netlify
+    if (!res.ok) {
+      res = await fetch('/.netlify/functions/inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...payload,
+          inquiryId,
+        }),
+      });
+    }
+
     if (!res.ok) {
       // Fallback: check if client-side webhook is available for local dev
       const webhookUrl = import.meta.env.VITE_DISCORD_WEBHOOK_URL;
       if (webhookUrl) {
+        const fields: any[] = [
+          { name: 'Client Name', value: payload.fullName, inline: true },
+          { name: 'Email', value: payload.email, inline: true },
+          { name: 'Project Type', value: payload.projectType, inline: true },
+          { name: 'Company', value: payload.company || 'N/A', inline: true },
+          { name: 'Phone', value: payload.phone || 'N/A', inline: true },
+          { name: 'Website', value: payload.website || 'N/A', inline: true },
+        ];
+
+        if (payload.bookedDate && payload.bookedTime) {
+          fields.push({
+            name: '📅 Scheduled Discovery Call',
+            value: `${payload.bookedDate} at ${formatTimeLabel(payload.bookedTime)}`,
+            inline: false,
+          });
+        }
+
+        fields.push({ name: 'Description', value: payload.description, inline: false });
+
         await fetch(webhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             embeds: [
               {
-                title: '🚀 New Project Inquiry Received!',
+                title: '🚀 New Project Inquiry & Discovery Call Booked!',
                 color: 38859,
-                fields: [
-                  { name: 'Client Name', value: payload.fullName, inline: true },
-                  { name: 'Email', value: payload.email, inline: true },
-                  { name: 'Project Type', value: payload.projectType, inline: true },
-                  { name: 'Company', value: payload.company || 'N/A', inline: true },
-                  { name: 'Phone', value: payload.phone || 'N/A', inline: true },
-                  { name: 'Description', value: payload.description, inline: false },
-                ],
+                fields,
                 footer: { text: `Inquiry ID: ${inquiryId}` },
                 timestamp: new Date().toISOString(),
               },
@@ -108,8 +144,24 @@ const triggerNotification = async (payload: SubmitInquiryPayload, inquiryId: str
   }
 };
 
+export const deleteProjectInquiry = async (inquiryId: string): Promise<boolean> => {
+  if (!isSupabaseConfigured) return true;
+  try {
+    const { error } = await supabase.from('inquiries').delete().eq('id', inquiryId);
+    if (error) {
+      console.error('Failed to rollback inquiry record:', error);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Unexpected error rolling back inquiry:', e);
+    return false;
+  }
+};
+
 export const submitProjectInquiry = async (
-  payload: SubmitInquiryPayload
+  payload: SubmitInquiryPayload,
+  options?: { skipNotification?: boolean }
 ): Promise<InquiryResponse> => {
   // Rate limit check
   const rateLimitCheck = checkRateLimit();
@@ -135,7 +187,9 @@ export const submitProjectInquiry = async (
   if (!isSupabaseConfigured) {
     console.log('Simulating inquiry delivery (Supabase env missing):', sanitizedPayload);
     const mockId = `INQ-DEV-${Date.now().toString(36).toUpperCase()}`;
-    await triggerNotification(sanitizedPayload, mockId);
+    if (!options?.skipNotification) {
+      await triggerNotification(sanitizedPayload, mockId);
+    }
     return {
       success: true,
       message: 'Inquiry received in local preview fallback mode!',
@@ -174,8 +228,10 @@ export const submitProjectInquiry = async (
       };
     }
 
-    // Trigger server-side notification (Discord webhook)
-    triggerNotification(sanitizedPayload, inquiryId);
+    // Trigger server-side notification unless skipped (e.g. waiting for booking)
+    if (!options?.skipNotification) {
+      triggerNotification(sanitizedPayload, inquiryId);
+    }
 
     return {
       success: true,

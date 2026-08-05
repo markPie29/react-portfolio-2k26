@@ -73,7 +73,8 @@ export const fetchAvailableSlotsForDate = async (
   }
 
   try {
-    const selectedDate = new Date(dateStr);
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const selectedDate = new Date(year, month - 1, day);
     const dayOfWeek = selectedDate.getDay();
 
     // 1. Fetch active custom rules
@@ -174,7 +175,7 @@ export const createBooking = async (
         booked_time: payload.bookedTime,
         duration: payload.duration || 30,
         meeting_type: payload.meetingType || 'discovery',
-        status: 'new',
+        status: 'confirmed',
         notes: payload.notes ? payload.notes.trim().replace(/</g, '&lt;') : null,
       },
     ]);

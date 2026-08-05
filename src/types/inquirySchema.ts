@@ -54,9 +54,17 @@ export const step2Schema = z.object({
     .max(5000, 'Description exceeds 5,000 character limit')
 });
 
-// Combined 2-step schema
-export const projectInquirySchema = step1Schema.merge(step2Schema);
+// Zod validation schema for Step 3 (Schedule Discovery Call)
+export const step3Schema = z.object({
+  bookedDate: z.string().min(1, 'Please select a date for your discovery call'),
+  bookedTime: z.string().min(1, 'Please select a time slot for your discovery call'),
+});
+
+// Combined 3-step schema
+export const projectInquirySchema = step1Schema.merge(step2Schema).merge(step3Schema);
 
 export type Step1FormData = z.infer<typeof step1Schema>;
 export type Step2FormData = z.infer<typeof step2Schema>;
+export type Step3FormData = z.infer<typeof step3Schema>;
 export type ProjectInquiryFormData = z.infer<typeof projectInquirySchema>;
+

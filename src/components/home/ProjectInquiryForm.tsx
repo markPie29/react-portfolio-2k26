@@ -8,8 +8,14 @@ import {
 } from '../../types/inquirySchema';
 import { Step1PersonalInfo } from './inquiry/Step1PersonalInfo';
 import { Step2ProjectDetails } from './inquiry/Step2ProjectDetails';
+import { Step3BookingSlot } from './inquiry/Step3BookingSlot';
 import { InquirySuccess } from './inquiry/InquirySuccess';
-import { submitProjectInquiry } from '../../services/inquiryService';
+import {
+  submitProjectInquiry,
+  triggerNotification,
+  deleteProjectInquiry,
+} from '../../services/inquiryService';
+import { createBooking } from '../../services/bookingService';
 import { ArrowLeft, ArrowRight, Loader2, Send, ShieldCheck } from 'lucide-react';
 
 export const ProjectInquiryForm: React.FC = () => {
@@ -44,7 +50,9 @@ export const ProjectInquiryForm: React.FC = () => {
       phone: '',
       website: '',
       projectType: '',
-      description: ''
+      description: '',
+      bookedDate: '',
+      bookedTime: ''
     }
   });
 
@@ -87,6 +95,8 @@ export const ProjectInquiryForm: React.FC = () => {
 
   const clientFullName = watch('fullName');
   const clientEmailAddress = watch('email');
+  const selectedDate = watch('bookedDate');
+  const selectedTime = watch('bookedTime');
 
   const handleNextStep = async () => {
     if (step === 1) {
@@ -94,11 +104,18 @@ export const ProjectInquiryForm: React.FC = () => {
       if (isValid) {
         setStep(2);
       }
+    } else if (step === 2) {
+      const isValid = await trigger(['projectType', 'description']);
+      if (isValid) {
+        setStep(3);
+      }
     }
   };
 
   const handlePrevStep = () => {
-    setStep(1);
+    if (step > 1) {
+      setStep(step - 1);
+    }
   };
 
   const onSubmit = async (data: ProjectInquiryFormData) => {
@@ -124,21 +141,63 @@ export const ProjectInquiryForm: React.FC = () => {
     setSubmitError(null);
 
     try {
-      const response = await submitProjectInquiry({
-        ...data,
-        turnstileToken,
+      // Step A: Insert Inquiry into DB without sending notification yet
+      const inquiryRes = await submitProjectInquiry(
+        {
+          ...data,
+          turnstileToken,
+        },
+        { skipNotification: true }
+      );
+
+      if (!inquiryRes.success || !inquiryRes.inquiryId) {
+        setSubmitError(
+          inquiryRes.error
+            ? `${inquiryRes.message} (${inquiryRes.error})`
+            : inquiryRes.message || 'Failed to record inquiry.'
+        );
+        setIsSubmitting(false);
+        isSubmittingRef.current = false;
+        return;
+      }
+
+      const activeInquiryId = inquiryRes.inquiryId;
+      setInquiryId(activeInquiryId);
+
+      // Step B: Create Booking tied to the inquiry
+      const bookingRes = await createBooking({
+        inquiryId: activeInquiryId,
+        clientName: data.fullName,
+        clientEmail: data.email,
+        bookedDate: data.bookedDate,
+        bookedTime: data.bookedTime,
+        duration: 30,
+        meetingType: 'discovery',
       });
 
-      if (response.success) {
-        setInquiryId(response.inquiryId);
-        setIsSuccess(true);
-      } else {
+      if (!bookingRes.success) {
+        // Step C: Rollback (Delete inquiry) if booking fails so database remains clean
+        await deleteProjectInquiry(activeInquiryId);
+        setInquiryId(undefined);
         setSubmitError(
-          response.error
-            ? `${response.message} (${response.error})`
-            : response.message || 'Failed to submit inquiry.'
+          bookingRes.message || 'Selected time slot could not be reserved. Please select another time slot.'
         );
+        setIsSubmitting(false);
+        isSubmittingRef.current = false;
+        return;
       }
+
+      // Step D: Trigger Discord Notification ONLY AFTER both inquiry and booking succeed
+      await triggerNotification(
+        {
+          ...data,
+          bookedDate: data.bookedDate,
+          bookedTime: data.bookedTime,
+        },
+        activeInquiryId
+      );
+
+      setIsSuccess(true);
     } catch (err: any) {
       setSubmitError('An unexpected error occurred. Please try again.');
     } finally {
@@ -152,6 +211,7 @@ export const ProjectInquiryForm: React.FC = () => {
     setStep(1);
     setIsSuccess(false);
     setSubmitError(null);
+    setInquiryId(undefined);
     mountTimeRef.current = Date.now();
   };
 
@@ -161,12 +221,15 @@ export const ProjectInquiryForm: React.FC = () => {
         <>
           {/* Top Progress Bar & Steps */}
           <div className="mb-8">
-            <div className="flex items-center justify-between text-xs font-neutralfacebold uppercase tracking-wider mb-3">
+            <div className="flex items-center justify-between text-[11px] sm:text-xs font-neutralfacebold uppercase tracking-wider mb-3">
               <span className={step >= 1 ? 'text-sky-500' : 'text-gray-400'}>
-                01. Contact Details
+                01. Contact
               </span>
               <span className={step >= 2 ? 'text-sky-500' : 'text-gray-400'}>
-                02. Project Details
+                02. Project
+              </span>
+              <span className={step >= 3 ? 'text-sky-500' : 'text-gray-400'}>
+                03. Schedule
               </span>
             </div>
 
@@ -174,8 +237,8 @@ export const ProjectInquiryForm: React.FC = () => {
             <div className="w-full h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-sky-500 to-cyan-400"
-                initial={{ width: '50%' }}
-                animate={{ width: `${(step / 2) * 100}%` }}
+                initial={{ width: '33.3%' }}
+                animate={{ width: `${(step / 3) * 100}%` }}
                 transition={{ duration: 0.3 }}
               />
             </div>
@@ -192,7 +255,7 @@ export const ProjectInquiryForm: React.FC = () => {
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
-                initial={{ opacity: 0, x: step === 1 ? 0 : 20 }}
+                initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.25 }}
@@ -220,6 +283,15 @@ export const ProjectInquiryForm: React.FC = () => {
                     )}
                   </div>
                 )}
+                {step === 3 && (
+                  <Step3BookingSlot
+                    selectedDate={selectedDate}
+                    selectedTime={selectedTime}
+                    onSelectDate={(date) => setValue('bookedDate', date, { shouldValidate: true })}
+                    onSelectTime={(time) => setValue('bookedTime', time, { shouldValidate: true })}
+                    errors={errors}
+                  />
+                )}
               </motion.div>
             </AnimatePresence>
 
@@ -238,7 +310,7 @@ export const ProjectInquiryForm: React.FC = () => {
                 <div />
               )}
 
-              {step < 2 ? (
+              {step < 3 ? (
                 <button
                   type="button"
                   onClick={handleNextStep}
@@ -250,18 +322,18 @@ export const ProjectInquiryForm: React.FC = () => {
               ) : (
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !selectedTime}
                   className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 text-white text-xs font-neutralfacebold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-sky-500/30 cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Sending Inquiry...</span>
+                      <span>Completing Booking...</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>Submit Inquiry</span>
+                      <span>Confirm & Book Call</span>
                     </>
                   )}
                 </button>
@@ -275,6 +347,8 @@ export const ProjectInquiryForm: React.FC = () => {
           inquiryId={inquiryId}
           clientName={clientFullName}
           clientEmail={clientEmailAddress}
+          bookedDate={selectedDate}
+          bookedTime={selectedTime}
         />
       )}
     </div>

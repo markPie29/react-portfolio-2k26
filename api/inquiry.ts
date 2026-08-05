@@ -1,14 +1,10 @@
-export const handler = async (event: any) => {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
-    };
+export default async function handler(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   try {
-    const body = JSON.parse(event.body || '{}');
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
     const {
       fullName,
       company,
@@ -25,14 +21,10 @@ export const handler = async (event: any) => {
 
     // 1. Basic validation
     if (!fullName || !email || !description || !projectType) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Missing required inquiry fields' }),
-      };
+      return res.status(400).json({ error: 'Missing required inquiry fields' });
     }
 
-    // 2. Cloudflare Turnstile Verification (if secret key configured on Netlify server)
+    // 2. Cloudflare Turnstile Verification (if secret key configured on Vercel)
     const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
     if (turnstileSecret && turnstileToken) {
       const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -44,13 +36,9 @@ export const handler = async (event: any) => {
         }),
       });
 
-      const verifyData = await verifyRes.json();
+      const verifyData = (await verifyRes.json()) as { success: boolean };
       if (!verifyData.success) {
-        return {
-          statusCode: 400,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'CAPTCHA verification failed. Please try again.' }),
-        };
+        return res.status(400).json({ error: 'CAPTCHA verification failed. Please try again.' });
       }
     }
 
@@ -82,7 +70,7 @@ export const handler = async (event: any) => {
             title: bookedDate ? '🚀 New Project Inquiry & Discovery Call Booked!' : '🚀 New Project Inquiry Received!',
             color: 38859, // #0077b6 (Sky blue)
             fields,
-            footer: { text: `Inquiry ID: ${inquiryId || 'N/A'} • Portfolio Backend` },
+            footer: { text: `Inquiry ID: ${inquiryId || 'N/A'} • Portfolio Backend (Vercel)` },
             timestamp: new Date().toISOString(),
           },
         ],
@@ -95,17 +83,9 @@ export const handler = async (event: any) => {
       });
     }
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ success: true, message: 'Notification dispatched successfully' }),
-    };
+    return res.status(200).json({ success: true, message: 'Notification dispatched successfully' });
   } catch (error: any) {
-    console.error('Netlify Function Inquiry Notification Error:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ success: false, error: error.message || 'Internal Server Error' }),
-    };
+    console.error('Vercel Function Inquiry Notification Error:', error);
+    return res.status(500).json({ success: false, error: error.message || 'Internal Server Error' });
   }
-};
+}
