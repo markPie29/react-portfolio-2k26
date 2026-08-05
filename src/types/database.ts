@@ -1,4 +1,4 @@
-export type InquiryStatus = 'new' | 'confirmed' | 'cancelled';
+export type InquiryStatus = 'new' | 'confirmed' | 'done' | 'cancelled';
 
 export interface InquiryRow {
   id: string;

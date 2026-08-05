@@ -335,8 +335,14 @@ export const InquiriesPage: React.FC = () => {
     inquiriesByDate[dateStr].push(inq);
   });
 
-  const handleSaveDetails = async () => {
+  const handleSaveDetails = async (overrideStatus?: InquiryStatus | React.MouseEvent) => {
     if (!selectedInquiry) return;
+    const validOverride = typeof overrideStatus === 'string' ? overrideStatus : undefined;
+    const targetStatus = validOverride || editingStatus;
+    if (validOverride) {
+      setEditingStatus(validOverride);
+    }
+
     setIsSaving(true);
     setSaveSuccess(false);
 
@@ -346,7 +352,7 @@ export const InquiriesPage: React.FC = () => {
       const { error } = await supabase
         .from('inquiries')
         .update({
-          status: editingStatus,
+          status: targetStatus,
           notes: editingNotes,
           updated_at: nowIso,
         })
@@ -359,12 +365,14 @@ export const InquiriesPage: React.FC = () => {
       }
 
       // Update or insert matching booking status & meeting link in Supabase
+      const bookingStatus: BookingStatus = targetStatus === 'done' ? 'completed' : (targetStatus as BookingStatus);
+
       const existingBooking = bookings.find((b) => b.inquiry_id === selectedInquiry.id);
       if (existingBooking) {
         await supabase
           .from('bookings')
           .update({
-            status: editingStatus,
+            status: bookingStatus,
             meeting_link: editingMeetingLink.trim() || null,
             updated_at: nowIso,
           })
@@ -378,7 +386,7 @@ export const InquiriesPage: React.FC = () => {
             booked_date: selectedInquiry.created_at.split('T')[0],
             booked_time: '10:00',
             meeting_type: 'discovery',
-            status: editingStatus,
+            status: bookingStatus,
             meeting_link: editingMeetingLink.trim(),
           },
         ]);
@@ -388,7 +396,7 @@ export const InquiriesPage: React.FC = () => {
     // Update local state for inquiry
     const updatedInquiry = {
       ...selectedInquiry,
-      status: editingStatus,
+      status: targetStatus,
       notes: editingNotes,
       updated_at: nowIso,
     };
@@ -397,6 +405,7 @@ export const InquiriesPage: React.FC = () => {
     setSelectedInquiry(updatedInquiry);
 
     // Update local state for bookings
+    const bookingStatus: BookingStatus = targetStatus === 'done' ? 'completed' : (targetStatus as BookingStatus);
     setBookings((prev) => {
       const exists = prev.some((b) => b.inquiry_id === selectedInquiry.id);
       if (exists) {
@@ -404,7 +413,7 @@ export const InquiriesPage: React.FC = () => {
           b.inquiry_id === selectedInquiry.id
             ? {
                 ...b,
-                status: editingStatus,
+                status: bookingStatus,
                 meeting_link: editingMeetingLink.trim() || b.meeting_link,
                 updated_at: nowIso,
               }
@@ -420,7 +429,7 @@ export const InquiriesPage: React.FC = () => {
           booked_time: '10:00',
           duration: 30,
           meeting_type: 'discovery',
-          status: editingStatus,
+          status: bookingStatus,
           meeting_link: editingMeetingLink.trim(),
           notes: null,
           created_at: nowIso,
@@ -437,6 +446,19 @@ export const InquiriesPage: React.FC = () => {
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
+  const hasMeetingLink = Boolean(editingMeetingLink.trim());
+
+  const handleEmailClient = async () => {
+    if (!selectedInquiry || !hasMeetingLink) return;
+
+    // Auto-confirm inquiry and save to database immediately
+    await handleSaveDetails('confirmed');
+
+    // Open Gmail compose window
+    const composeUrl = getGmailComposeUrl(selectedInquiry, activeBooking, editingMeetingLink);
+    window.open(composeUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const getStatusBadge = (st: InquiryStatus) => {
     switch (st) {
       case 'new':
@@ -451,6 +473,13 @@ export const InquiriesPage: React.FC = () => {
           <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase inline-flex items-center gap-1.5 shrink-0">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             Email Confirmed
+          </span>
+        );
+      case 'done':
+        return (
+          <span className="px-2.5 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase inline-flex items-center gap-1.5 shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+            Meeting Done
           </span>
         );
       case 'cancelled':
@@ -543,6 +572,18 @@ export const InquiriesPage: React.FC = () => {
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span>Confirmed</span>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('done')}
+            className={`px-3.5 py-2 rounded-xl border text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+              statusFilter === 'done'
+                ? 'bg-cyan-500 border-cyan-500 text-white shadow-md shadow-cyan-500/20'
+                : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:border-cyan-500/50'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-cyan-400" />
+            <span>Done</span>
           </button>
 
           <button
@@ -692,6 +733,8 @@ export const InquiriesPage: React.FC = () => {
                               ? 'bg-blue-500/20 border-blue-500/40 text-blue-200 hover:bg-blue-500/30'
                               : inq.status === 'confirmed'
                               ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/30'
+                              : inq.status === 'done'
+                              ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-200 hover:bg-cyan-500/30'
                               : 'bg-red-500/20 border-red-500/40 text-red-200 hover:bg-red-500/30'
                           }`}
                         >
@@ -703,6 +746,8 @@ export const InquiriesPage: React.FC = () => {
                               ? 'bg-blue-400 animate-pulse'
                               : inq.status === 'confirmed'
                               ? 'bg-emerald-400'
+                              : inq.status === 'done'
+                              ? 'bg-cyan-400'
                               : 'bg-red-400'
                           }`} />
                         </button>
@@ -1077,6 +1122,19 @@ export const InquiriesPage: React.FC = () => {
 
                     <button
                       type="button"
+                      onClick={() => setEditingStatus('done')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+                        editingStatus === 'done'
+                          ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/25'
+                          : 'bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20'
+                      }`}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-current" />
+                      <span>Done</span>
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => setEditingStatus('cancelled')}
                       className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
                         editingStatus === 'cancelled'
@@ -1107,6 +1165,13 @@ export const InquiriesPage: React.FC = () => {
                           title: 'text-emerald-400',
                           badge: 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30',
                           label: 'Confirmed',
+                        };
+                      case 'done':
+                        return {
+                          box: 'bg-cyan-500/10 border-cyan-500/30',
+                          title: 'text-cyan-400',
+                          badge: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                          label: 'Done / Completed',
                         };
                       case 'cancelled':
                         return {
@@ -1184,15 +1249,24 @@ export const InquiriesPage: React.FC = () => {
 
             {/* Footer Action Buttons */}
             <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              <a
-                href={getGmailComposeUrl(selectedInquiry, activeBooking, editingMeetingLink)}
-                target="_blank"
-                rel="noreferrer"
-                className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-gray-300 transition-colors flex items-center justify-center gap-2"
+              <button
+                type="button"
+                disabled={!hasMeetingLink || isSaving}
+                onClick={handleEmailClient}
+                title={
+                  hasMeetingLink
+                    ? 'Click to email client (auto-sets status to Confirmed & saves)'
+                    : 'Please paste a meeting link above to enable emailing the client'
+                }
+                className={`px-4 py-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-2 ${
+                  hasMeetingLink && !isSaving
+                    ? 'bg-sky-500/10 hover:bg-sky-500/20 border-sky-500/40 text-sky-300 hover:text-sky-200 cursor-pointer shadow-md shadow-sky-500/10'
+                    : 'bg-white/5 border-white/10 text-gray-500 cursor-not-allowed opacity-50'
+                }`}
               >
-                <Mail className="w-4 h-4 text-sky-400" />
+                <Mail className={`w-4 h-4 ${hasMeetingLink ? 'text-sky-400' : 'text-gray-500'}`} />
                 <span>Email Client</span>
-              </a>
+              </button>
 
               <div className="flex items-center gap-3">
                 <button
@@ -1206,7 +1280,7 @@ export const InquiriesPage: React.FC = () => {
                 <button
                   type="button"
                   disabled={isSaving}
-                  onClick={handleSaveDetails}
+                  onClick={() => handleSaveDetails()}
                   className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 text-white font-neutralfacebold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 cursor-pointer disabled:opacity-50 flex-1 sm:flex-initial"
                 >
                   {isSaving ? (
