@@ -21,11 +21,11 @@ export const servicesData: ServiceItem[] = [
     description:
       'Engineering robust, scalable web and mobile applications using modern frameworks, clean software architecture, and seamless user experiences.',
     bullets: [
-      'Full-Stack Web Apps',
-      'RESTful API Development',
-      'Database Design & Integration',
-      'Real-Time Systems',
-      'Mobile & AR Applications',
+      'Web and Mobile Applications',
+      'Landing Pages',
+      'POS and Inventory Systems',
+      'HR Information Systems',
+      'Custom Systems',
     ],
     href: '/services/software-development',
   },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { motion } from 'motion/react';
@@ -9,6 +9,8 @@ export const AdminLogin: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [failedAttempts, setFailedAttempts] = useState<number>(0);
+  const [lockoutTimeSec, setLockoutTimeSec] = useState<number>(0);
 
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
@@ -16,12 +18,24 @@ export const AdminLogin: React.FC = () => {
 
   const from = (location.state as any)?.from?.pathname || '/admin';
 
-  if (user) {
-    navigate(from, { replace: true });
-  }
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
+
+  useEffect(() => {
+    if (lockoutTimeSec <= 0) return;
+    const timer = setInterval(() => {
+      setLockoutTimeSec((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [lockoutTimeSec]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (lockoutTimeSec > 0) return;
+
     setIsSubmitting(true);
     setErrorMsg(null);
 
@@ -31,7 +45,14 @@ export const AdminLogin: React.FC = () => {
     if (res.success) {
       navigate(from, { replace: true });
     } else {
-      setErrorMsg(res.error || 'Failed to authenticate.');
+      const attempts = failedAttempts + 1;
+      setFailedAttempts(attempts);
+      if (attempts >= 5) {
+        setLockoutTimeSec(60); // 60s lockout after 5 fails
+        setErrorMsg('Too many failed login attempts. Please wait 60 seconds.');
+      } else {
+        setErrorMsg(res.error || 'Failed to authenticate.');
+      }
     }
   };
 

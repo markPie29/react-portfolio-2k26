@@ -1,0 +1,185 @@
+# 🛡️ Inquiry Form & Admin Dashboard — Full Security Audit & Fix Plan
+
+Comprehensive end-to-end audit of the inquiry form submission pipeline, booking system, and admin dashboard. Covers security, abuse prevention, data flow integrity, and production readiness.
+
+---
+
+## 📋 Audit Findings Checklist
+
+### 🔴 CRITICAL Issues (Must Fix)
+
+| # | Issue | File(s) | Details |
+|---|-------|---------|---------|
+| C1 | **No rate limiting on form submissions** | [inquiryService.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/services/inquiryService.ts) | Anyone can spam-submit hundreds of inquiries per second. No client-side throttle, no server-side rate limit. Database will fill with junk. |
+| C2 | **No rate limiting on booking creation** | [bookingService.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/services/bookingService.ts) | Same as C1 — bookings can be mass-created with no throttle. |
+| C3 | **No honeypot / bot detection on form** | [ProjectInquiryForm.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/components/home/ProjectInquiryForm.tsx) | Zero bot protection. Automated scripts can submit the form trivially. No CAPTCHA, no honeypot field, no timing check. |
+| C4 | **Discord webhook URL exposed to client** | [inquiryService.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/services/inquiryService.ts#L33) | `VITE_DISCORD_WEBHOOK_URL` is a `VITE_` prefixed env var, meaning it's **bundled into the frontend JS**. Anyone can extract it and abuse/spam your Discord channel. |
+| C5 | **XSS vulnerability in API email templates** | [api/inquiry.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/api/inquiry.ts#L29-L74), [netlify/functions/inquiry.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/netlify/functions/inquiry.ts#L36-L81) | User input (`fullName`, `company`, `description`, `featureChips`) is interpolated directly into HTML email templates with **zero sanitization**. A malicious user can inject `<script>` or HTML into the email. |
+| C6 | **No server-side validation in API endpoints** | [api/inquiry.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/api/inquiry.ts), [netlify/functions/inquiry.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/netlify/functions/inquiry.ts) | The serverless functions accept **any** JSON body without validation. No check for required fields, no email format validation, no length limits. |
+| C7 | **API email endpoint is completely disconnected** | [inquiryService.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/services/inquiryService.ts) | The `submitProjectInquiry` function **never calls** `api/inquiry.ts` or the Netlify function. The email sending code exists as dead code — inquiries are only saved to Supabase, meaning **you never get email notifications** unless the Discord webhook is configured. |
+| C8 | **Bookings table has no public SELECT policy** | [00001_init_schema.sql](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/supabase/migrations/00001_init_schema.sql#L104-L129) | The `bookings` table only has `SELECT` for authenticated users. But `bookingService.ts` queries bookings on the public form (line 100-104) to check for booked time slots — **this query silently fails for anonymous users**, returning empty data and showing all slots as available, leading to double-bookings. |
+| C9 | **No file type validation on attachments** | [Step3Requirements.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/components/home/inquiry/Step3Requirements.tsx#L41-L68), [inquiryService.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/services/inquiryService.ts#L86-L124) | HTML `accept` attribute is easily bypassed. No server-side file type validation. Malicious files (`.exe`, `.bat`) can be uploaded to the public `inquiry-attachments` bucket. |
+
+---
+
+### 🟡 IMPORTANT Issues (Should Fix)
+
+| # | Issue | File(s) | Details |
+|---|-------|---------|---------|
+| I1 | **No max attachment count limit** | [Step3Requirements.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/components/home/inquiry/Step3Requirements.tsx#L41-L68) | Users can upload unlimited files. No cap on total count (e.g., max 5). The 5MB-per-file limit exists but no total size limit. |
+| I2 | **No duplicate submission prevention** | [ProjectInquiryForm.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/components/home/ProjectInquiryForm.tsx) | The submit button disables during submission (`isSubmitting`), but there's no idempotency key. Fast double-clicks before the state updates could cause duplicate inserts. |
+| I3 | **Admin login has no brute-force protection** | [AdminLogin.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/pages/admin/AdminLogin.tsx) | No failed attempt counter, no lockout, no delay between attempts. Supabase has its own rate limiting on auth, but the UI doesn't surface this. |
+| I4 | **Hardcoded dev credentials in source code** | [AuthContext.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/context/AuthContext.tsx#L56) | `admin@portfolio.com` / `admin123` is hardcoded for preview mode. While it only works when Supabase is not configured, these credentials are visible in the shipped JS bundle. |
+| I5 | **Storage bucket has no file-size server limit** | [00001_init_schema.sql](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/supabase/migrations/00001_init_schema.sql#L135-L151) | The `inquiry-attachments` bucket allows anyone to upload any size. The 5MB client check is trivially bypassable. Supabase bucket `file_size_limit` should be set. |
+| I6 | **Netlify function returns wrong HTTP status** | [netlify/functions/inquiry.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/netlify/functions/inquiry.ts#L9) | Returns `450` for Method Not Allowed — should be `405`. `450` is a non-standard code (Microsoft "Blocked by Windows Parental Controls"). |
+| I7 | **Description field has no max length** | [inquirySchema.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/types/inquirySchema.ts#L98) | Only min 15 chars, no max. A user could paste a 10MB string into the description field. |
+| I8 | **Phone field has no format validation** | [inquirySchema.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/types/inquirySchema.ts) | The phone field is `z.string().optional()` with no regex pattern. Arbitrary text is accepted. |
+| I9 | **Booking race condition — no unique constraint** | [00001_init_schema.sql](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/supabase/migrations/00001_init_schema.sql#L88-L102) | No `UNIQUE(booked_date, booked_time)` constraint. Two users booking the same slot simultaneously both succeed, creating double-bookings. |
+| I10 | **Dashboard metrics only count fetched data** | [AdminDashboard.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/pages/admin/AdminDashboard.tsx#L44) | `totalInquiries` counts only the 5 most recent (`.limit(5)`), not the actual total. The metric card says "Total Inquiries" but only counts the last 5. |
+
+---
+
+### 🟢 MINOR Issues (Nice to Fix)
+
+| # | Issue | File(s) | Details |
+|---|-------|---------|---------|
+| M1 | **Storage policy too broad** | [00001_init_schema.sql](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/supabase/migrations/00001_init_schema.sql#L140-L144) | The upload policy matches `bucket_id = 'inquiry-attachments'` but doesn't restrict file paths, extensions, or sizes. |
+| M2 | **No input sanitization before DB insert** | [inquiryService.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/services/inquiryService.ts#L130-L149) | While Supabase uses parameterized queries (safe from SQL injection), the raw text is stored as-is. Consider trimming whitespace on all text fields. |
+| M3 | **Dead Netlify function** | [netlify/functions/inquiry.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/netlify/functions/inquiry.ts) | Duplicate of `api/inquiry.ts`. Neither is actually called. Should be cleaned up or properly integrated. |
+| M4 | **AdminLogin renders + navigates during render** | [AdminLogin.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/pages/admin/AdminLogin.tsx#L19-L21) | `navigate()` is called directly in the component body (not in a `useEffect`). This is a React anti-pattern that can cause "Cannot update during an existing state transition" warnings. |
+
+---
+
+## 🔧 Proposed Changes
+
+### Phase 1: Form Security & Abuse Prevention
+
+---
+
+#### [MODIFY] [inquiryService.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/services/inquiryService.ts)
+
+- **Add client-side rate limiting** — Track submission timestamps in `sessionStorage`. Block if less than 30 seconds since last submission. Block if more than 5 submissions in 10 minutes.
+- **Add input sanitization** — Trim all text fields before DB insert. Strip potential HTML/script tags from text fields using a simple escape function.
+- **Move Discord webhook to server-side** — Remove `VITE_DISCORD_WEBHOOK_URL` usage from client code. Move the Discord notification trigger to the Netlify serverless function instead.
+- **Add email notification call** — After Supabase insert succeeds, call the Netlify function `/api/inquiry` to also send the email notification (fixing C7).
+
+#### [MODIFY] [ProjectInquiryForm.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/components/home/ProjectInquiryForm.tsx)
+
+- **Add honeypot field** — Add a hidden `website2` input field. If filled (by bots), silently reject the submission.
+- **Add submission timing check** — Record the timestamp when the form mounts. If the user submits within 3 seconds of loading (humanly impossible for a 3-step form), reject as bot.
+- **Add duplicate submit guard** — Use a ref to track if a submission is already in-flight, preventing double-clicks regardless of React state timing.
+
+#### [MODIFY] [Step3Requirements.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/components/home/inquiry/Step3Requirements.tsx)
+
+- **Add max file count** — Limit to 5 attachments total.
+- **Add total file size cap** — 15MB total across all files.
+- **Add file type validation** — Validate MIME type on the File object itself (not just extension).
+
+#### [MODIFY] [inquirySchema.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/types/inquirySchema.ts)
+
+- **Add max length to description** — Cap at 5000 characters.
+- **Add phone format regex** — Optional, but if present must match a phone-like pattern.
+- **Add max length to fullName** — Cap at 100 characters.
+- **Add max length to company** — Cap at 200 characters.
+
+---
+
+### Phase 2: Server-Side Hardening
+
+---
+
+#### [MODIFY] [netlify/functions/inquiry.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/netlify/functions/inquiry.ts)
+
+- **Add server-side validation** — Validate required fields (`fullName`, `email`, `services`, `budget`, `timeline`, `projectType`, `description`). Validate email format. Reject if missing.
+- **Add HTML sanitization** — Escape all user input before injecting into the HTML email template (fix C5).
+- **Fix HTTP status code** — Change `450` to `405` for Method Not Allowed.
+- **Add rate limiting header checks** — Return appropriate `Retry-After` header on rapid requests.
+- **Add Discord webhook trigger** — Move the Discord notification here from client-side, using `process.env.DISCORD_WEBHOOK_URL` (non-`VITE_` prefix so it stays server-side only).
+
+#### [DELETE] [api/inquiry.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/api/inquiry.ts)
+
+- **Remove dead API endpoint** — This Vercel-style handler is never called and duplicates Netlify function logic. Consolidate to the Netlify function only since you deploy on Netlify.
+
+---
+
+### Phase 3: Database & RLS Fixes
+
+---
+
+#### [NEW] [supabase/migrations/00005_security_fixes.sql](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/supabase/migrations/00005_security_fixes.sql)
+
+- **Add public SELECT on bookings (limited columns)** — Allow anonymous users to read only `booked_date`, `booked_time`, `status` columns from `bookings` where `status != 'cancelled'`. This fixes the availability slot checking for anonymous visitors (C8).
+- **Add UNIQUE constraint on bookings** — `UNIQUE(booked_date, booked_time)` WHERE `status NOT IN ('cancelled')` to prevent double-bookings (I9).
+- **Set storage bucket file size limit** — `ALTER` the `inquiry-attachments` bucket to have a `file_size_limit` of 5MB.
+- **Restrict storage upload policy** — Add path/extension restrictions to the storage upload policy.
+
+---
+
+### Phase 4: Admin Dashboard Fixes
+
+---
+
+#### [MODIFY] [AdminDashboard.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/pages/admin/AdminDashboard.tsx)
+
+- **Fix total inquiry count** — Use a separate count query (`.select('*', { count: 'exact', head: true })`) to get the real total, separate from the 5 recent inquiries shown in the feed.
+
+#### [MODIFY] [AdminLogin.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/pages/admin/AdminLogin.tsx)
+
+- **Fix navigation-during-render** — Move the `navigate()` call into a `useEffect` hook.
+- **Add failed attempt tracking** — Show a lockout message after 5 consecutive failed attempts (client-side cooldown).
+
+#### [MODIFY] [AuthContext.tsx](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/context/AuthContext.tsx)
+
+- **Remove hardcoded credentials from comment-adjacent text** — Keep the dev fallback but use less obvious test credentials and add a clear `DEV ONLY` guard.
+
+#### [MODIFY] [bookingService.ts](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/src/services/bookingService.ts)
+
+- **Add rate limiting** — Same pattern as inquiry submissions: 30-second cooldown between bookings.
+
+---
+
+### Phase 5: Env & Config Cleanup
+
+---
+
+#### [MODIFY] [.env.example](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/.env.example)
+
+- **Rename `VITE_DISCORD_WEBHOOK_URL`** → `DISCORD_WEBHOOK_URL` (server-only).
+- **Add `RESEND_API_KEY` and `RECIPIENT_EMAIL`** to the example file.
+
+#### [MODIFY] [netlify.toml](file:///c:/Users/Nitro%20V15/Documents/GitHub/react-portfolio-2k26/netlify.toml)
+
+- **Add functions directory config** — Specify `[functions]` directory so Netlify auto-discovers the function.
+
+---
+
+## Open Questions
+
+> [!IMPORTANT]
+> **Q1: Do you want CAPTCHA (Cloudflare Turnstile) on the inquiry form?**
+> A honeypot + timing check blocks most bots, but sophisticated spam bots can bypass these. Cloudflare Turnstile is free and invisible (no user interaction). I'd recommend adding it, but it requires a Cloudflare account. Let me know if you'd like this included.
+
+> [!IMPORTANT]
+> **Q2: Should the Netlify function email notification be triggered from the client after Supabase insert, or should it replace the direct Supabase insert?**
+> Currently the form writes directly to Supabase (client → Supabase). I recommend keeping this and additionally calling the Netlify function for email notification only. The alternative is routing everything through the Netlify function (client → Netlify → Supabase + Email), which is more secure but adds a layer.
+
+> [!IMPORTANT]
+> **Q3: Do you want to keep the `api/inquiry.ts` (Vercel-style) file, or can I remove it?**
+> You deploy on Netlify, and this file is never called. I recommend deleting it to avoid confusion.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- Build check: `npm run build` to ensure no TypeScript errors after changes
+- Zod schema validation: verify new constraints work by checking form behavior
+
+### Manual Verification
+1. **Rate limiting test** — Submit the form twice in quick succession. Second submission should be blocked with a user-friendly message.
+2. **Honeypot test** — Fill the hidden field programmatically via browser console. Submission should silently fail.
+3. **Booking collision test** — Check that the UNIQUE constraint prevents double-booking the same slot.
+4. **Dashboard metric test** — Verify the "Total Inquiries" count shows the real total, not just 5.
+5. **Attachment validation test** — Try uploading a `.exe` file — should be rejected.
+6. **Email notification test** — Submit an inquiry and verify the email arrives (if Resend API key is configured).
+7. **Availability slot check** — As an anonymous user, verify that booked slots show as unavailable (after RLS fix).

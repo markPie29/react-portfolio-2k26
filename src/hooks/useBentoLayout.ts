@@ -1,18 +1,26 @@
 import { useState, useEffect, useMemo } from 'react';
 import { GraphicProject, GraphicProjectImage } from '../data/graphicProjects';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export interface ExtendedImage extends GraphicProjectImage {
   projectId: string;
   projectName: string;
+  aspectRatio: number;
+  colSpan: number;
+  rowSpan: number;
 }
 
-export function useBentoLayout(projects: GraphicProject[], columnCount: number) {
+export function useBentoLayout(
+  projects: GraphicProject[],
+  columnCount: number,
+  containerWidth: number
+) {
   const [aspectRatios, setAspectRatios] = useState<Record<string, number>>({});
   const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
 
   // 1. Round-Robin Interleave images across projects to avoid same-project grouping
   const interleavedImages = useMemo(() => {
-    const result: ExtendedImage[] = [];
+    const result: (GraphicProjectImage & { projectId: string; projectName: string })[] = [];
     if (!projects || projects.length === 0) return result;
 
     const maxImages = Math.max(...projects.map((p) => p.images.length));
@@ -69,33 +77,46 @@ export function useBentoLayout(projects: GraphicProject[], columnCount: number) 
     return interleavedImages.filter((img) => !brokenImages.has(img.src));
   }, [interleavedImages, brokenImages]);
 
-  // 4. Shortest-Column Bin Packing Algorithm
-  const columns = useMemo(() => {
-    const numCols = Math.max(1, columnCount);
-    const colHeights = new Array(numCols).fill(0);
-    const cols: ExtendedImage[][] = Array.from({ length: numCols }, () => []);
+  // 4. Calculate Grid Layout Spans (Col Span & Row Span)
+  const layoutImages = useMemo<ExtendedImage[]>(() => {
+    const gap = 16; // 16px grid gap (gap-4)
+    const baseRowHeight = 10; // 10px base row height
+    const cols = Math.max(1, columnCount);
 
-    validImages.forEach((image) => {
-      const ratio = aspectRatios[image.src] || 1; // Default to 1 (square) until loaded
-      const heightFactor = 1 / ratio; // Higher value for tall/portrait images
+    // Calculate width of a single column track
+    const safeWidth = containerWidth > 0 ? containerWidth : 1152;
+    const colWidth = Math.max(100, (safeWidth - (cols - 1) * gap) / cols);
 
-      // Find the column with the minimum height
-      let minColIndex = 0;
-      let minHeight = colHeights[0];
-      for (let i = 1; i < numCols; i++) {
-        if (colHeights[i] < minHeight) {
-          minHeight = colHeights[i];
-          minColIndex = i;
-        }
-      }
+    return validImages.map((img) => {
+      const ratio = aspectRatios[img.src] || 1.0;
+      const isLandscape = ratio >= 1.15;
 
-      // Add image to shortest column
-      cols[minColIndex].push(image);
-      colHeights[minColIndex] += heightFactor;
+      // Landscape images span 2 columns if total columns >= 2
+      const colSpan = isLandscape && cols >= 2 ? Math.min(2, cols) : 1;
+
+      // Calculate rendered pixel width and height
+      const itemWidth = colSpan * colWidth + (colSpan - 1) * gap;
+      const renderedHeight = itemWidth / ratio;
+
+      // Calculate grid row span (auto-rows: 10px + 16px gap = 26px unit per row track)
+      const trackUnit = baseRowHeight + gap;
+      const rowSpan = Math.max(2, Math.round((renderedHeight + gap) / trackUnit));
+
+      return {
+        ...img,
+        aspectRatio: ratio,
+        colSpan,
+        rowSpan,
+      };
     });
+  }, [validImages, aspectRatios, columnCount, containerWidth]);
 
-    return cols;
-  }, [validImages, aspectRatios, columnCount]);
+  // 5. Refresh GSAP ScrollTrigger whenever aspect ratios update layout dimensions
+  useEffect(() => {
+    if (Object.keys(aspectRatios).length > 0) {
+      ScrollTrigger.refresh();
+    }
+  }, [aspectRatios]);
 
   const handleImageError = (src: string) => {
     setBrokenImages((prev) => {
@@ -106,8 +127,8 @@ export function useBentoLayout(projects: GraphicProject[], columnCount: number) 
   };
 
   return {
-    allImages: validImages,
-    columns,
+    allImages: layoutImages,
     handleImageError,
   };
 }
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { graphicProjects } from '../../data/graphicProjects';
 import { useBentoLayout, ExtendedImage } from '../../hooks/useBentoLayout';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,15 +7,38 @@ import { Maximize2, X } from 'lucide-react';
 const GraphicsBento: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<ExtendedImage | null>(null);
   const [columnCount, setColumnCount] = useState<number>(4);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState<number>(0);
 
-  // Responsive column calculation
+  // Measure container width dynamically
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (containerRef.current) {
+      resizeObserver = new ResizeObserver(updateWidth);
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateWidth);
+      if (resizeObserver) resizeObserver.disconnect();
+    };
+  }, []);
+
+  // Responsive column count calculation
   useEffect(() => {
     const updateColumnCount = () => {
       const width = window.innerWidth;
       if (width < 640) {
-        setColumnCount(1);
-      } else if (width < 768) {
-        setColumnCount(2);
+        setColumnCount(2); // 2 cols on mobile (1-col portrait, 2-col landscape)
       } else if (width < 1024) {
         setColumnCount(3);
       } else {
@@ -28,8 +51,12 @@ const GraphicsBento: React.FC = () => {
     return () => window.removeEventListener('resize', updateColumnCount);
   }, []);
 
-  // Dynamic Auto-Layout Algorithm Hook with automatic file scanning & broken image handling
-  const { allImages, columns, handleImageError } = useBentoLayout(graphicProjects, columnCount);
+  // Dynamic Bento Layout Engine with colSpan and rowSpan calculations
+  const { allImages, handleImageError } = useBentoLayout(
+    graphicProjects,
+    columnCount,
+    containerWidth
+  );
 
   return (
     <div className="w-full max-w-6xl mx-auto mb-16 sm:mb-20">
@@ -48,48 +75,51 @@ const GraphicsBento: React.FC = () => {
         </p>
       </div>
 
-      {/* Dynamic Balanced Multi-Column Bento Layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-start">
-        {columns.map((columnImages, colIndex) => (
-          <div key={`col-${colIndex}`} className="flex flex-col gap-4">
-            {columnImages.map((image, imgIndex) => (
-              <motion.div
-                key={`${image.projectId}-${image.src}-${imgIndex}`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.4, delay: (imgIndex % 6) * 0.05 }}
-                onClick={() => setSelectedImage(image)}
-                className="group relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-[#0d1117] border border-slate-200 dark:border-white/10 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300"
-              >
-                {/* Image with 100% original uncropped aspect ratio */}
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  loading="lazy"
-                  onError={() => handleImageError(image.src)}
-                  className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-500 ease-out block"
-                />
+      {/* Dense Bento CSS Grid Layout */}
+      <div
+        ref={containerRef}
+        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[10px] grid-flow-dense"
+      >
+        {allImages.map((image, imgIndex) => (
+          <motion.div
+            key={`${image.projectId}-${image.src}-${imgIndex}`}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4, delay: (imgIndex % 6) * 0.05 }}
+            onClick={() => setSelectedImage(image)}
+            style={{
+              gridColumnEnd: `span ${image.colSpan}`,
+              gridRowEnd: `span ${image.rowSpan}`,
+            }}
+            className="group relative overflow-hidden rounded-2xl bg-slate-100 dark:bg-[#0d1117] border border-slate-200 dark:border-white/10 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 w-full h-full"
+          >
+            {/* Image with matching container aspect ratio */}
+            <img
+              src={image.src}
+              alt={image.alt}
+              loading="lazy"
+              onError={() => handleImageError(image.src)}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out block"
+            />
 
-                {/* Overlay Gradient on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                    <span className="text-[10px] font-mono font-semibold tracking-wider uppercase bg-white/20 dark:bg-black/40 text-white backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
-                      {image.projectName}
-                    </span>
-                    <div className="p-2 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/20">
-                      <Maximize2 size={14} />
-                    </div>
-                  </div>
-                  <div className="mt-auto">
-                    <p className="text-white text-xs font-medium truncate drop-shadow-sm">
-                      {image.alt}
-                    </p>
-                  </div>
+            {/* Overlay Gradient on Hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between">
+              <div className="flex justify-between items-start">
+                <span className="text-[10px] font-mono font-semibold tracking-wider uppercase bg-white/20 dark:bg-black/40 text-white backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
+                  {image.projectName}
+                </span>
+                <div className="p-2 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/20">
+                  <Maximize2 size={14} />
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+              <div className="mt-auto">
+                <p className="text-white text-xs font-medium truncate drop-shadow-sm">
+                  {image.alt}
+                </p>
+              </div>
+            </div>
+          </motion.div>
         ))}
       </div>
 

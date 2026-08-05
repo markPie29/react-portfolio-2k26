@@ -1,116 +1,91 @@
-import { Resend } from 'resend';
+export default async function handler(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
 
-const TARGET_EMAIL = process.env.RECIPIENT_EMAIL || 'markyisulat@gmail.com';
-const resendKey = process.env.RESEND_API_KEY;
-
-export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
     const {
       fullName,
       company,
       email,
       phone,
       website,
-      services,
-      budget,
-      timeline,
       projectType,
-      featureChips,
       description,
-      attachments
+      inquiryId,
+      turnstileToken,
+      bookedDate,
+      bookedTime,
     } = body;
 
-    const formattedServices = Array.isArray(services) ? services.join(', ') : services;
-    const formattedChips = Array.isArray(featureChips) && featureChips.length > 0
-      ? featureChips.map((chip: string) => `<span style="display:inline-block; background:#0077b6; color:#ffffff; padding:4px 10px; border-radius:12px; font-size:12px; margin:2px;">${chip}</span>`).join(' ')
-      : 'None specified';
-
-    const htmlContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
-        <div style="background: linear-gradient(135deg, #0077b6, #00b4d8); color: #fff; padding: 24px; text-align: center;">
-          <h1 style="margin: 0; font-size: 24px;">🚀 New Project Inquiry Received</h1>
-          <p style="margin: 8px 0 0; opacity: 0.9;">From ${fullName} (${company || 'Individual'})</p>
-        </div>
-        
-        <div style="padding: 24px;">
-          <h2 style="color: #0077b6; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-size: 18px;">👤 Client Contact Details</h2>
-          <table style="width: 100%; margin-bottom: 20px;">
-            <tr><td style="font-weight: bold; width: 130px;">Name:</td><td>${fullName}</td></tr>
-            <tr><td style="font-weight: bold;">Email:</td><td><a href="mailto:${email}" style="color: #0077b6;">${email}</a></td></tr>
-            ${company ? `<tr><td style="font-weight: bold;">Company:</td><td>${company}</td></tr>` : ''}
-            ${phone ? `<tr><td style="font-weight: bold;">Phone:</td><td>${phone}</td></tr>` : ''}
-            ${website ? `<tr><td style="font-weight: bold;">Website:</td><td><a href="${website}" target="_blank" style="color: #0077b6;">${website}</a></td></tr>` : ''}
-          </table>
-
-          <h2 style="color: #0077b6; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-size: 18px;">📊 Project Scope & Budget</h2>
-          <table style="width: 100%; margin-bottom: 20px;">
-            <tr><td style="font-weight: bold; width: 130px;">Services Requested:</td><td>${formattedServices}</td></tr>
-            <tr><td style="font-weight: bold;">Budget Range:</td><td><strong>${budget}</strong></td></tr>
-            <tr><td style="font-weight: bold;">Timeline:</td><td>${timeline}</td></tr>
-            <tr><td style="font-weight: bold;">Project Type:</td><td>${projectType}</td></tr>
-          </table>
-
-          <h2 style="color: #0077b6; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-size: 18px;">✨ Feature Tags</h2>
-          <div style="margin-bottom: 20px;">${formattedChips}</div>
-
-          <h2 style="color: #0077b6; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-size: 18px;">📝 Project Description</h2>
-          <div style="background: #f9f9f9; padding: 16px; border-radius: 6px; border-left: 4px solid #0077b6; white-space: pre-wrap; margin-bottom: 20px;">
-            ${description}
-          </div>
-
-          ${Array.isArray(attachments) && attachments.length > 0 ? `
-            <h2 style="color: #0077b6; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-size: 18px;">📎 Attachments (${attachments.length})</h2>
-            <ul>
-              ${attachments.map((att: any) => `<li>${att.name} (${Math.round(att.size / 1024)} KB)</li>`).join('')}
-            </ul>
-          ` : ''}
-        </div>
-
-        <div style="background: #f4f4f4; padding: 16px; text-align: center; font-size: 12px; color: #777;">
-          <p style="margin: 0;">Sent automatically from Portfolio Website Project Inquiry System</p>
-        </div>
-      </div>
-    `;
-
-    if (!resendKey) {
-      console.warn('RESEND_API_KEY is not defined. Email content generated:', htmlContent);
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: 'Inquiry received in dev mode (RESEND_API_KEY missing).',
-          inquiryId: `DEV-${Date.now()}`
-        }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      );
+    // 1. Basic validation
+    if (!fullName || !email || !description || !projectType) {
+      return res.status(400).json({ error: 'Missing required inquiry fields' });
     }
 
-    const resend = new Resend(resendKey);
-    const resendAttachments = Array.isArray(attachments)
-      ? attachments.map((att: any) => ({
-          filename: att.name,
-          content: att.content.split(',')[1] || att.content,
-        }))
-      : [];
+    // 2. Cloudflare Turnstile Verification (if secret key configured on Vercel)
+    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+    if (turnstileSecret && turnstileToken) {
+      const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          secret: turnstileSecret,
+          response: turnstileToken,
+        }),
+      });
 
-    const data = await resend.emails.send({
-      from: 'Portfolio Inquiry <onboarding@resend.dev>',
-      to: TARGET_EMAIL,
-      subject: `New Inquiry from ${fullName} [${projectType || 'Project'}]`,
-      html: htmlContent,
-      replyTo: email,
-      attachments: resendAttachments,
-    });
+      const verifyData = (await verifyRes.json()) as { success: boolean };
+      if (!verifyData.success) {
+        return res.status(400).json({ error: 'CAPTCHA verification failed. Please try again.' });
+      }
+    }
 
-    return new Response(
-      JSON.stringify({ success: true, message: 'Inquiry sent successfully', inquiryId: data.data?.id }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    // 3. Send Discord Webhook Notification securely from backend
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL || process.env.VITE_DISCORD_WEBHOOK_URL;
+    if (webhookUrl) {
+      const fields: any[] = [
+        { name: 'Client Name', value: String(fullName).substring(0, 100), inline: true },
+        { name: 'Email', value: String(email).substring(0, 150), inline: true },
+        { name: 'Project Type', value: String(projectType || 'N/A'), inline: true },
+        { name: 'Company', value: company ? String(company).substring(0, 100) : 'N/A', inline: true },
+        { name: 'Phone', value: phone ? String(phone) : 'N/A', inline: true },
+        { name: 'Website', value: website ? String(website) : 'N/A', inline: true },
+      ];
+
+      if (bookedDate && bookedTime) {
+        fields.push({
+          name: '📅 Scheduled Discovery Call',
+          value: `${bookedDate} at ${bookedTime}`,
+          inline: false,
+        });
+      }
+
+      fields.push({ name: 'Description', value: String(description).substring(0, 1000), inline: false });
+
+      const discordPayload = {
+        embeds: [
+          {
+            title: bookedDate ? '🚀 New Project Inquiry & Discovery Call Booked!' : '🚀 New Project Inquiry Received!',
+            color: 38859, // #0077b6 (Sky blue)
+            fields,
+            footer: { text: `Inquiry ID: ${inquiryId || 'N/A'} • Portfolio Backend (Vercel)` },
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      };
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(discordPayload),
+      });
+    }
+
+    return res.status(200).json({ success: true, message: 'Notification dispatched successfully' });
   } catch (error: any) {
-    console.error('Serverless Inquiry API error:', error);
-    return new Response(
-      JSON.stringify({ success: false, error: error.message || 'Internal Server Error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    console.error('Vercel Function Inquiry Notification Error:', error);
+    return res.status(500).json({ success: false, error: error.message || 'Internal Server Error' });
   }
 }

@@ -12,6 +12,5 @@ export const navigationData: NavLink[] = [
       { label: 'SOFTWARE DEVELOPMENT', href: '/services/software-development' },
       { label: 'SOCIAL MEDIA MANAGEMENT', href: '/services/social-media-management' }
     ]
-  },
-  { label: 'INQUIRY', href: '/#cta' }
+  }
 ];

@@ -12,9 +12,9 @@ const TestimonialsSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-8"
+          className="mb-8 flex justify-center md:justify-start"
         >
-          <h2 className="font-neutralfacebold text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase !leading-none text-gray-900 dark:text-white text-left w-fit !my-0">
+          <h2 className="font-neutralfacebold !text-3xl sm:!text-4xl md:!text-6xl tracking-tight uppercase !leading-none text-gray-900 dark:text-white text-center md:text-left w-fit !my-0">
             TESTIMONIALS
           </h2>
         </motion.div>

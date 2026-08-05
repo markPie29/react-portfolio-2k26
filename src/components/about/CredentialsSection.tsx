@@ -158,15 +158,15 @@ const CredentialsSection: React.FC = () => {
     <section id="credentials" className="py-8 md:py-12 px-6 md:px-12 lg:px-24">
       <div className="max-w-6xl mx-auto">
         {/* Section Heading */}
-        <div className="mb-8">
+        <div className="mb-8 flex justify-center md:justify-start">
           <ScrollFloat
             animationDuration={1}
             ease="back.inOut(2)"
             scrollStart="center bottom+=50%"
             scrollEnd="bottom bottom-=40%"
             stagger={0.03}
-            textClassName="font-neutralfacebold text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase !leading-none text-gray-900 dark:text-white"
-            containerClassName="text-left w-fit !my-0"
+            textClassName="font-neutralfacebold !text-3xl sm:!text-4xl md:!text-6xl tracking-tight uppercase !leading-none text-gray-900 dark:text-white text-center md:text-left"
+            containerClassName="text-center md:text-left w-fit !my-0"
           >
             CREDENTIALS
           </ScrollFloat>

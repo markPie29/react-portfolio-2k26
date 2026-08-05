@@ -93,163 +93,171 @@ const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
+      className={`fixed left-6 right-6 md:left-0 md:right-0 z-[100] transition-all duration-500 bottom-6 md:bottom-auto md:top-0 ${
         showNavbar
-          ? 'opacity-100 translate-y-0 pointer-events-auto bg-white/85 dark:bg-[#080A0F]/85 backdrop-blur-md border-b border-gray-200 dark:border-white/10 shadow-sm dark:shadow-md py-4'
-          : 'opacity-0 -translate-y-full pointer-events-none py-4'
+          ? 'opacity-100 translate-y-0 pointer-events-auto'
+          : 'opacity-0 translate-y-[150%] md:-translate-y-full pointer-events-none'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-        {/* Logo */}
-        <a
-          href="/"
-          onClick={(e) => handleNavClick(e, '/')}
-          className="font-neutralfacebold text-xl md:text-2xl tracking-tight gradient-text hover:opacity-85 transition-opacity"
-        >
-          MARKY
-        </a>
-
-        {/* Center Nav Links - Desktop */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navigationData.map((link) => (
-            <div
-              key={link.label}
-              className="relative py-2"
-              onMouseEnter={() => link.sublinks && setDropdownOpen(link.label)}
-              onMouseLeave={() => link.sublinks && setDropdownOpen(null)}
+      <div className="relative w-full">
+        {/* Mobile Menu Drawer (Absolute popover tucked seamlessly behind the pill) */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: "100%" }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: "100%" }}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className="md:hidden absolute bottom-4 left-0 w-full bg-white/95 dark:bg-[#080A0F]/95 backdrop-blur-xl border border-gray-200 dark:border-white/10 px-6 pt-6 pb-20 rounded-3xl shadow-2xl overflow-hidden z-0"
             >
-              <a
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="text-xs md:text-sm font-semibold tracking-wider text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-accent transition-colors uppercase flex items-center gap-1.5"
-              >
-                <span>{link.label}</span>
-                {link.sublinks && (
-                  <ChevronDown
-                    size={14}
-                    className={`transition-transform duration-200 ${
-                      dropdownOpen === link.label ? 'rotate-180 text-accent' : ''
-                    }`}
-                  />
-                )}
-              </a>
-
-              {link.sublinks && (
-                <AnimatePresence>
-                  {dropdownOpen === link.label && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.18, ease: 'easeOut' }}
-                      className="absolute left-1/2 -translate-x-1/2 top-full pt-3 w-64 z-50"
+              <div className="flex flex-col gap-4">
+                {navigationData.map((link) => (
+                  <div key={link.label} className="flex flex-col gap-2">
+                    <a
+                      href={link.href}
+                      onClick={(e) => handleNavClick(e, link.href)}
+                      className="text-base font-neutralfacebold text-gray-800 dark:text-gray-200 hover:text-accent tracking-wider uppercase py-1 flex items-center justify-between"
                     >
-                      <div className="bg-white/95 dark:bg-[#080a0f]/95 backdrop-blur-xl border border-gray-200 dark:border-[#48cae4]/20 rounded-2xl p-2 shadow-2xl dark:shadow-sky-950/40 flex flex-col gap-1">
+                      <span>{link.label}</span>
+                    </a>
+                    {link.sublinks && (
+                      <div className="pl-4 flex flex-col gap-2.5 border-l border-accent/40 my-1">
                         {link.sublinks.map((sublink) => (
                           <a
                             key={sublink.label}
                             href={sublink.href}
                             onClick={(e) => handleNavClick(e, sublink.href)}
-                            className="text-xs font-semibold tracking-wider text-gray-700 dark:text-gray-300 hover:text-accent dark:hover:text-accent hover:bg-gray-100/80 dark:hover:bg-white/5 px-3.5 py-2.5 rounded-xl transition-all flex items-center justify-between group/item uppercase"
+                            className="text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-accent tracking-wider uppercase"
                           >
-                            <span>{sublink.label}</span>
-                            <span className="opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-0.5 transition-all text-accent font-bold">
-                              →
-                            </span>
+                            {sublink.label}
                           </a>
                         ))}
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              )}
+                    )}
+                  </div>
+                ))}
+                <a
+                  href="#cta"
+                  onClick={(e) => handleNavClick(e, '#cta')}
+                  className="mt-2 text-center gradient-bg text-white hover:brightness-110 font-bold py-3 rounded-full uppercase tracking-wider text-xs shadow-md shadow-sky-500/20 transition-all"
+                >
+                  LETS WORK
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Main Navbar Pill / Desktop Header Bar */}
+        <div className="relative z-10 w-full bg-white/85 dark:bg-[#080A0F]/85 backdrop-blur-md border border-gray-200 dark:border-white/10 md:border-x-0 md:border-t-0 md:border-b rounded-full md:rounded-none shadow-xl md:shadow-sm dark:shadow-md py-3 md:py-4">
+          <div className="w-full max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex-1 flex items-center justify-start">
+              <a
+                href="/"
+                onClick={(e) => handleNavClick(e, '/')}
+                className="font-neutralfacebold text-xl md:text-2xl tracking-tight gradient-text hover:opacity-85 transition-opacity"
+              >
+                MARKY
+              </a>
             </div>
-          ))}
-        </nav>
 
-        {/* Right CTA Button & Theme Toggle */}
-        <div className="hidden md:flex items-center gap-4">
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all cursor-pointer"
-            title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-          >
-            {isDark ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-
-          <a
-            href="#cta"
-            onClick={(e) => handleNavClick(e, '#cta')}
-            className="gradient-bg text-white hover:brightness-110 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 transform hover:-translate-y-0.5 shadow-md shadow-sky-500/20"
-          >
-            LETS WORK
-          </a>
-        </div>
-
-        {/* Mobile Hamburger */}
-        <div className="flex items-center gap-3 md:hidden">
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300"
-          >
-            {isDark ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 text-gray-900 dark:text-white"
-            aria-label="Toggle Navigation Menu"
-          >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu Drawer */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white dark:bg-[#080A0F] border-b border-gray-200 dark:border-white/10 px-6 py-6"
-          >
-            <div className="flex flex-col gap-4">
+            {/* Center Nav Links - Desktop */}
+            <nav className="hidden md:flex items-center justify-center gap-8">
               {navigationData.map((link) => (
-                <div key={link.label} className="flex flex-col gap-2">
+                <div
+                  key={link.label}
+                  className="relative py-2"
+                  onMouseEnter={() => link.sublinks && setDropdownOpen(link.label)}
+                  onMouseLeave={() => link.sublinks && setDropdownOpen(null)}
+                >
                   <a
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className="text-base font-neutralfacebold text-gray-800 dark:text-gray-200 hover:text-accent tracking-wider uppercase py-1 flex items-center justify-between"
+                    className="text-xs md:text-sm font-semibold tracking-wider text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-accent transition-colors uppercase flex items-center gap-1.5"
                   >
                     <span>{link.label}</span>
+                    {link.sublinks && (
+                      <ChevronDown
+                        size={14}
+                        className={`transition-transform duration-200 ${
+                          dropdownOpen === link.label ? 'rotate-180 text-accent' : ''
+                        }`}
+                      />
+                    )}
                   </a>
+
                   {link.sublinks && (
-                    <div className="pl-4 flex flex-col gap-2.5 border-l border-accent/40 my-1">
-                      {link.sublinks.map((sublink) => (
-                        <a
-                          key={sublink.label}
-                          href={sublink.href}
-                          onClick={(e) => handleNavClick(e, sublink.href)}
-                          className="text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-accent tracking-wider uppercase"
+                    <AnimatePresence>
+                      {dropdownOpen === link.label && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.18, ease: 'easeOut' }}
+                          className="absolute left-1/2 -translate-x-1/2 top-full pt-3 w-64 z-50"
                         >
-                          {sublink.label}
-                        </a>
-                      ))}
-                    </div>
+                          <div className="bg-white/95 dark:bg-[#080a0f]/95 backdrop-blur-xl border border-gray-200 dark:border-[#48cae4]/20 rounded-2xl p-2 shadow-2xl dark:shadow-sky-950/40 flex flex-col gap-1">
+                            {link.sublinks.map((sublink) => (
+                              <a
+                                key={sublink.label}
+                                href={sublink.href}
+                                onClick={(e) => handleNavClick(e, sublink.href)}
+                                className="text-xs font-semibold tracking-wider text-gray-700 dark:text-gray-300 hover:text-accent dark:hover:text-accent hover:bg-gray-100/80 dark:hover:bg-white/5 px-3.5 py-2.5 rounded-xl transition-all flex items-center justify-between group/item uppercase"
+                              >
+                                <span>{sublink.label}</span>
+                                <span className="opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-0.5 transition-all text-accent font-bold">
+                                  →
+                                </span>
+                              </a>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   )}
                 </div>
               ))}
+            </nav>
+
+            {/* Right CTA Button & Theme Toggle */}
+            <div className="hidden md:flex flex-1 items-center justify-end gap-4">
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all cursor-pointer"
+                title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+              >
+                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+
               <a
                 href="#cta"
                 onClick={(e) => handleNavClick(e, '#cta')}
-                className="mt-2 text-center gradient-bg text-white hover:brightness-110 font-bold py-3 rounded-full uppercase tracking-wider text-xs shadow-md shadow-sky-500/20 transition-all"
+                className="gradient-bg text-white hover:brightness-110 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 transform hover:-translate-y-0.5 shadow-md shadow-sky-500/20"
               >
                 LETS WORK
               </a>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+            {/* Mobile Hamburger */}
+            <div className="flex items-center gap-3 md:hidden">
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300"
+              >
+                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="p-2 text-gray-900 dark:text-white"
+                aria-label="Toggle Navigation Menu"
+              >
+                {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
   );
 };

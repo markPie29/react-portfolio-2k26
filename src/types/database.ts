@@ -1,18 +1,4 @@
-export type InquiryStatus =
-  | 'new'
-  | 'reviewed'
-  | 'contacted'
-  | 'booked'
-  | 'completed'
-  | 'archived';
-
-export interface InquiryAttachment {
-  name: string;
-  size: number;
-  type: string;
-  url?: string;
-  content?: string; // base64 fallback
-}
+export type InquiryStatus = 'new' | 'confirmed' | 'cancelled';
 
 export interface InquiryRow {
   id: string;
@@ -21,13 +7,8 @@ export interface InquiryRow {
   email: string;
   phone: string | null;
   website: string | null;
-  services: string[];
-  budget: string;
-  timeline: string;
   project_type: string;
-  feature_chips: string[] | null;
   description: string;
-  attachments: InquiryAttachment[];
   status: InquiryStatus;
   notes: string | null;
   created_at: string;
@@ -45,7 +26,7 @@ export interface AvailabilitySlotRow {
   created_at: string;
 }
 
-export type BookingStatus = 'confirmed' | 'cancelled' | 'completed' | 'no-show';
+export type BookingStatus = 'new' | 'confirmed' | 'cancelled' | 'completed' | 'no-show';
 export type MeetingType = 'discovery' | 'follow-up' | 'consultation';
 
 export interface BookingRow {

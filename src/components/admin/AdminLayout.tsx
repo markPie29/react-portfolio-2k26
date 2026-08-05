@@ -25,7 +25,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { label: 'Overview', path: '/admin', icon: LayoutDashboard },
     { label: 'Projects', path: '/admin/projects', icon: FolderKanban },
     { label: 'Inquiries', path: '/admin/inquiries', icon: Inbox },
-    { label: 'Calendar Bookings', path: '/admin/calendar', icon: CalendarIcon },
     { label: 'Availability Rules', path: '/admin/availability', icon: Clock },
   ];
 
@@ -37,7 +36,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen w-full bg-[#07090e] text-gray-100 flex flex-col md:flex-row">
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 bg-[#0c1017] border-r border-white/10 p-5 flex flex-col justify-between shrink-0">
+      <aside className="w-full md:w-64 bg-[#0c1017] border-r border-white/10 p-5 flex flex-col justify-between shrink-0 md:h-screen md:sticky md:top-0">
         <div className="space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">

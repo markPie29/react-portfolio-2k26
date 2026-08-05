@@ -21,6 +21,18 @@ export const Step1PersonalInfo: React.FC<Step1Props> = ({ register, errors }) =>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Hidden Honeypot Field for Bot Prevention */}
+        <div style={{ display: 'none' }} aria-hidden="true">
+          <input
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            {...register('company' as any)} // Extra fallback or custom honeypot name
+            name="hp_website_trap"
+            id="hp_website_trap"
+          />
+        </div>
+
         {/* Full Name */}
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">

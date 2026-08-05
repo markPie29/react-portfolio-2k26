@@ -1,88 +1,19 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import ScrollFloat from '../../components/ScrollFloat';
-import SpotlightCard from './SpotlightCard';
 import ProjectModal from './home/ProjectModal';
+import ProjectCard from './ProjectCard';
 import { fetchProjects } from '../services/projectService';
 import { projectsData } from '../data/projects';
 import { ProjectItem } from '../types/content';
-import { Search, X, ImageOff, ExternalLink, ArrowLeft } from 'lucide-react';
-import { 
-  SiReact, 
-  SiNextdotjs, 
-  SiTailwindcss, 
-  SiLaravel, 
-  SiFirebase, 
-  SiExpress, 
-  SiSupabase, 
-  SiUnity, 
-  SiFigma, 
-  SiFramer, 
-  SiCanva
-} from 'react-icons/si';
-import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from './CustomIcons';
-import { Film, Video } from 'lucide-react';
-
-const getTechIcon = (name: string) => {
-  const lower = name.toLowerCase();
-  if (lower.includes('react')) return <SiReact className="text-[#61DAFB]" />;
-  if (lower.includes('next')) return <SiNextdotjs className="text-white" />;
-  if (lower.includes('tailwind')) return <SiTailwindcss className="text-[#38BDF8]" />;
-  if (lower.includes('laravel')) return <SiLaravel className="text-[#FF2D20]" />;
-  if (lower.includes('firebase')) return <SiFirebase className="text-[#FFCA28]" />;
-  if (lower.includes('express')) return <SiExpress className="text-gray-300" />;
-  if (lower.includes('supabase')) return <SiSupabase className="text-[#3ECF8E]" />;
-  if (lower.includes('unity')) return <SiUnity className="text-white text-xs" />;
-  if (lower.includes('figma')) return <SiFigma className="text-[#F24E1E]" />;
-  if (lower.includes('framer')) return <SiFramer className="text-[#0055FF]" />;
-  if (lower.includes('canva')) return <SiCanva className="text-[#00C4CC]" />;
-  if (lower.includes('photoshop')) return <CustomPhotoshop className="w-3.5 h-3.5" />;
-  if (lower.includes('illustrator')) return <CustomIllustrator className="w-3.5 h-3.5" />;
-  if (lower.includes('capcut')) return <CustomCapcut className="w-3.5 h-3.5" />;
-  if (lower.includes('premiere')) return <Film className="w-3.5 h-3.5 text-[#9999FF]" />;
-  if (lower.includes('after effects')) return <Video className="w-3.5 h-3.5 text-[#9999FF]" />;
-  return null;
-};
-
-const ProjectCardImage: React.FC<{ project: ProjectItem }> = ({ project }) => {
-  const [imageError, setImageError] = useState(false);
-
-  if (!project.image || imageError) {
-    return (
-      <div className="w-full h-full bg-[#0d111a] flex flex-col items-center justify-center p-4 text-center relative overflow-hidden border border-white/5">
-        <div className="p-3 rounded-2xl bg-white/5 text-accent mb-2 border border-white/10 shadow-md">
-          <ImageOff size={24} />
-        </div>
-        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 font-sans">
-          Preview Coming Soon
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <img
-        src={project.image}
-        alt={project.title}
-        className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500 opacity-90 group-hover/card:opacity-100 filter grayscale group-hover/card:grayscale-0"
-        onError={() => setImageError(true)}
-      />
-      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2 text-white font-neutralfacebold text-xs uppercase tracking-widest backdrop-blur-[2px]">
-        <span>View Project</span>
-        <ExternalLink size={14} className="text-accent" />
-      </div>
-    </>
-  );
-};
+import { Search, X, ArrowLeft, ChevronDown, Check } from 'lucide-react';
 
 const FILTER_CATEGORIES = [
   'ALL',
   'GRAPHIC DESIGN',
-  'VIDEO EDITING',
-  'SOCIAL MEDIA MANAGEMENT',
   'SOFTWARE DEVELOPMENT',
+  'SOCIAL MEDIA MANAGEMENT',
 ];
 
 interface ProjectsSectionProps {
@@ -95,6 +26,38 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const categoryParam = params.get('category');
+    if (categoryParam) {
+      const lower = categoryParam.toLowerCase().replace(/[-_]+/g, ' ');
+      if (lower.includes('graphic')) {
+        setSelectedCategory('GRAPHIC DESIGN');
+      } else if (lower.includes('software')) {
+        setSelectedCategory('SOFTWARE DEVELOPMENT');
+      } else if (lower.includes('social') || lower.includes('media')) {
+        setSelectedCategory('SOCIAL MEDIA MANAGEMENT');
+      } else if (lower === 'all') {
+        setSelectedCategory('ALL');
+      }
+    }
+  }, [location.search]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     fetchProjects().then((data) => {
@@ -133,7 +96,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
         {/* Header Navigation & Subtitle */}
         <div className="w-full flex flex-col items-center gap-2 mb-4 relative">
           {isProjectsPage && (
-            <div className="self-start mb-2">
+            <div className="self-start mb-2 hidden md:block">
               <Link
                 to="/"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent/20 bg-[#080a0f] hover:bg-accent/10 hover:border-accent text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white transition-all duration-300 shadow-[0_4px_14px_0_rgba(72,202,228,0.08)]"
@@ -151,17 +114,56 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
 
           {/* Headline DESIGNED, DEVELOPED, DEPLOYED */}
           <div className="mt-1 mb-4 w-full">
-            <ScrollFloat
-              animationDuration={1}
-              ease="back.inOut(2)"
-              scrollStart="center bottom+=50%"
-              scrollEnd="bottom bottom-=40%"
-              stagger={0.03}
-              textClassName="font-neutralfacebold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight uppercase !leading-tight text-center"
-              containerClassName="text-center w-full justify-center !my-0"
-            >
-              {"DESIGNED, DEVELOPED, DEPLOYED"}
-            </ScrollFloat>
+            {/* Desktop View */}
+            <div className="hidden md:block">
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+                textClassName="font-neutralfacebold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight uppercase !leading-tight text-center"
+                containerClassName="text-center w-full justify-center !my-0"
+              >
+                {"DESIGNED, DEVELOPED, DEPLOYED"}
+              </ScrollFloat>
+            </div>
+            {/* Mobile View */}
+            <div className="md:hidden flex flex-col items-center gap-1">
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+                textClassName="font-neutralfacebold text-3xl text-white tracking-tight uppercase !leading-tight text-center"
+                containerClassName="text-center w-full justify-center !my-0"
+              >
+                {"DESIGNED,"}
+              </ScrollFloat>
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+                textClassName="font-neutralfacebold text-3xl text-white tracking-tight uppercase !leading-tight text-center"
+                containerClassName="text-center w-full justify-center !my-0"
+              >
+                {"DEVELOPED,"}
+              </ScrollFloat>
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+                textClassName="font-neutralfacebold text-3xl text-white tracking-tight uppercase !leading-tight text-center"
+                containerClassName="text-center w-full justify-center !my-0"
+              >
+                {"DEPLOYED"}
+              </ScrollFloat>
+            </div>
           </div>
         </div>
 
@@ -188,8 +190,8 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
           </div>
         </div>
 
-        {/* Category Filter Pills */}
-        <div className="w-full flex items-center justify-center flex-wrap gap-2.5 sm:gap-3 mb-12 max-w-5xl px-2">
+        {/* Category Filter Pills (Desktop View) */}
+        <div className="hidden md:flex w-full items-center justify-center flex-wrap gap-2.5 sm:gap-3 mb-12 max-w-5xl px-2">
           {FILTER_CATEGORIES.map((category) => {
             const isActive = selectedCategory === category;
             return (
@@ -215,6 +217,63 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
           })}
         </div>
 
+        {/* Category Filter Dropdown (Mobile View) */}
+        <div ref={dropdownRef} className="md:hidden w-full mb-12 px-2 relative max-w-2xl z-30">
+          {/* Dropdown Trigger Button */}
+          <button
+            type="button"
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+            className={`w-full py-3.5 px-6 rounded-full bg-[#0e121d]/90 border text-white text-xs font-bold uppercase tracking-widest outline-none transition-all duration-300 shadow-[0_4px_20px_0_rgba(0,0,0,0.4)] backdrop-blur-md flex items-center justify-between font-sans ${
+              isDropdownOpen ? 'border-accent ring-2 ring-accent/20' : 'border-white/15 hover:border-accent/40'
+            }`}
+          >
+            <span>{selectedCategory}</span>
+            <motion.div
+              animate={{ rotate: isDropdownOpen ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="text-gray-400 w-4 h-4" />
+            </motion.div>
+          </button>
+
+          {/* Animated Floating Menu */}
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 4, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="absolute left-2 right-2 mt-2 bg-[#0d111a]/95 border border-white/15 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-xl overflow-hidden z-50 p-1.5"
+              >
+                <div className="flex flex-col gap-1">
+                  {FILTER_CATEGORIES.map((category) => {
+                    const isSelected = selectedCategory === category;
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full text-left py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-between font-sans ${
+                          isSelected
+                            ? 'bg-accent/15 text-accent border border-accent/30'
+                            : 'text-gray-300 hover:text-white hover:bg-white/5 border border-transparent'
+                        }`}
+                      >
+                        <span>{category}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-accent" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {/* 3-Column Projects Grid */}
         {filteredProjects.length > 0 ? (
           <motion.div
@@ -223,61 +282,11 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
           >
             <AnimatePresence mode="popLayout">
               {filteredProjects.map((project) => (
-                <motion.div
+                <ProjectCard
                   key={project.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
+                  project={project}
                   onClick={() => setSelectedProject(project)}
-                  className="group/card cursor-pointer h-full flex"
-                >
-                  <SpotlightCard
-                    className="flex flex-col justify-between rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden transition-all duration-300 w-full border border-white/10 hover:border-accent/50 bg-[#090c13]"
-                    spotlightColor="rgba(72, 202, 228, 0.12)"
-                  >
-                    <div className="flex flex-col w-full h-full">
-                      
-                      {/* Project Thumbnail */}
-                      <div className="w-full aspect-[16/10] bg-[#05070c] rounded-2xl relative overflow-hidden mb-5 border border-white/5 flex items-center justify-center">
-                        <ProjectCardImage project={project} />
-                      </div>
-
-                      {/* Category Subtitle */}
-                      <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-accent mb-1.5 block font-sans">
-                        {project.category}
-                      </span>
-
-                      {/* Project Title */}
-                      <h3 className="font-neutralfacebold text-lg sm:text-xl text-white uppercase tracking-wide leading-snug mb-2 group-hover/card:text-accent transition-colors">
-                        {project.title}
-                      </h3>
-
-                      {/* Short Description */}
-                      <p className="text-xs sm:text-sm text-gray-400 font-sans leading-relaxed mb-6 line-clamp-3">
-                        {project.description}
-                      </p>
-
-                      {/* Tech Stack Pills */}
-                      <div className="mt-auto pt-4 border-t border-white/5 flex flex-wrap gap-2">
-                        {project.techStack.map((tech, tIdx) => {
-                          const icon = getTechIcon(tech);
-                          return (
-                            <span
-                              key={tIdx}
-                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-semibold uppercase tracking-wider bg-white/5 border border-white/10 text-gray-300"
-                            >
-                              {icon && <span className="text-xs">{icon}</span>}
-                              <span>{tech}</span>
-                            </span>
-                          );
-                        })}
-                      </div>
-
-                    </div>
-                  </SpotlightCard>
-                </motion.div>
+                />
               ))}
             </AnimatePresence>
           </motion.div>
