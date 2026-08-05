@@ -21,6 +21,68 @@ import {
   Clock
 } from 'lucide-react';
 
+const getGmailComposeUrl = (
+  inquiry: InquiryRow,
+  booking?: BookingRow | null,
+  meetingLink?: string
+) => {
+  const subject = `Confirmation: Your ${inquiry.project_type} Inquiry Schedule`;
+
+  let scheduleText = '';
+  const effectiveMeetingLink = meetingLink?.trim() || booking?.meeting_link || '';
+
+  if (booking && booking.booked_date) {
+    let dateFormatted = booking.booked_date;
+    try {
+      const [year, month, day] = booking.booked_date.split('-').map(Number);
+      const d = new Date(year, month - 1, day);
+      dateFormatted = d.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      // Fallback to raw string
+    }
+
+    let timeFormatted = booking.booked_time || '';
+    if (timeFormatted && timeFormatted.includes(':')) {
+      const parts = timeFormatted.split(':');
+      const hours = parseInt(parts[0], 10);
+      const minutes = parts[1];
+      if (!isNaN(hours)) {
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const hour12 = hours % 12 || 12;
+        timeFormatted = `${hour12}:${minutes} ${period}`;
+      }
+    }
+
+    const dateTimeStr = timeFormatted ? `${dateFormatted} at ${timeFormatted}` : dateFormatted;
+
+    scheduleText = `This is to confirm your schedule for ${dateTimeStr}, see you!`;
+
+    if (effectiveMeetingLink) {
+      scheduleText += `\n\nMeeting Link: ${effectiveMeetingLink}`;
+    }
+  } else {
+    scheduleText = `Let's schedule a time to discuss this further. Are you available for a quick discovery call?`;
+  }
+
+  const body = `Hi ${inquiry.full_name},
+
+Thank you for reaching out regarding your ${inquiry.project_type} project.
+I've reviewed your inquiry details:
+"${inquiry.description}"
+
+${scheduleText}
+
+Best regards,
+Mark`;
+
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(inquiry.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+};
+
 export const InquiriesPage: React.FC = () => {
   const [inquiries, setInquiries] = useState<InquiryRow[]>([]);
   const [bookings, setBookings] = useState<BookingRow[]>([]);
@@ -901,7 +963,12 @@ export const InquiriesPage: React.FC = () => {
                     <div className="flex items-center gap-2 text-gray-300">
                       <Mail className="w-4 h-4 text-sky-500 shrink-0" />
                       <span className="text-gray-400 font-semibold text-[10px] uppercase w-14">Email:</span>
-                      <a href={`mailto:${selectedInquiry.email}`} className="hover:underline truncate font-mono text-white">
+                      <a 
+                        href={getGmailComposeUrl(selectedInquiry, activeBooking, editingMeetingLink)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline truncate font-mono text-white"
+                      >
                         {selectedInquiry.email}
                       </a>
                     </div>
@@ -1118,7 +1185,9 @@ export const InquiriesPage: React.FC = () => {
             {/* Footer Action Buttons */}
             <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <a
-                href={`mailto:${selectedInquiry.email}?subject=Regarding%20Your%20${encodeURIComponent(selectedInquiry.project_type)}%20Inquiry`}
+                href={getGmailComposeUrl(selectedInquiry, activeBooking, editingMeetingLink)}
+                target="_blank"
+                rel="noreferrer"
                 className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-gray-300 transition-colors flex items-center justify-center gap-2"
               >
                 <Mail className="w-4 h-4 text-sky-400" />
