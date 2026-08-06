@@ -100,43 +100,45 @@ export const triggerNotification = async (payload: SubmitInquiryPayload, inquiry
     }
 
     if (!res.ok) {
-      // Fallback: check if client-side webhook is available for local dev
-      const webhookUrl = import.meta.env.VITE_DISCORD_WEBHOOK_URL;
-      if (webhookUrl) {
-        const fields: any[] = [
-          { name: 'Client Name', value: payload.fullName, inline: true },
-          { name: 'Email', value: payload.email, inline: true },
-          { name: 'Project Type', value: payload.projectType, inline: true },
-          { name: 'Company', value: payload.company || 'N/A', inline: true },
-          { name: 'Phone', value: payload.phone || 'N/A', inline: true },
-          { name: 'Website', value: payload.website || 'N/A', inline: true },
-        ];
+      // Client-side fallback only active in local development mode
+      if (import.meta.env.DEV) {
+        const webhookUrl = import.meta.env.VITE_DISCORD_WEBHOOK_URL;
+        if (webhookUrl) {
+          const fields: any[] = [
+            { name: 'Client Name', value: payload.fullName, inline: true },
+            { name: 'Email', value: payload.email, inline: true },
+            { name: 'Project Type', value: payload.projectType, inline: true },
+            { name: 'Company', value: payload.company || 'N/A', inline: true },
+            { name: 'Phone', value: payload.phone || 'N/A', inline: true },
+            { name: 'Website', value: payload.website || 'N/A', inline: true },
+          ];
 
-        if (payload.bookedDate && payload.bookedTime) {
-          fields.push({
-            name: '📅 Scheduled Discovery Call',
-            value: `${payload.bookedDate} at ${formatTimeLabel(payload.bookedTime)}`,
-            inline: false,
+          if (payload.bookedDate && payload.bookedTime) {
+            fields.push({
+              name: '📅 Scheduled Discovery Call',
+              value: `${payload.bookedDate} at ${formatTimeLabel(payload.bookedTime)}`,
+              inline: false,
+            });
+          }
+
+          fields.push({ name: 'Description', value: payload.description, inline: false });
+
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              embeds: [
+                {
+                  title: '🚀 New Project Inquiry & Discovery Call Booked!',
+                  color: 38859,
+                  fields,
+                  footer: { text: `Inquiry ID: ${inquiryId}` },
+                  timestamp: new Date().toISOString(),
+                },
+              ],
+            }),
           });
         }
-
-        fields.push({ name: 'Description', value: payload.description, inline: false });
-
-        await fetch(webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            embeds: [
-              {
-                title: '🚀 New Project Inquiry & Discovery Call Booked!',
-                color: 38859,
-                fields,
-                footer: { text: `Inquiry ID: ${inquiryId}` },
-                timestamp: new Date().toISOString(),
-              },
-            ],
-          }),
-        });
       }
     }
   } catch (err) {

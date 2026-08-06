@@ -52,15 +52,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     if (!isSupabaseConfigured) {
-      // Demo login in preview mode if credentials match dev password or any input
-      if (email === 'admin@portfolio.com' && password === 'admin123') {
-        const mockUser = { id: 'dev-admin-id', email } as User;
-        setUser(mockUser);
-        return { success: true };
-      }
       return {
         success: false,
-        error: 'Supabase credentials not configured. Use admin@portfolio.com / admin123 for local preview mode.',
+        error: 'Supabase authentication is not configured in this environment.',
       };
     }
 
