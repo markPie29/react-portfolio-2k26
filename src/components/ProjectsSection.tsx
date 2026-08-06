@@ -78,9 +78,21 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
       const matchTitle = project.title.toLowerCase().includes(query);
       const matchCategoryText = projectCats.some((cat) => cat.toLowerCase().includes(query));
       const matchDesc = project.description.toLowerCase().includes(query);
+      const matchLongDesc = project.longDescription?.toLowerCase().includes(query) ?? false;
+      const matchRole = project.role?.toLowerCase().includes(query) ?? false;
       const matchTech = project.techStack.some((tech) => tech.toLowerCase().includes(query));
+      const matchFeatures = project.features?.some((feat) => feat.toLowerCase().includes(query)) ?? false;
 
-      return matchCategory && (matchTitle || matchCategoryText || matchDesc || matchTech);
+      return (
+        matchCategory &&
+        (matchTitle ||
+          matchCategoryText ||
+          matchDesc ||
+          matchLongDesc ||
+          matchRole ||
+          matchTech ||
+          matchFeatures)
+      );
     });
   }, [projectsList, selectedCategory, searchQuery]);
 
@@ -170,8 +182,8 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="SEARCH"
-              className="w-full pl-13 pr-12 py-3.5 sm:py-4 rounded-full bg-[#0e121d]/90 border border-white/15 focus:border-accent focus:ring-2 focus:ring-accent/20 text-white placeholder-gray-400 text-sm sm:text-base font-sans tracking-widest uppercase outline-none transition-all shadow-[0_4px_20px_0_rgba(0,0,0,0.4)] backdrop-blur-md"
+              placeholder="Search (e.g. jersey, shirt, packaging...)"
+              className="w-full pl-13 pr-12 py-3.5 sm:py-4 rounded-full bg-[#0e121d]/90 border border-white/15 focus:border-accent focus:ring-2 focus:ring-accent/20 text-white placeholder-gray-400 placeholder:normal-case placeholder:tracking-normal text-sm sm:text-base font-sans tracking-wide uppercase outline-none transition-all shadow-[0_4px_20px_0_rgba(0,0,0,0.4)] backdrop-blur-md"
             />
             {searchQuery && (
               <button
