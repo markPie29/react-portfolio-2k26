@@ -256,7 +256,12 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
             </div>
 
             {/* Split View Container (Left: Media, Right: General Details) */}
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-y-auto lg:overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-slate-200 dark:divide-white/10">
+            <div 
+              data-lenis-prevent="true"
+              data-lenis-prevent-wheel="true"
+              data-lenis-prevent-touch="true"
+              className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-y-auto lg:overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-slate-200 dark:divide-white/10"
+            >
               
               {/* LEFT COLUMN: Media Section (Images & Videos with full aspect preservation) */}
               <div className="lg:col-span-7 flex flex-col p-4 sm:p-6 bg-slate-950/90 dark:bg-[#06080e] min-h-[350px] lg:min-h-0 justify-between overflow-hidden relative">
@@ -385,11 +390,8 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
               {/* RIGHT COLUMN: General Details Panel (Scrollable content) */}
               <div
                 ref={modalDetailsRef}
-                data-lenis-prevent="true"
-                data-lenis-prevent-wheel="true"
-                data-lenis-prevent-touch="true"
                 tabIndex={0}
-                className="lg:col-span-5 flex flex-col p-6 sm:p-8 overflow-y-auto overscroll-contain modal-scrollbar bg-white dark:bg-[#0c0f17] gap-6 outline-none"
+                className="lg:col-span-5 flex flex-col p-6 sm:p-8 overflow-visible lg:overflow-y-auto overscroll-contain lg:modal-scrollbar bg-white dark:bg-[#0c0f17] gap-6 outline-none"
               >
                 {/* Project Overview */}
                 <div>

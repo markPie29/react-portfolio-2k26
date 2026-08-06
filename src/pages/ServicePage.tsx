@@ -128,7 +128,7 @@ const ServicePage: React.FC = () => {
           <div className="max-w-6xl mx-auto mb-16 sm:mb-20">
             {/* Header: Sub-label & Title with Top CTA Button */}
             <div className="mb-8 sm:mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div>
+              <div className="text-center lg:text-left">
                 <p className="font-mono text-xs sm:text-sm font-bold tracking-widest text-gray-500 dark:text-gray-400 uppercase mb-2">
                   SERVICES
                 </p>
@@ -138,7 +138,7 @@ const ServicePage: React.FC = () => {
               </div>
 
               {/* Centered Action CTA Button in Header Container */}
-              <div className="flex items-center justify-center shrink-0 self-center">
+              <div className="flex items-center justify-center shrink-0 lg:self-center">
                 <button
                   onClick={scrollToInquiry}
                   className="gradient-bg text-white font-neutralfacebold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full shadow-lg shadow-sky-500/25 hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer group"

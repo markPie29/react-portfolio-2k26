@@ -295,6 +295,7 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
 }
 
 /* Hide native browser dark picker icons to render custom white Lucide icons consistently */
