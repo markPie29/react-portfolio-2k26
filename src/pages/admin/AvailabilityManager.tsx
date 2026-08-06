@@ -13,6 +13,18 @@ const DAYS_MAP = [
   { day: 0, label: 'Sunday' },
 ];
 
+const format12Hour = (time24: string) => {
+  if (!time24) return '';
+  const parts = time24.split(':');
+  let h = parseInt(parts[0], 10);
+  const m = parts[1] || '00';
+  if (isNaN(h)) return time24;
+  const period = h >= 12 ? 'PM' : 'AM';
+  if (h === 0) h = 12;
+  else if (h > 12) h -= 12;
+  return `${h}:${m} ${period}`;
+};
+
 export const AvailabilityManager: React.FC = () => {
   const [slots, setSlots] = useState<AvailabilitySlotRow[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -199,7 +211,7 @@ export const AvailabilityManager: React.FC = () => {
               <span>Weekly Recurring Schedule</span>
             </h2>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               {DAYS_MAP.map((d) => {
                 const slot = slots.find((s) => s.day_of_week === d.day);
                 const isActive = slot ? slot.is_active : false;
@@ -207,58 +219,66 @@ export const AvailabilityManager: React.FC = () => {
                 return (
                   <div
                     key={d.day}
-                    className={`p-4 rounded-xl border text-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                    className={`p-5 rounded-2xl border text-sm transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4 ${
                       isActive
                         ? 'bg-white/5 border-sky-500/30'
                         : 'bg-white/5 border-white/5 opacity-60'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-[140px]">
                       <input
                         type="checkbox"
                         checked={isActive}
                         onChange={() => handleToggleDay(d.day)}
                         className="w-4 h-4 accent-sky-500 rounded cursor-pointer"
                       />
-                      <span className="font-neutralfacebold text-sm text-white w-24">
+                      <span className="font-neutralfacebold text-base text-white">
                         {d.label}
                       </span>
                     </div>
 
                     {isActive && slot ? (
-                      <div className="flex flex-wrap items-center gap-3 text-xs">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-gray-400 text-[10px] uppercase font-bold">Start:</span>
+                      <div className="flex flex-wrap items-center gap-4 text-sm">
+                        {/* 12-Hour Human Readable Preview Badge */}
+                        <div className="px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-mono font-semibold flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-sky-400" />
+                          <span>
+                            {format12Hour(slot.start_time)} – {format12Hour(slot.end_time)}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400 text-xs font-semibold uppercase">Start:</span>
                           <input
                             type="time"
                             value={slot.start_time.substring(0, 5)}
                             onChange={(e) =>
                               handleTimeChange(d.day, 'start_time', `${e.target.value}:00`)
                             }
-                            className="p-1.5 bg-white/5 border border-white/10 rounded-lg text-white font-mono focus:outline-none focus:ring-1 focus:ring-sky-500"
+                            className="px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                           />
                         </div>
 
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-gray-400 text-[10px] uppercase font-bold">End:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400 text-xs font-semibold uppercase">End:</span>
                           <input
                             type="time"
                             value={slot.end_time.substring(0, 5)}
                             onChange={(e) =>
                               handleTimeChange(d.day, 'end_time', `${e.target.value}:00`)
                             }
-                            className="p-1.5 bg-white/5 border border-white/10 rounded-lg text-white font-mono focus:outline-none focus:ring-1 focus:ring-sky-500"
+                            className="px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                           />
                         </div>
 
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-gray-400 text-[10px] uppercase font-bold">Duration:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400 text-xs font-semibold uppercase">Slot:</span>
                           <select
                             value={slot.slot_duration || 30}
                             onChange={(e) =>
                               handleTimeChange(d.day, 'slot_duration', parseInt(e.target.value, 10))
                             }
-                            className="p-1.5 bg-white/5 border border-white/10 rounded-lg text-white font-mono focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer"
+                            className="px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
                           >
                             <option value={15} className="bg-[#0c1017]">15 min</option>
                             <option value={30} className="bg-[#0c1017]">30 min</option>
@@ -277,48 +297,48 @@ export const AvailabilityManager: React.FC = () => {
           </div>
 
           {/* Specific Date Overrides */}
-          <div className="bg-[#0c1017] border border-white/10 rounded-2xl p-6 space-y-4">
+          <div className="bg-[#0c1017] border border-white/10 rounded-2xl p-6 space-y-5">
             <h2 className="font-neutralfacebold text-sm text-white uppercase tracking-wider flex items-center gap-2">
               <CalendarIcon className="w-4 h-4 text-sky-400" />
               <span>Specific Date Hours / Overrides</span>
             </h2>
 
-            <div className="flex flex-col sm:flex-row items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="flex flex-col sm:flex-row items-center gap-4 p-5 bg-white/5 rounded-2xl border border-white/10">
               <input
                 type="date"
                 value={overrideDate}
                 onChange={(e) => setOverrideDate(e.target.value)}
-                className="p-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="px-3 py-2.5 bg-white/5 border border-white/15 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono"
               />
-              <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-2 text-sm">
                 <input
                   type="time"
                   value={overrideStart}
                   onChange={(e) => setOverrideStart(e.target.value)}
-                  className="p-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white font-mono"
+                  className="px-3 py-2.5 bg-white/5 border border-white/15 rounded-xl text-sm text-white font-mono"
                 />
-                <span>to</span>
+                <span className="text-gray-400 font-semibold">to</span>
                 <input
                   type="time"
                   value={overrideEnd}
                   onChange={(e) => setOverrideEnd(e.target.value)}
-                  className="p-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white font-mono"
+                  className="px-3 py-2.5 bg-white/5 border border-white/15 rounded-xl text-sm text-white font-mono"
                 />
               </div>
               <button
                 onClick={handleAddOverrideDate}
                 disabled={!overrideDate}
-                className="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+                className="px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-white font-semibold rounded-xl text-xs uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 shrink-0"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add Override Date</span>
+                <span>Add Override</span>
               </button>
             </div>
 
             {/* List of active overrides */}
             {slots.filter((s) => s.specific_date).length > 0 && (
-              <div className="space-y-2 pt-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">
+              <div className="space-y-3 pt-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 block">
                   Active Specific Date Overrides
                 </span>
                 {slots
@@ -326,19 +346,20 @@ export const AvailabilityManager: React.FC = () => {
                   .map((s) => (
                     <div
                       key={s.id}
-                      className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10 text-xs"
+                      className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 text-sm"
                     >
                       <div className="flex items-center gap-3">
                         <CalendarIcon className="w-4 h-4 text-sky-400" />
-                        <span className="font-semibold text-white">{s.specific_date}</span>
-                        <span className="text-gray-400 font-mono">
-                          {s.start_time.substring(0, 5)} - {s.end_time.substring(0, 5)}
+                        <span className="font-semibold text-white font-mono">{s.specific_date}</span>
+                        <span className="px-3 py-1 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-mono font-semibold">
+                          {format12Hour(s.start_time)} – {format12Hour(s.end_time)}
                         </span>
                       </div>
 
                       <button
                         onClick={() => handleDeleteSlot(s.id)}
-                        className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                        className="p-2 text-gray-400 hover:text-red-400 hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+                        title="Delete override"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

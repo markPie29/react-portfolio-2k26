@@ -645,6 +645,27 @@ export const InquiriesPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Dot Status Legend Bar */}
+            <div className="flex items-center gap-4 text-[11px] text-gray-400 py-1 flex-wrap">
+              <span className="font-semibold text-gray-300">Status Legend:</span>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />
+                <span>New</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                <span>Confirmed</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
+                <span>Meeting Done</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                <span>Cancelled</span>
+              </div>
+            </div>
+
             {/* Days of Week Headers */}
             <div className="grid grid-cols-7 gap-2 text-center font-mono text-xs uppercase font-bold text-gray-400 py-2 border-b border-white/10">
               <span>Mon</span>
@@ -716,60 +737,37 @@ export const InquiriesPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Inquiry Badges inside the Day Cell - max 2 shown */}
-                    <div className="space-y-1.5 my-1 overflow-y-auto max-h-[70px] scrollbar-none">
-                      {dayInquiries.slice(0, 2).map((inq) => (
-                        <button
-                          key={inq.id}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedDateStr(dateStr);
-                            openInquiryModal(inq);
-                          }}
-                          title={`Click to view details for ${inq.full_name}`}
-                          className={`w-full text-left p-1.5 rounded-lg border text-[11px] font-medium transition-all hover:scale-[1.02] flex items-center justify-between gap-1 cursor-pointer ${
-                            inq.status === 'new'
-                              ? 'bg-blue-500/20 border-blue-500/40 text-blue-200 hover:bg-blue-500/30'
-                              : inq.status === 'confirmed'
-                              ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/30'
-                              : inq.status === 'done'
-                              ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-200 hover:bg-cyan-500/30'
-                              : 'bg-red-500/20 border-red-500/40 text-red-200 hover:bg-red-500/30'
-                          }`}
-                        >
-                          <span className="truncate font-semibold text-[11px]">
-                            {inq.full_name}
+                    {/* Status Color Dots Grid inside the Day Cell */}
+                    {dayInquiries.length > 0 ? (
+                      <div className="my-auto py-2 flex flex-wrap gap-1.5 items-center justify-start max-h-[60px] overflow-hidden">
+                        {dayInquiries.slice(0, 6).map((inq) => (
+                          <button
+                            key={inq.id}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedDateStr(dateStr);
+                              openInquiryModal(inq);
+                            }}
+                            title={`${inq.full_name} (${inq.project_type}) - Status: ${inq.status}`}
+                            className={`w-3 h-3 rounded-full transition-transform hover:scale-150 cursor-pointer shadow-sm ${
+                              inq.status === 'new'
+                                ? 'bg-blue-400 animate-pulse shadow-blue-400/50'
+                                : inq.status === 'confirmed'
+                                ? 'bg-emerald-400 shadow-emerald-400/50'
+                                : inq.status === 'done'
+                                ? 'bg-cyan-400 shadow-cyan-400/50'
+                                : 'bg-red-400 shadow-red-400/50'
+                            }`}
+                          />
+                        ))}
+                        {dayInquiries.length > 6 && (
+                          <span className="text-[10px] font-mono font-bold text-sky-400">
+                            +{dayInquiries.length - 6}
                           </span>
-                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                            inq.status === 'new'
-                              ? 'bg-blue-400 animate-pulse'
-                              : inq.status === 'confirmed'
-                              ? 'bg-emerald-400'
-                              : inq.status === 'done'
-                              ? 'bg-cyan-400'
-                              : 'bg-red-400'
-                          }`} />
-                        </button>
-                      ))}
-
-                      {dayInquiries.length > 2 && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedDateStr(dateStr);
-                            setExpandedDayDateStr(dateStr);
-                          }}
-                          className="w-full text-center py-1 px-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
-                        >
-                          + {dayInquiries.length - 2} more...
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Bottom hint if cell has no inquiries */}
-                    {dayInquiries.length === 0 && (
+                        )}
+                      </div>
+                    ) : (
                       <span className="text-[10px] text-gray-600 font-mono self-start">
                         No events
                       </span>

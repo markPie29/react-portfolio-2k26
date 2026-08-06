@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { InquiryRow, BookingRow } from '../../types/database';
-import { Inbox, Clock, CheckCircle2, ArrowRight, Sparkles, AlertCircle, FolderKanban } from 'lucide-react';
+import { Inbox, Clock, CheckCircle2, ArrowRight, Sparkles, AlertCircle, FolderKanban, Video } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const [inquiries, setInquiries] = useState<InquiryRow[]>([]);
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [totalInquiryCount, setTotalInquiryCount] = useState<number>(0);
+  const [newCount, setNewCount] = useState<number>(0);
+  const [confirmedCount, setConfirmedCount] = useState<number>(0);
+  const [doneCount, setDoneCount] = useState<number>(0);
+  const [cancelledCount, setCancelledCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -32,20 +36,32 @@ export const AdminDashboard: React.FC = () => {
         ]);
         setBookings([]);
         setTotalInquiryCount(1);
+        setNewCount(1);
+        setConfirmedCount(0);
+        setDoneCount(0);
+        setCancelledCount(0);
         setIsLoading(false);
         return;
       }
 
       try {
-        const [inqRes, bookRes, countRes] = await Promise.all([
+        const [inqRes, bookRes, countRes, newRes, confRes, doneRes, cancRes] = await Promise.all([
           supabase.from('inquiries').select('*').order('created_at', { ascending: false }).limit(5),
           supabase.from('bookings').select('*').order('booked_date', { ascending: true }),
           supabase.from('inquiries').select('*', { count: 'exact', head: true }),
+          supabase.from('inquiries').select('*', { count: 'exact', head: true }).eq('status', 'new'),
+          supabase.from('inquiries').select('*', { count: 'exact', head: true }).eq('status', 'confirmed'),
+          supabase.from('inquiries').select('*', { count: 'exact', head: true }).eq('status', 'done'),
+          supabase.from('inquiries').select('*', { count: 'exact', head: true }).eq('status', 'cancelled'),
         ]);
 
         if (inqRes.data) setInquiries(inqRes.data);
         if (bookRes.data) setBookings(bookRes.data);
         if (countRes.count !== null) setTotalInquiryCount(countRes.count);
+        if (newRes.count !== null) setNewCount(newRes.count);
+        if (confRes.count !== null) setConfirmedCount(confRes.count);
+        if (doneRes.count !== null) setDoneCount(doneRes.count);
+        if (cancRes.count !== null) setCancelledCount(cancRes.count);
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
       } finally {
@@ -57,9 +73,10 @@ export const AdminDashboard: React.FC = () => {
   }, []);
 
   const totalInquiries = totalInquiryCount || inquiries.length;
-  const newInquiries = inquiries.filter((i) => i.status === 'new').length;
-  const confirmedInquiries = inquiries.filter((i) => i.status === 'confirmed').length;
-  const cancelledInquiries = inquiries.filter((i) => i.status === 'cancelled').length;
+  const newInquiries = newCount || inquiries.filter((i) => i.status === 'new').length;
+  const confirmedInquiries = confirmedCount || inquiries.filter((i) => i.status === 'confirmed').length;
+  const doneInquiries = doneCount || inquiries.filter((i) => i.status === 'done').length;
+  const cancelledInquiries = cancelledCount || inquiries.filter((i) => i.status === 'cancelled').length;
 
   return (
     <div className="space-y-8 text-gray-100">
@@ -88,7 +105,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Metric Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="p-5 bg-[#0c1017] border border-white/10 rounded-2xl space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase text-gray-400 tracking-wider">
@@ -128,6 +145,20 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <p className="text-3xl font-neutralfacebold text-emerald-400">{confirmedInquiries}</p>
           <span className="text-[10px] text-gray-500 block">Confirmed inquiries & calls</span>
+        </div>
+
+        <div className="p-5 bg-[#0c1017] border border-white/10 rounded-2xl space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase text-cyan-400 tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-cyan-400" />
+              Meeting Done
+            </span>
+            <div className="p-2 bg-cyan-500/10 text-cyan-400 rounded-xl">
+              <Video className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-3xl font-neutralfacebold text-cyan-400">{doneInquiries}</p>
+          <span className="text-[10px] text-gray-500 block">Completed discovery calls</span>
         </div>
 
         <div className="p-5 bg-[#0c1017] border border-white/10 rounded-2xl space-y-2">
