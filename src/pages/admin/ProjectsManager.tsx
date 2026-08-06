@@ -54,6 +54,8 @@ import {
 } from 'react-icons/si';
 import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from '../../components/CustomIcons';
 import SpotlightCard from '../../components/SpotlightCard';
+import ServiceShowcasePanel from '../../components/admin/ServiceShowcasePanel';
+
 
 type GalleryItem = { id: string; type: 'url'; value: string } | { id: string; type: 'file'; value: File };
 
@@ -1552,6 +1554,9 @@ export const ProjectsManager: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Service Showcase Settings Panel */}
+      <ServiceShowcasePanel projects={projects} />
 
       {/* --- REDESIGNED CREATE / EDIT PROJECT MODAL WITH LIVE PORTFOLIO PREVIEW --- */}
       {isModalOpen &&

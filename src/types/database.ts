@@ -67,3 +67,12 @@ export interface ProjectRow {
   updated_at: string;
 }
 
+export interface ServiceFeaturedProjectRow {
+  id: string;
+  service_slug: string;
+  project_ids: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+

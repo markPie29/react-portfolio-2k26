@@ -8,6 +8,7 @@ import GraphicsBento from '../components/services/GraphicsBento';
 import ProjectCard from '../components/ProjectCard';
 import ProjectModal from '../components/home/ProjectModal';
 import { fetchProjects } from '../services/projectService';
+import { fetchServicePins } from '../services/serviceFeaturedService';
 import { ProjectItem } from '../types/content';
 import { serviceSlugToCategory, projectMatchesCategory } from '../utils/categoryFilter';
 import { ArrowLeft, CheckCircle2, Send, ArrowRight } from 'lucide-react';
@@ -17,6 +18,7 @@ const ServicePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [projectsList, setProjectsList] = useState<ProjectItem[]>([]);
+  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
 
   useEffect(() => {
@@ -33,16 +35,38 @@ const ServicePage: React.FC = () => {
       (slug === 'graphic-design-video-editing' && s.slug === 'graphic-design')
   );
 
+  useEffect(() => {
+    if (service) {
+      fetchServicePins(service.slug).then((ids) => {
+        setPinnedIds(ids || []);
+      });
+    }
+  }, [service]);
+
   const serviceProjects = useMemo(() => {
     if (!service) return [];
     const filterCategory = serviceSlugToCategory(service.slug);
     const matches = projectsList.filter((p) => projectMatchesCategory(p, filterCategory));
 
+    if (pinnedIds && pinnedIds.length > 0) {
+      const pinnedProjects: ProjectItem[] = [];
+      for (const id of pinnedIds) {
+        const found = projectsList.find((p) => p.id === id);
+        if (found) {
+          pinnedProjects.push(found);
+        }
+      }
+      if (pinnedProjects.length > 0) {
+        return pinnedProjects.slice(0, 3);
+      }
+    }
+
+    // Fallback: featured projects first, then non-featured
     const featured = matches.filter((p) => p.isFeatured);
     const nonFeatured = matches.filter((p) => !p.isFeatured);
 
     return [...featured, ...nonFeatured].slice(0, 3);
-  }, [projectsList, service]);
+  }, [projectsList, service, pinnedIds]);
 
   const scrollToInquiry = () => {
     const element = document.getElementById('inquiry');
