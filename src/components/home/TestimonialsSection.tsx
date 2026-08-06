@@ -4,6 +4,13 @@ import { testimonialsData } from '../../data/testimonials';
 import { Quote, Star } from 'lucide-react';
 
 const TestimonialsSection: React.FC = () => {
+  // Toggle to true once real client testimonials are ready to be displayed
+  const SHOW_TESTIMONIALS = false;
+
+  if (!SHOW_TESTIMONIALS) {
+    return null;
+  }
+
   return (
     <section id="testimonials" className="py-8 md:py-12 px-6 md:px-12 lg:px-24 overflow-hidden">
       <div className="max-w-6xl mx-auto">

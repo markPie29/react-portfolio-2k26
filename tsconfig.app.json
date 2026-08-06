@@ -26,7 +26,7 @@
       "#lib/*": ["./src/lib/*"],
       "#hooks/*": ["./src/hooks/*"]
     },
-    "types": ["vite/client"]
+    "types": ["vite/client", "node"]
   },
-  "include": ["src", "components"]
+  "include": ["src", "components", "api"]
 }
