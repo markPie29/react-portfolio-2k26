@@ -77,7 +77,7 @@ export const fetchAvailableSlotsForDate = async (
     const selectedDate = new Date(year, month - 1, day);
     const dayOfWeek = selectedDate.getDay();
 
-    // 1. Fetch active custom rules
+    // 1. Fetch active custom rules for specific date OR matching day of week
     const { data: slotsData, error: slotsError } = await supabase
       .from('availability_slots')
       .select('*')
@@ -88,28 +88,76 @@ export const fetchAvailableSlotsForDate = async (
       console.warn('Error fetching availability_slots:', slotsError);
     }
 
-    let baseTimes: string[] = DEFAULT_BUSINESS_SLOTS;
+    const activeSlots = slotsData || [];
+    
+    // Check if there is a specific date override
+    const specificDateSlots = activeSlots.filter((s) => s.specific_date === dateStr);
+    const dayOfWeekSlots = activeSlots.filter((s) => s.day_of_week === dayOfWeek && !s.specific_date);
 
-    if (slotsData && slotsData.length > 0) {
-      const generatedTimes: string[] = [];
-      for (const slot of slotsData) {
-        const startH = parseInt(slot.start_time.split(':')[0], 10);
-        const endH = parseInt(slot.end_time.split(':')[0], 10);
-        const step = (slot.slot_duration || 30) / 60;
-
-        for (let h = startH; h < endH; h += step) {
-          const hours = Math.floor(h);
-          const mins = Math.round((h - hours) * 60);
-          const timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-          if (!generatedTimes.includes(timeStr)) {
-            generatedTimes.push(timeStr);
-          }
-        }
-      }
-      if (generatedTimes.length > 0) {
-        baseTimes = generatedTimes.sort();
+    // If specific date slots exist, check if it's a blocked date (start_time === end_time)
+    if (specificDateSlots.length > 0) {
+      const isBlocked = specificDateSlots.some((s) => s.start_time === s.end_time);
+      if (isBlocked) {
+        return [];
       }
     }
+
+    const targetSlots = specificDateSlots.length > 0 ? specificDateSlots : dayOfWeekSlots;
+
+    if (targetSlots.length === 0) {
+      // If no active slots configured for this day/date in database
+      return [];
+    }
+
+    const generatedTimes: string[] = [];
+    for (const slot of targetSlots) {
+      const startH = parseInt(slot.start_time.split(':')[0], 10);
+      const startM = parseInt(slot.start_time.split(':')[1] || '0', 10);
+      let endH = parseInt(slot.end_time.split(':')[0], 10);
+      const endM = parseInt(slot.end_time.split(':')[1] || '0', 10);
+
+      // If start equals end, it's a blocked slot
+      if (startH === endH && startM === endM) {
+        continue;
+      }
+
+      // Midnight boundary: 00:00 end_time means 24:00 (end of day)
+      if (endH === 0 && endM === 0) {
+        endH = 24;
+      }
+
+      const startFloat = startH + startM / 60;
+      let endFloat = endH + endM / 60;
+      if (endFloat <= startFloat && endH === 0) {
+        endFloat = 24 + endM / 60;
+      }
+
+      const step = (slot.slot_duration || 30) / 60;
+
+      // Note: h <= endFloat allows including 12:00 AM (24:00) as the last slot
+      for (let h = startFloat; h <= endFloat + 0.001; h += step) {
+        let hours = Math.floor(h);
+        const mins = Math.round((h - hours) * 60);
+        
+        let actualHours = hours % 24;
+        if (mins === 60) {
+          actualHours = (actualHours + 1) % 24;
+        }
+
+        const formattedMins = (mins % 60).toString().padStart(2, '0');
+        const timeStr = `${actualHours.toString().padStart(2, '0')}:${formattedMins}`;
+        
+        if (!generatedTimes.includes(timeStr)) {
+          generatedTimes.push(timeStr);
+        }
+      }
+    }
+
+    if (generatedTimes.length === 0) {
+      return [];
+    }
+
+    const baseTimes = generatedTimes.sort();
 
     // 2. Fetch existing bookings for date
     const { data: existingBookings, error: bookingsError } = await supabase
@@ -133,11 +181,7 @@ export const fetchAvailableSlotsForDate = async (
     }));
   } catch (err) {
     console.error('Failed to fetch available slots:', err);
-    return DEFAULT_BUSINESS_SLOTS.map((time) => ({
-      time,
-      label: formatTimeLabel(time),
-      isAvailable: true,
-    }));
+    return [];
   }
 };
 

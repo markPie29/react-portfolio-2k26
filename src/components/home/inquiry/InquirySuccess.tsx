@@ -18,7 +18,7 @@ const formatTimeLabel = (time24: string): string => {
   const period = hour >= 12 ? 'PM' : 'AM';
   if (hour === 0) hour = 12;
   else if (hour > 12) hour -= 12;
-  return `${hour}:${minStr || '00'} ${period}`;
+  return `${hour}:${minStr || '00'} ${period} (PST / UTC+8)`;
 };
 
 export const InquirySuccess: React.FC<SuccessProps> = ({

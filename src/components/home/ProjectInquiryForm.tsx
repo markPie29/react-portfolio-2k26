@@ -16,6 +16,7 @@ import {
   deleteProjectInquiry,
 } from '../../services/inquiryService';
 import { createBooking } from '../../services/bookingService';
+import { getDetectedTimezone } from '../../utils/timezone';
 import { ArrowLeft, ArrowRight, Loader2, Send, ShieldCheck } from 'lucide-react';
 
 export const ProjectInquiryForm: React.FC = () => {
@@ -25,6 +26,7 @@ export const ProjectInquiryForm: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [inquiryId, setInquiryId] = useState<string | undefined>(undefined);
   const [turnstileToken, setTurnstileToken] = useState<string | undefined>(undefined);
+  const [selectedTimezone, setSelectedTimezone] = useState<string>(getDetectedTimezone());
 
   // Security refs: load timestamp & submission lock
   const mountTimeRef = useRef<number>(Date.now());
@@ -287,8 +289,13 @@ export const ProjectInquiryForm: React.FC = () => {
                   <Step3BookingSlot
                     selectedDate={selectedDate}
                     selectedTime={selectedTime}
-                    onSelectDate={(date) => setValue('bookedDate', date, { shouldValidate: true })}
+                    selectedTimezone={selectedTimezone}
+                    onSelectDate={(date) => {
+                      setValue('bookedDate', date, { shouldValidate: true });
+                      setValue('bookedTime', '', { shouldValidate: false });
+                    }}
                     onSelectTime={(time) => setValue('bookedTime', time, { shouldValidate: true })}
+                    onSelectTimezone={(tz) => setSelectedTimezone(tz)}
                     errors={errors}
                   />
                 )}
