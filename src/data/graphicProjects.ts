@@ -10,7 +10,7 @@ export interface GraphicProject {
 }
 
 // Dynamically discover all existing graphics images in /public/graphics/
-const graphicsModules = import.meta.glob<string>('/public/graphics/**/*.{png,jpg,jpeg,webp,PNG,JPG,JPEG}', {
+const graphicsModules = import.meta.glob<string>('/graphics/**/*.{png,jpg,jpeg,webp,PNG,JPG,JPEG}', {
   eager: true,
   query: '?url',
   import: 'default',
@@ -27,8 +27,8 @@ function buildGraphicProjects(): GraphicProject[] {
   const projectsMap: Record<string, GraphicProjectImage[]> = {};
 
   Object.keys(graphicsModules).forEach((filePath) => {
-    // filePath is like "/public/graphics/access pubmats/1.png"
-    const relativePath = filePath.replace('/public', ''); // "/graphics/access pubmats/1.png"
+    // filePath is like "/graphics/access pubmats/1.png" or "/public/graphics/access pubmats/1.png"
+    const relativePath = filePath.startsWith('/public') ? filePath.replace('/public', '') : filePath;
     const parts = relativePath.split('/');
     if (parts.length < 4) return; // Expecting ["", "graphics", "folderName", "fileName"]
 

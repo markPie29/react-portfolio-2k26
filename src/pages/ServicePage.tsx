@@ -5,6 +5,8 @@ import FadeContent from '../../components/FadeContent';
 import CtaSection from '../components/home/CtaSection';
 import Footer from '../components/layout/Footer';
 import GraphicsBento from '../components/services/GraphicsBento';
+import GitHubActivitySection from '../components/services/GitHubActivitySection';
+import BrandLogosSection from '../components/services/BrandLogosSection';
 import ProjectCard from '../components/ProjectCard';
 import ProjectModal from '../components/home/ProjectModal';
 import { fetchProjects } from '../services/projectService';
@@ -216,8 +218,10 @@ const ServicePage: React.FC = () => {
           onClose={() => setSelectedProject(null)}
         />
 
-        {/* Graphics Bento Gallery (only for graphic design service) */}
+        {/* Unique Service Showcase Sections */}
         {service.slug === 'graphic-design' && <GraphicsBento />}
+        {service.slug === 'software-development' && <GitHubActivitySection />}
+        {service.slug === 'social-media-management' && <BrandLogosSection />}
 
         {/* CTA section */}
         <CtaSection />
