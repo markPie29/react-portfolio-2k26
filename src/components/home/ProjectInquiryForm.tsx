@@ -218,7 +218,7 @@ export const ProjectInquiryForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white/80 dark:bg-[#080a0f]/40 backdrop-blur-xl border border-gray-200 dark:border-[#48cae4]/20 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300">
+    <div className="w-full max-w-4xl mx-auto bg-white/80 dark:bg-[#080a0f]/40 backdrop-blur-xl border border-gray-200 dark:border-[#48cae4]/20 rounded-2xl sm:rounded-3xl p-4 sm:p-10 shadow-2xl transition-all duration-300">
       {!isSuccess ? (
         <>
           {/* Top Progress Bar & Steps */}
@@ -303,14 +303,14 @@ export const ProjectInquiryForm: React.FC = () => {
             </AnimatePresence>
 
             {/* Form Action Controls */}
-            <div className="mt-10 pt-6 border-t border-gray-200 dark:border-white/10 flex items-center justify-between">
+            <div className="mt-8 sm:mt-10 pt-4 sm:pt-6 border-t border-gray-200 dark:border-white/10 flex items-center justify-between gap-3">
               {step > 1 ? (
                 <button
                   type="button"
                   onClick={handlePrevStep}
-                  className="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-white/10 text-xs font-neutralfacebold uppercase tracking-wider text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-4 sm:px-5 py-3 rounded-xl border border-gray-300 dark:border-white/10 text-xs font-neutralfacebold uppercase tracking-wider text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer min-h-[44px] shrink-0"
                 >
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-4 h-4 shrink-0" />
                   <span>Back</span>
                 </button>
               ) : (
@@ -321,26 +321,26 @@ export const ProjectInquiryForm: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleNextStep}
-                  className="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-neutralfacebold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-sky-500/25 cursor-pointer"
+                  className="px-5 sm:px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-neutralfacebold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 cursor-pointer min-h-[44px]"
                 >
                   <span>Continue</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 shrink-0" />
                 </button>
               ) : (
                 <button
                   type="submit"
                   disabled={isSubmitting || !selectedTime}
-                  className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 text-white text-xs font-neutralfacebold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-sky-500/30 cursor-pointer disabled:opacity-50"
+                  className="px-4 sm:px-8 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 text-white text-[11px] sm:text-xs font-neutralfacebold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-500/30 cursor-pointer disabled:opacity-50 min-h-[44px]"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Completing Booking...</span>
+                      <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                      <span className="whitespace-nowrap">Completing...</span>
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4" />
-                      <span>Confirm & Book Call</span>
+                      <Send className="w-4 h-4 shrink-0" />
+                      <span className="whitespace-nowrap">Confirm & Book Call</span>
                     </>
                   )}
                 </button>

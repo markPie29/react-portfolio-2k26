@@ -180,7 +180,7 @@ export const GitHubActivitySection: React.FC = () => {
                   <Activity size={10} className="mr-1 animate-pulse" /> Live Activity
                 </span>
               </div>
-              <h2 className="font-neutralfacebold text-xl sm:text-2xl text-white tracking-wide mt-0.5">
+              <h2 className="font-neutralfacebold text-base sm:text-xl lg:text-2xl text-white tracking-wide mt-0.5">
                 {totalContributions.toLocaleString()} Contributions in the Last Year
               </h2>
             </div>
@@ -190,7 +190,7 @@ export const GitHubActivitySection: React.FC = () => {
             href="https://github.com/markPie29"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700/80 hover:border-[#48cae4]/60 transition-all shadow-md hover:shadow-[0_0_20px_rgba(72,202,228,0.25)] shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700/80 hover:border-[#48cae4]/60 transition-all shadow-md hover:shadow-[0_0_20px_rgba(72,202,228,0.25)] shrink-0"
           >
             <span>@markPie29</span>
             <ExternalLink size={14} className="text-[#48cae4]" />
@@ -198,40 +198,40 @@ export const GitHubActivitySection: React.FC = () => {
         </div>
 
         {/* Quick Stats Highlights */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 relative z-10">
-          <div className="p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-sm">
-            <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Flame size={14} className="text-amber-400" /> Active Streak
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 mb-6 relative z-10">
+          <div className="p-2.5 sm:p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-sm">
+            <p className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1 sm:gap-1.5">
+              <Flame size={12} className="text-amber-400 shrink-0" /> Active Streak
             </p>
-            <p className="text-lg font-bold text-white font-mono mt-1">Consistent</p>
+            <p className="text-xs sm:text-base font-bold text-white font-mono mt-1">Consistent</p>
           </div>
-          <div className="p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-sm">
-            <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <GitCommit size={14} className="text-[#48cae4]" /> Total Commits
+          <div className="p-2.5 sm:p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-sm">
+            <p className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1 sm:gap-1.5">
+              <GitCommit size={12} className="text-[#48cae4] shrink-0" /> Total Commits
             </p>
-            <p className="text-lg font-bold text-white font-mono mt-1">{totalContributions}+</p>
+            <p className="text-xs sm:text-base font-bold text-white font-mono mt-1">{totalContributions}+</p>
           </div>
-          <div className="p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-sm">
-            <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <GitPullRequest size={14} className="text-purple-400" /> Repositories
+          <div className="p-2.5 sm:p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-sm">
+            <p className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1 sm:gap-1.5">
+              <GitPullRequest size={12} className="text-purple-400 shrink-0" /> Repositories
             </p>
-            <p className="text-lg font-bold text-white font-mono mt-1">Public & Private</p>
+            <p className="text-xs sm:text-base font-bold text-white font-mono mt-1">Public & Private</p>
           </div>
-          <div className="p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-sm">
-            <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Activity size={14} className="text-emerald-400" /> Ecosystem
+          <div className="p-2.5 sm:p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-sm">
+            <p className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1 sm:gap-1.5">
+              <Activity size={12} className="text-emerald-400 shrink-0" /> Ecosystem
             </p>
-            <p className="text-lg font-bold text-white font-mono mt-1">React, Node, Web3</p>
+            <p className="text-xs sm:text-base font-bold text-white font-mono mt-1">React, Node, Web3</p>
           </div>
         </div>
 
         {/* Heatmap Grid Wrapper */}
-        <div className="relative z-10 bg-slate-950/90 rounded-2xl p-4 sm:p-6 border border-slate-800/90 shadow-inner">
-          {/* Scroll container for responsiveness */}
-          <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-sky-500/20 scrollbar-track-transparent">
-            <div className="min-w-[720px] flex flex-col gap-2">
+        <div className="relative z-10 bg-slate-950/90 rounded-2xl p-3 sm:p-6 border border-slate-800/90 shadow-inner">
+          {/* Container scaling for small screens */}
+          <div className="overflow-x-auto pb-1 sm:pb-2 scrollbar-none">
+            <div className="w-full min-w-0 sm:min-w-[720px] flex flex-col gap-1.5 sm:gap-2">
               {/* Month Headers */}
-              <div className="flex pl-8 text-[11px] font-mono text-slate-400 select-none">
+              <div className="flex pl-5 sm:pl-8 text-[9px] sm:text-[11px] font-mono text-slate-400 select-none">
                 {MONTHS.map((month, idx) => (
                   <div key={idx} className="flex-1 text-left">
                     {month}
@@ -240,24 +240,24 @@ export const GitHubActivitySection: React.FC = () => {
               </div>
 
               {/* Day Labels + Grid */}
-              <div className="flex gap-2 items-start">
+              <div className="flex gap-1 sm:gap-2 items-start">
                 {/* Weekday Labels (Y-Axis) */}
-                <div className="flex flex-col justify-between text-[10px] font-mono text-slate-500 h-[106px] pr-2 select-none">
+                <div className="flex flex-col justify-between text-[8px] sm:text-[10px] font-mono text-slate-500 h-[50px] sm:h-[106px] pr-1 sm:pr-2 select-none shrink-0">
                   <span>Mon</span>
                   <span>Wed</span>
                   <span>Fri</span>
                 </div>
 
                 {/* 52-Week Grid Columns */}
-                <div className="flex-1 flex gap-1.5 justify-between">
+                <div className="flex-1 flex gap-[2px] sm:gap-1.5 justify-between">
                   {weeksData.map((week, wIdx) => (
-                    <div key={wIdx} className="flex flex-col gap-1.5">
+                    <div key={wIdx} className="flex flex-col gap-[2px] sm:gap-1.5">
                       {week.days.map((day, dIdx) => (
                         <div
                           key={dIdx}
                           onMouseEnter={() => day && setHoveredDay({ date: day.date, count: day.count })}
                           onMouseLeave={() => setHoveredDay(null)}
-                          className={`w-3 h-3 rounded-[3px] transition-all duration-200 cursor-pointer ${
+                          className={`w-[5px] h-[5px] sm:w-3 sm:h-3 rounded-[1px] sm:rounded-[3px] transition-all duration-200 cursor-pointer ${
                             day ? getLevelBgClass(day.level) : 'bg-transparent'
                           } hover:scale-125 hover:z-20`}
                           title={day ? `${day.count} contributions on ${day.date}` : ''}
@@ -271,28 +271,28 @@ export const GitHubActivitySection: React.FC = () => {
           </div>
 
           {/* Footer Legend & Hover Tooltip */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-800/60 text-xs font-mono text-slate-400">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3 mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-slate-800/60 text-[10px] sm:text-xs font-mono text-slate-400">
             {/* Dynamic Hover Tooltip Info */}
             <div className="h-5 flex items-center">
               {hoveredDay ? (
-                <span className="text-white font-medium flex items-center gap-1.5 bg-sky-500/10 px-2.5 py-1 rounded-md border border-sky-500/20 text-[11px]">
-                  <span className="w-2 h-2 rounded-full bg-[#48cae4] animate-ping" />
+                <span className="text-white font-medium flex items-center gap-1.5 bg-sky-500/10 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md border border-sky-500/20 text-[10px] sm:text-[11px]">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#48cae4] animate-ping" />
                   <strong className="text-[#48cae4]">{hoveredDay.count}</strong> contributions on {hoveredDay.date}
                 </span>
               ) : (
-                <span className="text-slate-500 text-[11px]">Hover over squares to inspect contributions</span>
+                <span className="text-slate-500 text-[10px] sm:text-[11px]">Hover over squares to inspect contributions</span>
               )}
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-2 text-[11px] text-slate-400 select-none">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-400 select-none">
               <span>Less</span>
-              <div className="flex gap-1.5 items-center">
-                <div className="w-3 h-3 rounded-[3px] bg-slate-900/60 border border-slate-800" />
-                <div className="w-3 h-3 rounded-[3px] bg-[#0077b6]/40 border border-[#0077b6]/60" />
-                <div className="w-3 h-3 rounded-[3px] bg-[#0096c7]/70 border border-[#0096c7]" />
-                <div className="w-3 h-3 rounded-[3px] bg-[#48cae4] border border-[#90e0ef]" />
-                <div className="w-3 h-3 rounded-[3px] bg-[#90e0ef] border border-white" />
+              <div className="flex gap-1 sm:gap-1.5 items-center">
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-[1px] sm:rounded-[3px] bg-slate-900/60 border border-slate-800" />
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-[1px] sm:rounded-[3px] bg-[#0077b6]/40 border border-[#0077b6]/60" />
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-[1px] sm:rounded-[3px] bg-[#0096c7]/70 border border-[#0096c7]" />
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-[1px] sm:rounded-[3px] bg-[#48cae4] border border-[#90e0ef]" />
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-[1px] sm:rounded-[3px] bg-[#90e0ef] border border-white" />
               </div>
               <span>More</span>
             </div>

@@ -5,7 +5,7 @@ import { Quote, Star } from 'lucide-react';
 
 const TestimonialsSection: React.FC = () => {
   return (
-    <section id="testimonials" className="py-8 md:py-12 px-6 md:px-12 lg:px-24">
+    <section id="testimonials" className="py-8 md:py-12 px-6 md:px-12 lg:px-24 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

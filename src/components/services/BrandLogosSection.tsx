@@ -27,7 +27,7 @@ const BRAND_ITEMS: BrandItem[] = [
 export const BrandLogosSection: React.FC = () => {
   return (
     <div className="w-full max-w-6xl mx-auto my-12">
-      <div className="relative rounded-3xl p-6 sm:p-10 bg-slate-950/80 dark:bg-[#07090e]/90 border border-sky-500/20 dark:border-[#48cae4]/30 shadow-[0_0_40px_rgba(72,202,228,0.08)] backdrop-blur-md group">
+      <div className="relative rounded-3xl p-4 sm:p-10 bg-slate-950/80 dark:bg-[#07090e]/90 border border-sky-500/20 dark:border-[#48cae4]/30 shadow-[0_0_40px_rgba(72,202,228,0.08)] backdrop-blur-md group">
         {/* Glow ambient background accents (clipped inside sub-container) */}
         <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none z-0">
           <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#0077b6]/20 rounded-full blur-3xl" />
@@ -35,33 +35,33 @@ export const BrandLogosSection: React.FC = () => {
         </div>
 
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 relative z-10 border-b border-slate-800/80 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-10 relative z-10 border-b border-slate-800/80 pb-4 sm:pb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-[#48cae4] shadow-[0_0_15px_rgba(72,202,228,0.2)]">
-              <Building2 size={24} />
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-[#48cae4] shadow-[0_0_15px_rgba(72,202,228,0.2)]">
+              <Building2 size={20} className="sm:w-6 sm:h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold tracking-widest text-[#48cae4] uppercase">
+                <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-[#48cae4] uppercase">
                   TRUSTED PARTNERS
                 </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/30">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/30">
                   <Sparkles size={10} className="mr-1" /> Client Roster
                 </span>
               </div>
-              <h2 className="font-neutralfacebold text-xl sm:text-2xl text-white tracking-wide mt-0.5 uppercase">
+              <h2 className="font-neutralfacebold text-sm sm:text-xl lg:text-2xl text-white tracking-wide mt-0.5 uppercase">
                 Brands and Communities I Worked With
               </h2>
             </div>
           </div>
 
-          <div className="text-xs font-mono text-slate-400 bg-slate-900/60 px-4 py-2 rounded-xl border border-slate-800 shrink-0">
+          <div className="text-[10px] sm:text-xs font-mono text-slate-400 bg-slate-900/60 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-slate-800 shrink-0 self-start sm:self-auto">
             <span>12 Featured Collaborations</span>
           </div>
         </div>
 
         {/* 6x2 Seamless Clean Grid of Brand Logos */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-8 items-center relative z-10 py-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-8 items-center relative z-10 py-4 sm:py-6">
           {BRAND_ITEMS.map((brand, index) => {
             // Smart tooltip alignment based on column position (6-column desktop grid)
             const isLeftmostCol = index % 6 === 0;
@@ -76,7 +76,7 @@ export const BrandLogosSection: React.FC = () => {
             return (
               <div
                 key={brand.id}
-                className="group/logo relative flex items-center justify-center p-2 h-36 sm:h-40 lg:h-44 transition-all duration-300 hover:scale-110 cursor-pointer"
+                className="group/logo relative flex items-center justify-center p-2 h-28 sm:h-40 lg:h-44 transition-all duration-300 hover:scale-110 cursor-pointer"
               >
                 {/* Logo Image Container */}
                 <div

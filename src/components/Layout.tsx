@@ -61,7 +61,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <Navbar />
 
           {/* Page Content */}
-          <div className="relative z-10 w-full">
+          <div className="relative z-10 w-full max-w-full overflow-x-hidden">
             {children}
           </div>
         </motion.div>

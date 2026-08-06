@@ -291,6 +291,10 @@ html.dark, html {
   font-family: var(--font-helvetica-neue-medium), sans-serif;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text-primary);
