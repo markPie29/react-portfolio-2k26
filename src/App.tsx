@@ -1,6 +1,7 @@
 import SplitText from '../components/SplitText'
 import TextType from '../components/TextType'
 import BlurText from "../components/BlurText";
+import { ResumeDownloadButton } from './components/ui/ResumeDownloadButton';
 
 import { useState, useEffect } from 'react'
 import './index.css'
@@ -104,7 +105,7 @@ function App() {
 
 
 
-          <a className="gradient-bg text-white hover:brightness-110 rounded-full text-sm px-6 py-2.5 mt-2 font-bold uppercase tracking-wider shadow-lg shadow-sky-500/25 transition-all" href="Mark_Angelo_Isulat_Final_Resume.pdf" download>Download CV</a>
+          <ResumeDownloadButton className="gradient-bg text-white hover:brightness-110 rounded-full text-sm px-6 py-2.5 mt-2 font-bold uppercase tracking-wider shadow-lg shadow-sky-500/25 transition-all inline-flex items-center gap-2" />
         </div>
 
         <div

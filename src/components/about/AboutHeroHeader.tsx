@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import GradientText from '../../../components/GradientText';
 import LogoLoop, { LogoItem } from '../LogoLoop';
 import TiltedCard from '../../../components/TiltedCard';
+import { ResumeDownloadButton } from '../ui/ResumeDownloadButton';
 import {
   SiReact,
   SiNextdotjs,
@@ -97,26 +98,7 @@ const AboutHeroHeader: React.FC = () => {
             className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 pt-2"
           >
             {/* DOWNLOAD CV Button */}
-            <a
-              href="/Mark_Angelo_Isulat_Final_Resume.pdf"
-              download
-              className="gradient-bg text-white hover:brightness-110 px-8 py-3.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-sky-500/25 inline-flex items-center gap-3"
-            >
-              <span>DOWNLOAD CV</span>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2.5"
-                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                />
-              </svg>
-            </a>
+            <ResumeDownloadButton className="gradient-bg text-white hover:brightness-110 px-8 py-3.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-sky-500/25 inline-flex items-center gap-3" />
 
             {/* WORKS Button */}
             <a
