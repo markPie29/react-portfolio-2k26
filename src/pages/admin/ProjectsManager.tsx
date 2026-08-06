@@ -10,6 +10,7 @@ import {
   uploadProjectMedia
 } from '../../services/projectService';
 import { ProjectItem } from '../../types/content';
+import { getProjectCategories, projectMatchesCategory, PROJECT_CATEGORIES } from '../../utils/categoryFilter';
 import { isSupabaseConfigured } from '../../lib/supabase';
 import { 
   FolderKanban, 
@@ -56,11 +57,7 @@ import SpotlightCard from '../../components/SpotlightCard';
 
 type GalleryItem = { id: string; type: 'url'; value: string } | { id: string; type: 'file'; value: File };
 
-const CATEGORIES = [
-  'Graphic Design',
-  'Software Development',
-  'Social Media Management',
-];
+const CATEGORIES = PROJECT_CATEGORIES;
 
 const getTechIcon = (name: string) => {
   const lower = name.toLowerCase();
@@ -150,10 +147,17 @@ const ProjectCardPreview: React.FC<{ project: ProjectItem; onClickDetail?: () =>
             <ProjectCardImagePreview project={project} />
           </div>
 
-          {/* Category Subtitle */}
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-sky-400 mb-1.5 block font-sans">
-            {project.category || 'General'}
-          </span>
+          {/* Category Badges */}
+          <div className="flex flex-wrap gap-1.5 mb-1.5">
+            {(getProjectCategories(project).length > 0 ? getProjectCategories(project) : ['General']).map((cat, idx) => (
+              <span
+                key={idx}
+                className="text-[9.5px] font-bold uppercase tracking-wider text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 rounded-full font-sans"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
 
           {/* Project Title */}
           <h3 className="font-neutralfacebold text-lg sm:text-xl text-white uppercase tracking-wide leading-snug mb-2 group-hover/card:text-sky-400 transition-colors">
@@ -234,9 +238,16 @@ const ProjectDetailPreview: React.FC<{ project: ProjectItem }> = ({ project }) =
       {/* Header */}
       <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between gap-4 bg-[#0c0f17]/95 flex-shrink-0 z-20">
         <div>
-          <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-sky-400 mb-0.5 block">
-            {project.category || 'Category Preview'}
-          </span>
+          <div className="flex flex-wrap gap-1.5 mb-1">
+            {(getProjectCategories(project).length > 0 ? getProjectCategories(project) : ['Category Preview']).map((cat, idx) => (
+              <span
+                key={idx}
+                className="text-[10px] font-bold uppercase tracking-wider text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 rounded-full font-sans"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
           <h2 className="font-neutralfacebold text-lg sm:text-xl uppercase tracking-wide leading-tight text-white">
             {project.title || 'Project Title'}
           </h2>
@@ -434,7 +445,7 @@ export const ProjectsManager: React.FC = () => {
 
   // Form Fields State
   const [title, setTitle] = useState<string>('');
-  const [category, setCategory] = useState<string>('Graphic Design');
+  const [categories, setCategories] = useState<string[]>(['Graphic Design']);
   const [description, setDescription] = useState<string>('');
   const [longDescription, setLongDescription] = useState<string>('');
   const [role, setRole] = useState<string>('');
@@ -511,7 +522,7 @@ export const ProjectsManager: React.FC = () => {
   const handleOpenCreateModal = () => {
     setEditingProject(null);
     setTitle('');
-    setCategory('Graphic Design');
+    setCategories(['Graphic Design']);
     setDescription('');
     setLongDescription('');
     setRole('');
@@ -536,7 +547,13 @@ export const ProjectsManager: React.FC = () => {
     setEditingProject(project);
     setTitle(project.title);
 
-    setCategory(project.category);
+    const loadedCats =
+      project.categories && project.categories.length > 0
+        ? project.categories
+        : project.category
+        ? [project.category]
+        : ['Graphic Design'];
+    setCategories(loadedCats);
 
     setDescription(project.description);
     setLongDescription(project.longDescription || '');
@@ -584,7 +601,8 @@ export const ProjectsManager: React.FC = () => {
     return {
       id: editingProject ? editingProject.id : 'preview-id',
       title: title.trim() || 'Project Title Preview',
-      category: category as any,
+      categories: categories.length > 0 ? categories : ['Graphic Design'],
+      category: categories[0] || 'Graphic Design',
       description: description.trim() || 'Short project description preview will appear here...',
       longDescription: longDescription.trim() || undefined,
       role: role.trim() || undefined,
@@ -600,7 +618,7 @@ export const ProjectsManager: React.FC = () => {
   }, [
     editingProject,
     title,
-    category,
+    categories,
     description,
     longDescription,
     role,
@@ -732,7 +750,8 @@ export const ProjectsManager: React.FC = () => {
 
       const formData: ProjectFormData = {
         title: title.trim(),
-        category: category,
+        categories: categories.length > 0 ? categories : ['Graphic Design'],
+        category: categories[0] || 'Graphic Design',
         description: description.trim(),
         longDescription: longDescription.trim() || undefined,
         role: role.trim() || undefined,
@@ -783,6 +802,7 @@ export const ProjectsManager: React.FC = () => {
     const formData: ProjectFormData = {
       title: project.title,
       category: project.category,
+      categories: project.categories,
       description: project.description,
       longDescription: project.longDescription,
       role: project.role,
@@ -794,6 +814,7 @@ export const ProjectsManager: React.FC = () => {
       liveUrl: project.liveUrl,
       githubUrl: project.githubUrl,
       href: project.href,
+      displayOrder: project.displayOrder ?? 0,
       isFeatured: updatedStatus,
     };
     const res = await updateProject(project.id, formData);
@@ -833,9 +854,7 @@ export const ProjectsManager: React.FC = () => {
   // Filtered projects list
   const filteredProjects = useMemo(() => {
     return projects.filter((p) => {
-      const matchCat =
-        selectedCategory === 'ALL' ||
-        (p.category || '').toLowerCase() === selectedCategory.toLowerCase();
+      const matchCat = projectMatchesCategory(p, selectedCategory);
 
       const q = searchQuery.trim().toLowerCase();
       if (!q) return matchCat;
@@ -875,21 +894,48 @@ export const ProjectsManager: React.FC = () => {
             />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 sm:col-span-2">
             <label className="text-[11px] font-bold text-gray-300 uppercase tracking-wider block">
-              Classification / Category <span className="text-red-400">*</span>
+              Classification / Categories <span className="text-red-400">* (Select 1 or more)</span>
             </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-4 py-2.5 bg-[#05070c] border border-white/10 rounded-xl text-xs text-white outline-none focus:border-sky-500 transition-colors cursor-pointer"
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-3 bg-[#05070c] border border-white/10 rounded-xl">
+              {CATEGORIES.map((cat) => {
+                const isChecked = categories.includes(cat);
+                return (
+                  <label
+                    key={cat}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer transition-all border text-xs font-semibold select-none ${
+                      isChecked
+                        ? 'bg-sky-500/15 border-sky-500/40 text-sky-400'
+                        : 'bg-white/5 border-transparent text-gray-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setCategories((prev) => [...prev, cat]);
+                        } else {
+                          if (categories.length > 1) {
+                            setCategories((prev) => prev.filter((c) => c !== cat));
+                          }
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <div
+                      className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${
+                        isChecked ? 'border-sky-400 bg-sky-400 text-black' : 'border-gray-500'
+                      }`}
+                    >
+                      {isChecked && <CheckCircle2 className="w-3 h-3 text-black stroke-[3]" />}
+                    </div>
+                    <span className="truncate">{cat}</span>
+                  </label>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -1398,8 +1444,15 @@ export const ProjectsManager: React.FC = () => {
                     <span className="text-[10px] font-bold uppercase tracking-wider">No Cover Image</span>
                   </div>
                 )}
-                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/10 text-sky-400 text-[10px] font-bold uppercase tracking-wider">
-                  {project.category}
+                <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[70%] z-10">
+                  {(getProjectCategories(project).length > 0 ? getProjectCategories(project) : ['General']).map((cat, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/10 text-sky-400 text-[10px] font-bold uppercase tracking-wider"
+                    >
+                      {cat}
+                    </span>
+                  ))}
                 </div>
                 {project.isFeatured && (
                   <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-300 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 backdrop-blur-md">

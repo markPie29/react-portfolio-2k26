@@ -7,14 +7,10 @@ import ProjectCard from './ProjectCard';
 import { fetchProjects } from '../services/projectService';
 import { projectsData } from '../data/projects';
 import { ProjectItem } from '../types/content';
+import { getProjectCategories, projectMatchesCategory, PROJECT_CATEGORIES } from '../utils/categoryFilter';
 import { Search, X, ArrowLeft, ChevronDown, Check } from 'lucide-react';
 
-const FILTER_CATEGORIES = [
-  'ALL',
-  'GRAPHIC DESIGN',
-  'SOFTWARE DEVELOPMENT',
-  'SOCIAL MEDIA MANAGEMENT',
-];
+const FILTER_CATEGORIES = ['ALL', ...PROJECT_CATEGORIES.map((c) => c.toUpperCase())];
 
 interface ProjectsSectionProps {
   hideViewMore?: boolean;
@@ -70,18 +66,17 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ isProjectsPage = true
   // Filter projects by category and search query
   const filteredProjects = useMemo(() => {
     return projectsList.filter((project) => {
+      const projectCats = getProjectCategories(project);
+
       // Category check
-      const matchCategory =
-        selectedCategory === 'ALL' ||
-        project.category.toLowerCase() === selectedCategory.toLowerCase() ||
-        (selectedCategory === 'GRAPHIC DESIGN' && project.category.toLowerCase().includes('graphic design'));
+      const matchCategory = projectMatchesCategory(project, selectedCategory);
 
       // Search query check
       const query = searchQuery.trim().toLowerCase();
       if (!query) return matchCategory;
 
       const matchTitle = project.title.toLowerCase().includes(query);
-      const matchCategoryText = project.category.toLowerCase().includes(query);
+      const matchCategoryText = projectCats.some((cat) => cat.toLowerCase().includes(query));
       const matchDesc = project.description.toLowerCase().includes(query);
       const matchTech = project.techStack.some((tech) => tech.toLowerCase().includes(query));
 

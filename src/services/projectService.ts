@@ -7,7 +7,8 @@ export const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
 export interface ProjectFormData {
   title: string;
-  category: string;
+  category?: string;
+  categories?: string[];
   description: string;
   longDescription?: string;
   role?: string;
@@ -27,10 +28,18 @@ export interface ProjectFormData {
  * Converts a database row to a ProjectItem format used by UI components
  */
 export const mapRowToProjectItem = (row: ProjectRow): ProjectItem => {
+  const catArray =
+    row.categories && row.categories.length > 0
+      ? row.categories
+      : row.category
+      ? [row.category]
+      : [];
+
   return {
     id: row.id,
     title: row.title,
-    category: row.category,
+    category: row.category || catArray[0] || 'Uncategorized',
+    categories: catArray,
     description: row.description,
     longDescription: row.long_description || undefined,
     role: row.role || undefined,
@@ -43,6 +52,7 @@ export const mapRowToProjectItem = (row: ProjectRow): ProjectItem => {
     githubUrl: row.github_url || undefined,
     href: row.href || '#',
     isFeatured: row.is_featured ?? false,
+    displayOrder: row.display_order ?? 0,
   };
 };
 
@@ -202,11 +212,19 @@ export const createProject = async (
     }
 
     const newId = crypto.randomUUID();
+    const finalCategories =
+      form.categories && form.categories.length > 0
+        ? form.categories
+        : form.category
+        ? [form.category]
+        : [];
+    const primaryCategory = finalCategories[0] || form.category || 'Uncategorized';
 
     const payload = {
       id: newId,
       title: form.title,
-      category: form.category,
+      category: primaryCategory,
+      categories: finalCategories,
       description: form.description,
       long_description: form.longDescription || null,
       role: form.role || null,
@@ -274,10 +292,19 @@ export const updateProject = async (
       addDeletedProjectId(id);
     }
 
+    const finalCategories =
+      form.categories && form.categories.length > 0
+        ? form.categories
+        : form.category
+        ? [form.category]
+        : [];
+    const primaryCategory = finalCategories[0] || form.category || 'Uncategorized';
+
     const updatedItem: ProjectItem = {
       id: targetId,
       title: form.title,
-      category: form.category,
+      category: primaryCategory,
+      categories: finalCategories,
       description: form.description,
       longDescription: form.longDescription || undefined,
       role: form.role || undefined,
@@ -290,6 +317,7 @@ export const updateProject = async (
       githubUrl: form.githubUrl || undefined,
       href: form.href || '#',
       isFeatured: form.isFeatured ?? false,
+      displayOrder: form.displayOrder ?? 0,
     };
 
     // Save override locally for instant preview / fallback persistence
@@ -299,7 +327,8 @@ export const updateProject = async (
       const payload = {
         id: targetId,
         title: form.title,
-        category: form.category,
+        category: primaryCategory,
+        categories: finalCategories,
         description: form.description,
         long_description: form.longDescription || null,
         role: form.role || null,

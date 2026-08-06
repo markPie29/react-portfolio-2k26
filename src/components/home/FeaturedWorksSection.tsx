@@ -4,6 +4,7 @@ import FadeContent from '../../../components/FadeContent';
 import { fetchProjects } from '../../services/projectService';
 import { projectsData } from '../../data/projects';
 import { ProjectItem } from '../../types/content';
+import { getProjectCategories } from '../../utils/categoryFilter';
 import ProjectModal from './ProjectModal';
 import { ExternalLink, ImageOff } from 'lucide-react';
 
@@ -87,9 +88,16 @@ const FeaturedWorksSection: React.FC = () => {
                 {/* Card Details */}
                 <div className="p-6 flex flex-col justify-between flex-1">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-1 block font-helvetica-neue-medium">
-                      {project.category}
-                    </span>
+                    <div className="flex flex-wrap gap-1.5 mb-1.5">
+                      {(getProjectCategories(project).length > 0 ? getProjectCategories(project) : ['UNCATEGORIZED']).map((cat, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[9.5px] font-bold uppercase tracking-wider text-accent bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-full font-sans"
+                        >
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
 
                     <h3 className="font-neutralfacebold text-lg sm:text-xl uppercase tracking-wide mb-2 text-gray-900 dark:text-white group-hover:text-accent transition-colors">
                       {project.title}

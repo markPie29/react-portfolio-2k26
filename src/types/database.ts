@@ -48,7 +48,8 @@ export interface BookingRow {
 export interface ProjectRow {
   id: string;
   title: string;
-  category: string;
+  category?: string | null;
+  categories?: string[] | null;
   description: string;
   long_description: string | null;
   role: string | null;

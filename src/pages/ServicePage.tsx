@@ -9,6 +9,7 @@ import ProjectCard from '../components/ProjectCard';
 import ProjectModal from '../components/home/ProjectModal';
 import { fetchProjects } from '../services/projectService';
 import { ProjectItem } from '../types/content';
+import { serviceSlugToCategory, projectMatchesCategory } from '../utils/categoryFilter';
 import { ArrowLeft, CheckCircle2, Send, ArrowRight } from 'lucide-react';
 
 const ServicePage: React.FC = () => {
@@ -34,15 +35,8 @@ const ServicePage: React.FC = () => {
 
   const serviceProjects = useMemo(() => {
     if (!service) return [];
-    const serviceSlug = service.slug.toLowerCase();
-
-    const matches = projectsList.filter((p) => {
-      const cat = p.category.toLowerCase();
-      if (serviceSlug.includes('graphic') && cat.includes('graphic')) return true;
-      if (serviceSlug.includes('software') && cat.includes('software')) return true;
-      if ((serviceSlug.includes('social') || serviceSlug.includes('media')) && (cat.includes('social') || cat.includes('media'))) return true;
-      return false;
-    });
+    const filterCategory = serviceSlugToCategory(service.slug);
+    const matches = projectsList.filter((p) => projectMatchesCategory(p, filterCategory));
 
     const featured = matches.filter((p) => p.isFeatured);
     const nonFeatured = matches.filter((p) => !p.isFeatured);

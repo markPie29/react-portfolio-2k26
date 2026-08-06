@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ProjectItem } from '../../types/content';
+import { getProjectCategories } from '../../utils/categoryFilter';
 import { 
   X, 
   ChevronLeft, 
@@ -224,9 +225,16 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
               </div>
 
               <div>
-                <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-accent mb-0.5 block">
-                  {project.category}
-                </span>
+                <div className="flex flex-wrap gap-1.5 mb-1">
+                  {(getProjectCategories(project).length > 0 ? getProjectCategories(project) : ['UNCATEGORIZED']).map((cat, idx) => (
+                    <span
+                      key={idx}
+                      className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-accent bg-accent/10 border border-accent/20 px-2.5 py-0.5 rounded-full font-sans"
+                    >
+                      {cat}
+                    </span>
+                  ))}
+                </div>
                 <h2 id="modal-project-title" className="font-neutralfacebold text-lg sm:text-xl md:text-2xl uppercase tracking-wide leading-tight">
                   {project.title}
                 </h2>

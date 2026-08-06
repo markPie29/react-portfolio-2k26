@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import SpotlightCard from './SpotlightCard';
 import { ProjectItem } from '../types/content';
+import { getProjectCategories } from '../utils/categoryFilter';
 import { ImageOff, ExternalLink, Film, Video } from 'lucide-react';
 import {
   SiReact,
@@ -97,10 +98,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) =>
             <ProjectCardImage project={project} />
           </div>
 
-          {/* Category Subtitle */}
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-accent mb-1.5 block font-sans">
-            {project.category}
-          </span>
+          {/* Category Subtitles / Badges */}
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {(getProjectCategories(project).length > 0 ? getProjectCategories(project) : ['UNCATEGORIZED']).map((cat, idx) => (
+              <span
+                key={idx}
+                className="text-[9.5px] sm:text-[10.5px] font-bold uppercase tracking-wider text-accent bg-accent/10 border border-accent/20 px-2.5 py-0.5 rounded-full font-sans"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
 
           {/* Project Title */}
           <h3 className="font-neutralfacebold text-lg sm:text-xl text-white uppercase tracking-wide leading-snug mb-2 group-hover/card:text-accent transition-colors">

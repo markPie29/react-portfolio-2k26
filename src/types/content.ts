@@ -41,10 +41,13 @@ export interface ServiceItem {
   href?: string;
 }
 
+export type ProjectCategory = 'Graphic Design' | 'Software Development' | 'Social Media Management';
+
 export interface ProjectItem {
   id: string;
   title: string;
-  category: "Graphic Design" | "Software Development" | "Social Media Management";
+  category: string;
+  categories: string[];
   description: string;
   longDescription?: string;
   techStack: string[];
@@ -57,4 +60,5 @@ export interface ProjectItem {
   role?: string;
   href?: string;
   isFeatured?: boolean;
+  displayOrder?: number;
 }
