@@ -10,7 +10,7 @@
 - **Brand / Studio**: Marked Media
 - **Education**: Bachelor of Science in Computer Engineering (2023 – Present)
 - **Institution**: University of Rizal System – Antipolo Campus (URSAC)
-- **Honors & Awards**: DOST-SEI S&T Undergraduate Merit Scholar (Department of Science and Technology)
+- **Honors & Awards**: DOST-SEI S&T Undergraduate R.A. 7687 Scholar (Department of Science and Technology)
 - **Core Disciplines**: Full-Stack Web Development, UI/UX Design, Graphic Design & Rebranding, Multimedia & Social Media Management
 
 ---
@@ -84,7 +84,7 @@
 ## 📜 Education & Certifications
 
 - **BS in Computer Engineering** | University of Rizal System - Antipolo Campus (2023 – Present)
-- **DOST-SEI Undergraduate Merit Scholarship** | Department of Science and Technology (2023 – Present)
+- **DOST-SEI Undergraduate R.A. 7687 Scholarship** | Department of Science and Technology (2023 – Present)
 - **Full Stack Web Development Certification** | Tech Academy (2025)
 - **UI/UX & Visual Design Fundamentals** | Creative Design Institute (2024)
 - **Graphic Design & Digital Publishing Certification** | AP Global IT Solutions Training (2023)
@@ -202,6 +202,6 @@ Below is the complete registry of all projects stored in Supabase:
 ## 🎯 Summary Stats for Resume & CV Highlights
 
 - **Years of Experience**: 4+ Years in Multimedia Design & Web Development
-- **DOST Scholar**: Undergraduate S&T Scholar (Merit)
+- **DOST Scholar**: Undergraduate S&T Scholar (R.A. 7687)
 - **Projects Completed**: 14+ Commercial & Full-Stack Projects (Web Apps, Logistics, AR, Branding & Rebranding)
 - **Top Tech Stack Combination**: React, Next.js, Supabase, Laravel, TypeScript, Tailwind CSS, Figma, Adobe Suite (Photoshop & Illustrator)

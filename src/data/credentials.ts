@@ -18,13 +18,13 @@ export const educationData: EducationItem = {
   institution: "University of Rizal System - Antipolo Campus",
   degree: "BS in Computer Engineering",
   period: "2023 – Present",
-  honors: "DOST-SEI S&T Undergraduate Scholar",
+  honors: "DOST-SEI S&T Undergraduate Scholar (R.A. 7687)",
 };
 
 export const certificatesData: CertificateItem[] = [
   {
     id: "cert-1",
-    title: "DOST-SEI Undergraduate Merit Scholarship",
+    title: "DOST-SEI Undergraduate R.A. 7687 Scholarship",
     issuer: "Department of Science and Technology (DOST-SEI)",
     date: "2023 – Present",
     badgeTag: "SCHOLARSHIP",
