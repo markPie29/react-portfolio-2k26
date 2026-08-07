@@ -201,7 +201,7 @@ Below is the complete registry of all projects stored in Supabase:
 
 ## 🎯 Summary Stats for Resume & CV Highlights
 
-- **Years of Experience**: 3+ Years in Multimedia Design & Web Development
+- **Years of Experience**: 4+ Years in Multimedia Design & Web Development
 - **DOST Scholar**: Undergraduate S&T Scholar (Merit)
 - **Projects Completed**: 14+ Commercial & Full-Stack Projects (Web Apps, Logistics, AR, Branding & Rebranding)
 - **Top Tech Stack Combination**: React, Next.js, Supabase, Laravel, TypeScript, Tailwind CSS, Figma, Adobe Suite (Photoshop & Illustrator)
