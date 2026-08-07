@@ -62,6 +62,9 @@ export const developerCategories: SkillCategory[] = [
       { name: 'git', label: 'GIT' },
       { name: 'github', label: 'GITHUB' },
       { name: 'docker', label: 'DOCKER' },
+      { name: 'antigravity', label: 'ANTIGRAVITY CLI' },
+      { name: 'gemini', label: 'GEMINI CLI' },
+      { name: 'opencode', label: 'OPENCODE CLI' },
     ],
   },
 ];

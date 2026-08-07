@@ -23,7 +23,7 @@
 - **Databases & BaaS / Cloud**: Supabase (PostgreSQL, RLS, Storage), Firebase, MySQL, SQL Server, Vercel, Netlify, Render
 - **Programming Languages**: TypeScript, JavaScript, PHP, Python, Java, C#, Visual Basic
 - **Game & AR Development**: Unity, Vuforia (AR / Extended Reality), Pygame (Python)
-- **Tools & DevOps**: Git, GitHub, Docker, Postman, npm, Vite
+- **Tools & DevOps**: Git, GitHub, Docker, Antigravity CLI, Gemini CLI, Opencode CLI, Postman, npm, Vite
 
 ### 🎨 Design, Multimedia & Creative Suite
 - **UI/UX & Prototyping**: Figma, Responsive Design System Architecture, Wireframing, Web & Mobile Interface Design

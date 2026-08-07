@@ -8,9 +8,9 @@ import TiltedCard from '../../components/TiltedCard'
 import FadeContent from '../../components/FadeContent'
 import '../index.css'
 import LogoLoop from './LogoLoop'
-import { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiLaravel, SiFirebase, SiSupabase, SiCanva, SiFigma, SiTypescript, SiJavascript, SiHtml5, SiCss, SiFramer, SiWebflow, SiSketch, SiMiro, SiMysql, SiUnity, SiPython, SiPhp, SiGit, SiGithub, SiDocker, SiShadcnui } from 'react-icons/si'
+import { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiLaravel, SiFirebase, SiSupabase, SiCanva, SiFigma, SiTypescript, SiJavascript, SiHtml5, SiCss, SiFramer, SiWebflow, SiSketch, SiMiro, SiMysql, SiUnity, SiPython, SiPhp, SiGit, SiGithub, SiDocker, SiShadcnui, SiGooglegemini } from 'react-icons/si'
 import { FaJava, FaDatabase, FaCode, FaVrCardboard } from 'react-icons/fa'
-import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from './CustomIcons'
+import { CustomPhotoshop, CustomIllustrator, CustomCapcut, CustomAntigravity, CustomOpencode } from './CustomIcons'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const techLogos = [
@@ -26,6 +26,9 @@ const techLogos = [
   { node: <SiCanva />, title: "Canva" },
   { node: <SiFigma />, title: "Figma" },
   { node: <CustomCapcut />, title: "Capcut" },
+  { node: <CustomAntigravity />, title: "Antigravity CLI" },
+  { node: <SiGooglegemini />, title: "Gemini CLI" },
+  { node: <CustomOpencode />, title: "Opencode CLI" },
 ];
 
 const developerCategories = [
@@ -74,7 +77,10 @@ const developerCategories = [
     skills: [
       { label: "GIT", icon: <SiGit /> },
       { label: "GITHUB", icon: <SiGithub /> },
-      { label: "DOCKER", icon: <SiDocker /> }
+      { label: "DOCKER", icon: <SiDocker /> },
+      { label: "ANTIGRAVITY CLI", icon: <CustomAntigravity /> },
+      { label: "GEMINI CLI", icon: <SiGooglegemini /> },
+      { label: "OPENCODE CLI", icon: <CustomOpencode /> }
     ]
   }
 ];

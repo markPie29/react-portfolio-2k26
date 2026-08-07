@@ -27,8 +27,9 @@ import {
   SiGithub,
   SiDocker,
   SiShadcnui,
+  SiGooglegemini,
 } from 'react-icons/si';
-import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from '../CustomIcons';
+import { CustomPhotoshop, CustomIllustrator, CustomCapcut, CustomAntigravity, CustomOpencode } from '../CustomIcons';
 
 const techLogos: LogoItem[] = [
   { node: <SiReact />, title: 'React' },
@@ -54,6 +55,9 @@ const techLogos: LogoItem[] = [
   { node: <SiGit />, title: 'Git' },
   { node: <SiGithub />, title: 'GitHub' },
   { node: <SiDocker />, title: 'Docker' },
+  { node: <CustomAntigravity />, title: 'Antigravity CLI' },
+  { node: <SiGooglegemini />, title: 'Gemini CLI' },
+  { node: <CustomOpencode />, title: 'Opencode CLI' },
   { node: <SiHtml5 />, title: 'HTML5' },
   { node: <SiCss />, title: 'CSS3' },
 ];

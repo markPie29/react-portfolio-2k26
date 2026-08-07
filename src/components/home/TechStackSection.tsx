@@ -26,6 +26,7 @@ import {
   SiFramer,
   SiMysql,
   SiUnity,
+  SiGooglegemini,
 } from 'react-icons/si';
 import { FaJava, FaDatabase, FaCode, FaVrCardboard } from 'react-icons/fa';
 import {
@@ -38,7 +39,7 @@ import {
   PlaySquare,
   Film,
 } from 'lucide-react';
-import { CustomPhotoshop, CustomIllustrator, CustomCapcut } from '../CustomIcons';
+import { CustomPhotoshop, CustomIllustrator, CustomCapcut, CustomAntigravity, CustomOpencode } from '../CustomIcons';
 
 const getIcon = (name: string) => {
   switch (name) {
@@ -94,6 +95,12 @@ const getIcon = (name: string) => {
       return <SiGithub />;
     case 'docker':
       return <SiDocker />;
+    case 'antigravity':
+      return <CustomAntigravity />;
+    case 'gemini':
+      return <SiGooglegemini />;
+    case 'opencode':
+      return <CustomOpencode />;
     case 'image':
       return <ImageIcon size={14} />;
     case 'pentool':
