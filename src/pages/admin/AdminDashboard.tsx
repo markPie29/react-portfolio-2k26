@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { InquiryRow, BookingRow } from '../../types/database';
-import { Inbox, Clock, CheckCircle2, ArrowRight, Sparkles, AlertCircle, FolderKanban, Video } from 'lucide-react';
+import { Inbox, Clock, CheckCircle2, ArrowRight, Sparkles, AlertCircle, Video } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const [inquiries, setInquiries] = useState<InquiryRow[]>([]);
@@ -96,10 +96,10 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         <Link
-          to="/admin/projects"
+          to="/admin/inquiries"
           className="px-5 py-2.5 rounded-xl gradient-bg hover:brightness-110 text-white font-neutralfacebold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-sky-500/25 self-start sm:self-auto cursor-pointer"
         >
-          <span>Manage Projects</span>
+          <span>View Inquiries</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -177,25 +177,10 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Quick Action Navigation Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link
-          to="/admin/projects"
-          className="p-6 bg-[#0c1017] border border-sky-500/30 hover:border-sky-400 rounded-2xl space-y-3 transition-all group shadow-lg"
-        >
-          <div className="p-3 bg-sky-500/10 text-sky-400 rounded-xl w-fit">
-            <FolderKanban className="w-5 h-5" />
-          </div>
-          <h3 className="font-neutralfacebold text-base text-white group-hover:text-sky-400 transition-colors">
-            Upload & Manage Projects →
-          </h3>
-          <p className="text-xs text-gray-400 leading-relaxed">
-            Add new portfolio projects, upload media assets, update tech stack, and set display order.
-          </p>
-        </Link>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link
           to="/admin/inquiries"
-          className="p-6 bg-[#0c1017] border border-white/10 hover:border-sky-500/40 rounded-2xl space-y-3 transition-all group"
+          className="p-6 bg-[#0c1017] border border-sky-500/30 hover:border-sky-400 rounded-2xl space-y-3 transition-all group shadow-lg"
         >
           <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl w-fit">
             <Inbox className="w-5 h-5" />

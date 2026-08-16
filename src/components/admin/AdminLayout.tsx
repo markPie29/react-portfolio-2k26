@@ -6,7 +6,6 @@ import {
   Inbox,
   Calendar as CalendarIcon,
   Clock,
-  FolderKanban,
   LogOut,
   ExternalLink,
   ShieldCheck,
@@ -23,7 +22,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const navItems = [
     { label: 'Overview', path: '/admin', icon: LayoutDashboard },
-    { label: 'Projects', path: '/admin/projects', icon: FolderKanban },
     { label: 'Inquiries', path: '/admin/inquiries', icon: Inbox },
     { label: 'Availability Rules', path: '/admin/availability', icon: Clock },
   ];
