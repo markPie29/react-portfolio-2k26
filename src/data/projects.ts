@@ -2,6 +2,42 @@ import { ProjectItem } from '../types/content';
 
 export const projectsData: ProjectItem[] = [
   {
+    "id": "d02eb7a1-89ce-427f-9cb4-77a82fb10d02",
+    "title": "Doze Beauty Lounge",
+    "category": "Software Development",
+    "categories": [
+      "Software Development",
+      "Graphic Design"
+    ],
+    "description": "A modern, aesthetic booking and brand showcase web application designed for a luxury nail care, lash extension, and café sanctuary in Antipolo City. (Concept & Demo Website)",
+    "longDescription": "Doze Beauty Lounge is a bespoke web application and digital brand experience designed for an all-in-one beauty sanctuary and cozy café located in Antipolo City. Built as an interactive concept demo showcasing clean aesthetics, service packages, café beverage menu, and seamless booking workflows with a soothing pastel visual design language.",
+    "role": "Frontend Developer & UI/UX Designer",
+    "techStack": [
+      "React",
+      "Tailwind CSS",
+      "Shadcn UI",
+      "Figma",
+      "TypeScript"
+    ],
+    "features": [
+      "Bespoke UI/UX design crafted in Figma with a soft pastel aesthetic",
+      "Interactive service packages and café menu showcases",
+      "Fully responsive modern web application built with React & Shadcn UI"
+    ],
+    "image": "/projects/fullpage_snapshot_doze-beauty-lounge_vercel_app_2026-08-16-09-06-53.png",
+    "images": [
+      "/projects/fullpage_snapshot_doze-beauty-lounge_vercel_app_2026-08-16-09-06-53.png",
+      "/projects/fullpage_snapshot_doze-beauty-lounge_vercel_app_2026-08-16-09-07-36.png",
+      "/projects/fullpage_snapshot_doze-beauty-lounge_vercel_app_2026-08-16-09-07-58.png",
+      "/projects/fullpage_snapshot_doze-beauty-lounge_vercel_app_2026-08-16-09-08-16.png",
+      "/projects/fullpage_snapshot_doze-beauty-lounge_vercel_app_2026-08-16-09-08-32.png"
+    ],
+    "liveUrl": "https://doze-beauty-lounge.vercel.app",
+    "href": "#",
+    "isFeatured": false,
+    "displayOrder": 0
+  },
+  {
     "id": "ab8688d9-b08d-438e-8ecf-173b706ebece",
     "title": "Email AD Designs",
     "category": "Graphic Design",
