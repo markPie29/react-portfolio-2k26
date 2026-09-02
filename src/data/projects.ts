@@ -2,6 +2,81 @@ import { ProjectItem } from '../types/content';
 
 export const projectsData: ProjectItem[] = [
   {
+    "id": "a7f23c91-9e8a-4db3-bc12-68b3f11d7e21",
+    "title": "The Glow Bar",
+    "category": "Software Development",
+    "categories": [
+      "Software Development",
+      "Graphic Design"
+    ],
+    "description": "A modern, aesthetic booking and brand showcase web application designed for a premium skin & body wellness studio. (Concept & Demo Website)",
+    "longDescription": "The Glow Bar is an elegant web application and digital brand experience tailored for a high-end skin and body wellness studio. Built with Next.js, Tailwind CSS, and shadcn/ui, the platform features a serene visual design language showcasing curated aesthetic treatments, wellness packages, and client inquiry flows optimized for all screen sizes.",
+    "role": "UI/UX Designer & Web Developer",
+    "techStack": [
+      "React",
+      "Next.js",
+      "Tailwind CSS",
+      "Shadcn UI",
+      "TypeScript"
+    ],
+    "features": [
+      "Bespoke wellness-focused UI/UX design with clean typography and soothing aesthetics",
+      "Interactive treatment catalog and service showcase breakdown",
+      "High-performance responsive web application built with Next.js & shadcn/ui",
+      "Smooth mobile-first navigation and inquiry touchpoints"
+    ],
+    "image": "/projects/fullpage_snapshot_the-glow-bar_vercel_app_2026-09-02-12-51-02.png",
+    "images": [
+      "/projects/fullpage_snapshot_the-glow-bar_vercel_app_2026-09-02-12-51-02.png",
+      "/projects/fullpage_snapshot_the-glow-bar_vercel_app_2026-09-02-12-51-29.png",
+      "/projects/fullpage_snapshot_the-glow-bar_vercel_app_2026-09-02-12-52-16.png",
+      "/projects/fullpage_snapshot_the-glow-bar_vercel_app_2026-09-02-12-52-37.png",
+      "/projects/fullpage_snapshot_the-glow-bar_vercel_app_2026-09-02-12-52-49.png",
+      "/projects/fullpage_snapshot_the-glow-bar_vercel_app_2026-09-02-12-53-01.png"
+    ],
+    "liveUrl": "https://the-glow-bar.vercel.app/",
+    "href": "#",
+    "isFeatured": false,
+    "displayOrder": 0
+  },
+  {
+    "id": "e4d91b37-2384-48f5-a7c1-904ef23b9842",
+    "title": "Top Notch Constructions",
+    "category": "Software Development",
+    "categories": [
+      "Software Development",
+      "Graphic Design"
+    ],
+    "description": "A robust, modern digital portfolio and project showcase web application crafted for a commercial & residential construction firm. (Concept & Demo Website)",
+    "longDescription": "Top Notch Constructions is a high-impact digital portfolio and service showcase built for a construction and architectural development company. Developed with Next.js, Tailwind CSS, and shadcn/ui, the platform highlights ongoing and completed structural projects, service offerings, client trust markers, and quotation request channels with a bold, professional layout.",
+    "role": "UI/UX Designer & Web Developer",
+    "techStack": [
+      "React",
+      "Next.js",
+      "Tailwind CSS",
+      "Shadcn UI",
+      "TypeScript"
+    ],
+    "features": [
+      "Industrial-modern visual hierarchy engineered for construction & engineering branding",
+      "Rich project gallery showcasing structural developments and architectural details",
+      "Clear service breakdown and strategic quotation call-to-action touchpoints",
+      "Fully responsive, performance-optimized layout powered by Next.js & Tailwind CSS"
+    ],
+    "image": "/projects/fullpage_snapshot_top-notch-construction-iota_vercel_app_2026-09-02-12-45-51.png",
+    "images": [
+      "/projects/fullpage_snapshot_top-notch-construction-iota_vercel_app_2026-09-02-12-45-51.png",
+      "/projects/fullpage_snapshot_top-notch-construction-iota_vercel_app_2026-09-02-12-46-48.png",
+      "/projects/fullpage_snapshot_top-notch-construction-iota_vercel_app_2026-09-02-12-47-01.png",
+      "/projects/fullpage_snapshot_top-notch-construction-iota_vercel_app_2026-09-02-12-47-24.png",
+      "/projects/fullpage_snapshot_top-notch-construction-iota_vercel_app_2026-09-02-12-47-37.png"
+    ],
+    "liveUrl": "https://top-notch-construction-iota.vercel.app/",
+    "href": "#",
+    "isFeatured": false,
+    "displayOrder": 0
+  },
+  {
     "id": "d02eb7a1-89ce-427f-9cb4-77a82fb10d02",
     "title": "Doze Beauty Lounge",
     "category": "Software Development",
