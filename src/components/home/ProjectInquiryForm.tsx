@@ -66,6 +66,31 @@ export const ProjectInquiryForm: React.FC = () => {
   useEffect(() => {
     if (!turnstileSiteKey) return;
 
+    const renderWidget = () => {
+      const container = document.getElementById('turnstile-container');
+      if (container && (window as any).turnstile) {
+        if (container.children.length === 0) {
+          try {
+            (window as any).turnstile.render('#turnstile-container', {
+              sitekey: turnstileSiteKey,
+              callback: (token: string) => {
+                setTurnstileToken(token);
+                setSubmitError(null);
+              },
+              'error-callback': () => {
+                setTurnstileToken(undefined);
+              },
+              'expired-callback': () => {
+                setTurnstileToken(undefined);
+              },
+            });
+          } catch (e) {
+            // Container already rendered or not available
+          }
+        }
+      }
+    };
+
     const existingScript = document.getElementById('cloudflare-turnstile-script');
     if (!existingScript) {
       const script = document.createElement('script');
@@ -76,22 +101,10 @@ export const ProjectInquiryForm: React.FC = () => {
       document.head.appendChild(script);
 
       (window as any).onloadTurnstileCallback = () => {
-        if ((window as any).turnstile) {
-          (window as any).turnstile.render('#turnstile-container', {
-            sitekey: turnstileSiteKey,
-            callback: (token: string) => setTurnstileToken(token),
-          });
-        }
+        renderWidget();
       };
-    } else if ((window as any).turnstile) {
-      try {
-        (window as any).turnstile.render('#turnstile-container', {
-          sitekey: turnstileSiteKey,
-          callback: (token: string) => setTurnstileToken(token),
-        });
-      } catch (e) {
-        // Already rendered
-      }
+    } else {
+      renderWidget();
     }
   }, [turnstileSiteKey, step]);
 
@@ -108,9 +121,14 @@ export const ProjectInquiryForm: React.FC = () => {
       }
     } else if (step === 2) {
       const isValid = await trigger(['projectType', 'description']);
-      if (isValid) {
-        setStep(3);
+      if (!isValid) return;
+
+      if (turnstileSiteKey && !turnstileToken) {
+        setSubmitError('Please complete the Cloudflare security verification before continuing.');
+        return;
       }
+      setSubmitError(null);
+      setStep(3);
     }
   };
 
@@ -138,6 +156,13 @@ export const ProjectInquiryForm: React.FC = () => {
 
     // 3. Prevent duplicate in-flight requests
     if (isSubmittingRef.current) return;
+
+    // 4. Verify turnstile token is present if Turnstile is enabled
+    if (turnstileSiteKey && !turnstileToken) {
+      setSubmitError('Security verification required. Please complete Cloudflare Turnstile.');
+      return;
+    }
+
     isSubmittingRef.current = true;
     setIsSubmitting(true);
     setSubmitError(null);
@@ -193,6 +218,7 @@ export const ProjectInquiryForm: React.FC = () => {
       await triggerNotification(
         {
           ...data,
+          turnstileToken,
           bookedDate: data.bookedDate,
           bookedTime: data.bookedTime,
         },
@@ -214,6 +240,7 @@ export const ProjectInquiryForm: React.FC = () => {
     setIsSuccess(false);
     setSubmitError(null);
     setInquiryId(undefined);
+    setTurnstileToken(undefined);
     mountTimeRef.current = Date.now();
   };
 
