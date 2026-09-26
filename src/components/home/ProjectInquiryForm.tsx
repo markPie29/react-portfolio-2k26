@@ -9,6 +9,7 @@ import {
 import { Step1PersonalInfo } from './inquiry/Step1PersonalInfo';
 import { Step2ProjectDetails } from './inquiry/Step2ProjectDetails';
 import { Step3BookingSlot } from './inquiry/Step3BookingSlot';
+import { TurnstileWidget } from './inquiry/TurnstileWidget';
 import { InquirySuccess } from './inquiry/InquirySuccess';
 import {
   submitProjectInquiry,
@@ -17,7 +18,7 @@ import {
 } from '../../services/inquiryService';
 import { createBooking } from '../../services/bookingService';
 import { getDetectedTimezone } from '../../utils/timezone';
-import { ArrowLeft, ArrowRight, Loader2, Send, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Send } from 'lucide-react';
 
 export const ProjectInquiryForm: React.FC = () => {
   const [step, setStep] = useState<number>(1);
@@ -61,52 +62,6 @@ export const ProjectInquiryForm: React.FC = () => {
   useEffect(() => {
     mountTimeRef.current = Date.now();
   }, []);
-
-  // Load Turnstile Widget script dynamically if site key configured
-  useEffect(() => {
-    if (!turnstileSiteKey) return;
-
-    const renderWidget = () => {
-      const container = document.getElementById('turnstile-container');
-      if (container && (window as any).turnstile) {
-        if (container.children.length === 0) {
-          try {
-            (window as any).turnstile.render('#turnstile-container', {
-              sitekey: turnstileSiteKey,
-              callback: (token: string) => {
-                setTurnstileToken(token);
-                setSubmitError(null);
-              },
-              'error-callback': () => {
-                setTurnstileToken(undefined);
-              },
-              'expired-callback': () => {
-                setTurnstileToken(undefined);
-              },
-            });
-          } catch (e) {
-            // Container already rendered or not available
-          }
-        }
-      }
-    };
-
-    const existingScript = document.getElementById('cloudflare-turnstile-script');
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.id = 'cloudflare-turnstile-script';
-      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback';
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-
-      (window as any).onloadTurnstileCallback = () => {
-        renderWidget();
-      };
-    } else {
-      renderWidget();
-    }
-  }, [turnstileSiteKey, step]);
 
   const clientFullName = watch('fullName');
   const clientEmailAddress = watch('email');
@@ -301,14 +256,21 @@ export const ProjectInquiryForm: React.FC = () => {
                       errors={errors}
                     />
 
-                    {/* Cloudflare Turnstile Container if configured */}
+                    {/* Cloudflare Turnstile Verification Widget */}
                     {turnstileSiteKey && (
-                      <div className="pt-2 flex flex-col items-center justify-center space-y-2">
-                        <div id="turnstile-container" className="my-2" />
-                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                          <ShieldCheck className="w-3 h-3 text-sky-500" /> Protected by Cloudflare Turnstile CAPTCHA
-                        </span>
-                      </div>
+                      <TurnstileWidget
+                        siteKey={turnstileSiteKey}
+                        onVerify={(token) => {
+                          setTurnstileToken(token);
+                          setSubmitError(null);
+                        }}
+                        onError={() => {
+                          setTurnstileToken(undefined);
+                        }}
+                        onExpire={() => {
+                          setTurnstileToken(undefined);
+                        }}
+                      />
                     )}
                   </div>
                 )}
