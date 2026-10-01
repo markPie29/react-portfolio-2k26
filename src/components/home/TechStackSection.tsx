@@ -27,6 +27,7 @@ import {
   SiMysql,
   SiUnity,
   SiGooglegemini,
+  SiCloudflare,
 } from 'react-icons/si';
 import { FaJava, FaDatabase, FaCode, FaVrCardboard } from 'react-icons/fa';
 import {
@@ -101,6 +102,8 @@ const getIcon = (name: string) => {
       return <SiGooglegemini />;
     case 'opencode':
       return <CustomOpencode />;
+    case 'cloudflare':
+      return <SiCloudflare />;
     case 'image':
       return <ImageIcon size={14} />;
     case 'pentool':

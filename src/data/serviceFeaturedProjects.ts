@@ -7,7 +7,7 @@ export const serviceFeaturedProjects: Record<string, string[]> = {
   "software-development": [
     "2f1c79bd-2efb-49ed-af2c-6f8947243af4",
     "8f6cf2a5-0187-4dd0-a014-e35e6357be5f",
-    "0f93c424-90f8-469c-9cdb-e8856d9fc1e9"
+    "d02eb7a1-89ce-427f-9cb4-77a82fb10d02"
   ],
   "social-media-management": [
     "3a5ee75f-9780-4175-89d3-126d51d86404",

@@ -65,6 +65,8 @@ export const developerCategories: SkillCategory[] = [
       { name: 'antigravity', label: 'ANTIGRAVITY CLI' },
       { name: 'gemini', label: 'GEMINI CLI' },
       { name: 'opencode', label: 'OPENCODE CLI' },
+      { name: 'cloudflare', label: 'CLOUDFLARE BOT DETECTION' },
+      { name: 'cloudflare', label: 'CLOUDFLARE SECURITY' },
     ],
   },
 ];

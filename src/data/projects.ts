@@ -84,20 +84,21 @@ export const projectsData: ProjectItem[] = [
       "Software Development",
       "Graphic Design"
     ],
-    "description": "A modern, aesthetic booking and brand showcase web application designed for a luxury nail care, lash extension, and café sanctuary in Antipolo City. (Concept & Demo Website)",
-    "longDescription": "Doze Beauty Lounge is a bespoke web application and digital brand experience designed for an all-in-one beauty sanctuary and cozy café located in Antipolo City. Built as an interactive concept demo showcasing clean aesthetics, service packages, café beverage menu, and seamless booking workflows with a soothing pastel visual design language.",
-    "role": "Frontend Developer & UI/UX Designer",
+    "description": "A modern, aesthetic, and fully functioning web application featuring an integrated CMS, appointment booking system, and admin dashboard for a luxury beauty sanctuary and café in Antipolo City.",
+    "longDescription": "Doze Beauty Lounge is a bespoke, fully functioning production web application and digital brand platform designed for an all-in-one beauty sanctuary and cozy café located in Antipolo City. Equipped with an integrated CMS for dynamic service and café menu management, a seamless client booking workflow, and a dedicated admin dashboard for business operations.",
+    "role": "Full Stack Developer & UI/UX Designer",
     "techStack": [
+      "Next.js",
       "React",
+      "TypeScript",
       "Tailwind CSS",
-      "Shadcn UI",
-      "Figma",
-      "TypeScript"
+      "Supabase"
     ],
     "features": [
-      "Bespoke UI/UX design crafted in Figma with a soft pastel aesthetic",
-      "Interactive service packages and café menu showcases",
-      "Fully responsive modern web application built with React & Shadcn UI"
+      "Fully functioning production website with real-time appointment booking",
+      "Integrated dynamic CMS for service packages and café beverage menu",
+      "Comprehensive Admin Dashboard for business operations and scheduling",
+      "Fully responsive modern web application built with Next.js, React & TypeScript"
     ],
     "image": "/projects/fullpage_snapshot_doze-beauty-lounge_vercel_app_2026-08-16-09-06-53.png",
     "images": [
@@ -107,9 +108,9 @@ export const projectsData: ProjectItem[] = [
       "/projects/fullpage_snapshot_doze-beauty-lounge_vercel_app_2026-08-16-09-08-16.png",
       "/projects/fullpage_snapshot_doze-beauty-lounge_vercel_app_2026-08-16-09-08-32.png"
     ],
-    "liveUrl": "https://doze-beauty-lounge.vercel.app",
+    "liveUrl": "https://www.dozebeautylounge.com",
     "href": "#",
-    "isFeatured": false,
+    "isFeatured": true,
     "displayOrder": 0
   },
   {
@@ -182,7 +183,7 @@ export const projectsData: ProjectItem[] = [
       "/projects/project-1786009780575-l0wopd-Screenshot_2026-08-06_173349.png",
       "/projects/project-1786009780881-onovnb-Screenshot_2026-08-06_173415.png"
     ],
-    "liveUrl": "https://www.kadokohi.com/book/coffee-cart",
+    "liveUrl": "#",
     "href": "#",
     "isFeatured": true,
     "displayOrder": 0

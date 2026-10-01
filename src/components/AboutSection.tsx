@@ -8,7 +8,7 @@ import TiltedCard from '../../components/TiltedCard'
 import FadeContent from '../../components/FadeContent'
 import '../index.css'
 import LogoLoop from './LogoLoop'
-import { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiLaravel, SiFirebase, SiSupabase, SiCanva, SiFigma, SiTypescript, SiJavascript, SiHtml5, SiCss, SiFramer, SiWebflow, SiSketch, SiMiro, SiMysql, SiUnity, SiPython, SiPhp, SiGit, SiGithub, SiDocker, SiShadcnui, SiGooglegemini } from 'react-icons/si'
+import { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiLaravel, SiFirebase, SiSupabase, SiCanva, SiFigma, SiTypescript, SiJavascript, SiHtml5, SiCss, SiFramer, SiWebflow, SiSketch, SiMiro, SiMysql, SiUnity, SiPython, SiPhp, SiGit, SiGithub, SiDocker, SiShadcnui, SiGooglegemini, SiCloudflare } from 'react-icons/si'
 import { FaJava, FaDatabase, FaCode, FaVrCardboard } from 'react-icons/fa'
 import { CustomPhotoshop, CustomIllustrator, CustomCapcut, CustomAntigravity, CustomOpencode } from './CustomIcons'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -80,7 +80,9 @@ const developerCategories = [
       { label: "DOCKER", icon: <SiDocker /> },
       { label: "ANTIGRAVITY CLI", icon: <CustomAntigravity /> },
       { label: "GEMINI CLI", icon: <SiGooglegemini /> },
-      { label: "OPENCODE CLI", icon: <CustomOpencode /> }
+      { label: "OPENCODE CLI", icon: <CustomOpencode /> },
+      { label: "CLOUDFLARE BOT DETECTION", icon: <SiCloudflare /> },
+      { label: "CLOUDFLARE SECURITY", icon: <SiCloudflare /> }
     ]
   }
 ];
